@@ -14,7 +14,7 @@ title: 'Larry James Henry'
 slogan: 'Sharing the Journey from Here to There'
 
 # The description is used on homepage and in the footer to quickly describe your website. Use a maximum of 150 characters for SEO-purposes.
-description: 'Just livign life.'
+description: 'Just living life.'
 
 # The credits show up in the includes/_footer.html – It would be nice of you to leave a link to Phlow or Feeling Responsive as a thank you :)
 credits: '<p>Created with &hearts; by <a href="http://phlow.de/">Phlow</a> with <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> based on <a href="http://phlow.github.io/feeling-responsive/">Feeling Responsive</a>.</p>'
@@ -120,7 +120,7 @@ defaults:
     values:
       show_meta: true   # Show metadata for all posts
       # sidebar:        # Possible values › left, right › by default there will be no sidebar
-      comments: false
+      comments: true
       author: larry     # Default author for posts
 
 
@@ -158,18 +158,19 @@ bing_webmastertools_id:    #'0FB4C028ABCF07C908C54386ABD2D97F'
 #   /_/    \__,_/ |___/_/\___/\____/_/ /_/____/   Favicon-Crap: Favicons, Chrome, Android & Apple Touch Buttons
 #                                                 More information » https://mathiasbynens.be/notes/touch-icons
 
-favicon-32x32:                          'favicon-32x32.png'
-touch-icon-192x192:                     'touch-icon-192x192.png'
-apple-touch-icon-180x180-precomposed:   'apple-touch-icon-180x180-precomposed.png'
-apple-touch-icon-152x152-precomposed:   'apple-touch-icon-152x152-precomposed.png'
-apple-touch-icon-144x144-precomposed:   'apple-touch-icon-144x144-precomposed.png'
-apple-touch-icon-120x120-precomposed:   'apple-touch-icon-120x120-precomposed.png'
-apple-touch-icon-114x114-precomposed:   'apple-touch-icon-114x114-precomposed.png'
-apple-touch-icon-76x76-precomposed:     'apple-touch-icon-76x76-precomposed.png'
-apple-touch-icon-72x72-precomposed:     'apple-touch-icon-72x72-precomposed.png'
-apple-touch-icon-precomposed:           'apple-touch-icon-precomposed.png'
-msapplication_tileimage:                'msapplication_tileimage.png'               # Size 144x144
-msapplication_tilecolor:                '#fabb00'
+favicon: 'favicon.ico'
+#favicon-32x32:                          'favicon-32x32.png'
+#touch-icon-192x192:                     'touch-icon-192x192.png'
+#apple-touch-icon-180x180-precomposed:   'apple-touch-icon-180x180-precomposed.png'
+#apple-touch-icon-152x152-precomposed:   'apple-touch-icon-152x152-precomposed.png'
+#apple-touch-icon-144x144-precomposed:   'apple-touch-icon-144x144-precomposed.png'
+#apple-touch-icon-120x120-precomposed:   'apple-touch-icon-120x120-precomposed.png'
+#apple-touch-icon-114x114-precomposed:   'apple-touch-icon-114x114-precomposed.png'
+#apple-touch-icon-76x76-precomposed:     'apple-touch-icon-76x76-precomposed.png'
+#apple-touch-icon-72x72-precomposed:     'apple-touch-icon-72x72-precomposed.png'
+#apple-touch-icon-precomposed:           'apple-touch-icon-precomposed.png'
+#msapplication_tileimage:                'msapplication_tileimage.png'               # Size 144x144
+#msapplication_tilecolor:                '#fabb00'
 
 
 #       ______                __                __

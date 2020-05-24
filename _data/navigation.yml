@@ -5,9 +5,6 @@
 - title: Blog
   url: "/blog/"
   side: left
-  dropdown:
-  - title: "Blog Archive"
-    url: "/blog/archive/"
 
 - title: "Search"
   url: "/search/"
