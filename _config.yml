@@ -1,7 +1,7 @@
 # Site
 name: "Larry James Henry"
 title: "Sharing the Journey"
-description: ""
+description: "Larry James Henry - Sharing the Journey"
 logo: 'assets/images/logo.png'
 favicon: 'assets/images/favicon.ico'
 baseurl: /
@@ -55,11 +55,9 @@ paginate: 6
 paginate_path: /page:num/
     
 # Other
-highlighter: rouge
+#highlighter: rouge
 markdown: kramdown
-kramdown:
-   syntax_highlighter_opts:
-      disable : false
+
 
 
 
