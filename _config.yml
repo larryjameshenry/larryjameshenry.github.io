@@ -18,7 +18,7 @@ authors:
     name: Larry
     display_name: Larry
     avatar: 'assets/images/avatar.jpg'
-    gravatar: e56154546cf4be74e393c62d1ae9f9d4
+    gravatar: 
     email: larry@laryjameshenry.com
     web: https:/larryjameshenry.com
     twitter: https://twitter.com/larryjameshenry
@@ -57,9 +57,9 @@ paginate_path: /page:num/
 # Other
 highlighter: rouge
 markdown: kramdown
-kramdown:
-   syntax_highlighter_opts:
-      disable : true
+#kramdown:
+#   syntax_highlighter_opts:
+#      disable : true
 
 
 
