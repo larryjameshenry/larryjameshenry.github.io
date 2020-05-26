@@ -57,9 +57,9 @@ paginate_path: /page:num/
 # Other
 highlighter: rouge
 markdown: kramdown
-#kramdown:
-#   syntax_highlighter_opts:
-#      disable : true
+kramdown:
+   syntax_highlighter_opts:
+      disable : false
 
 
 
@@ -72,7 +72,7 @@ adsense-data-ad-slot: ""
 lazyimages: "disabled"
 
 # Post Author Box ("enabled" or "disabled")
-authorbox: "disabled"
+authorbox: "enabled"
 
 # Sass
 sass:
