@@ -17,7 +17,7 @@ So we can first look at the coupling in the current system.  The customer knows 
 
 It does help customer service to know when and what the customer will be charged, as well as, how much we have collected from the customer.  This data need does not warrant keeping all the schedule and payment data with the customer data to perform the scheduling and payment processing.  It's often helpful to to write down what data is needed in each area.
 
-![entities with needed data](/assets/images/posts/using-azure-function-apps-as-microservice-apis-part-1/entities-with-needed-data.jpg "entities with needed data")
+![entities with needed data](/assets/images/posts/2019-11-30-using-azure-function-apps-as-microservice-apis-part-1/entities-with-needed-data.jpg "entities with needed data")
 
 Since I don't want to turn this article into a book and want to get to using Azure Functions, I am going to focus on payment.  It is easier to peel off the last part of a coupled process instead of the beginning or middle.  So we are going to leave the customer and schedule alone.  Looking at Payment we will need a service to sit in front of the data, as well as, communicate with the external payment gateway and publish events.
 
