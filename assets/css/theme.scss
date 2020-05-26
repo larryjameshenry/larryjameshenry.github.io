@@ -1,16 +1,19 @@
 ---
+
 ---
+
+$brown: #B59F62;
+$teal: #3868b8;
+$black: #111;
+$primary: $teal;
+$dark:    $black;
+$enable-rounded: false;
+
 @import "bootstrap/functions";
 @import 'bootstrap/variables';
 @import "bootstrap/mixins";
 @import 'bootstrap/bootstrap';
 @import 'stars';
-
-//$primary: #3868b8;
-//$dark:    #111;
-//$enable-rounded: false;
-
-
 
 
 // general
@@ -22,7 +25,7 @@ body {
     background: #f4f4f4;
 }
 a {
-    color: darken(#3868b8, 24%);
+    color: darken($primary, 24%);
 }
 img {
     max-width:100%;
@@ -58,7 +61,7 @@ blockquote {
     font-style: italic;
     font-size: 20px;
     position:relative;
-    border-left:1px solid #111;
+    border-left:1px solid $dark;
     margin-left:30px;
     padding-left:15px;
     cite {
@@ -256,7 +259,7 @@ img, img:hover {
         font-size:22px;
         line-height:1.4;
         a { 
-            background-image: linear-gradient(180deg, transparent 89%, #3868b8 0);
+            background-image: linear-gradient(180deg, transparent 89%, $primary 0);
             background-repeat: no-repeat;
             background-size: 0 100%;
             transition: background-size .6s ease;
@@ -338,7 +341,7 @@ img, img:hover {
         color:#000;
         cursor:pointer;
         &:hover {
-            background: #3868b8;
+            background: $primary;
             text-decoration:none;
         }
     }
@@ -379,7 +382,7 @@ img, img:hover {
             color: #222;
             padding: 4px 20px;
             margin-left:-5px;
-            background:#3868b8;
+            background:$primary;
             border-left: 1px solid;
             font-weight:700;
         }
@@ -421,7 +424,7 @@ img, img:hover {
         width:50px;
         border-radius:50%;
         margin-right:10px;
-        border:2px solid darken(#3868b8,20%);
+        border:2px solid darken($primary,20%);
         padding:2px;
     }
 }
@@ -434,7 +437,7 @@ img, img:hover {
     .author-thumb {
         width:70px;
         border-radius:50%;
-        border:2px solid darken(#3868b8,20%);
+        border:2px solid darken($primary,20%);
         padding:2px;
     }
 }
@@ -526,7 +529,7 @@ img, img:hover {
         li {
             margin:15px 0;
             a {
-                color: #111;
+                color:$dark;
             }
         }
     }
@@ -536,7 +539,7 @@ img, img:hover {
 .show-search {
     cursor:pointer;
     &:hover {
-        color: darken(#3868b8,20%);
+        color: darken($primary,20%);
     }
 }
 .bd-search {
@@ -567,7 +570,7 @@ img, img:hover {
         font-size:20px;
         margin-bottom:5px;
         &:hover {
-            color: darken(#3868b8,20%);
+            color: darken($primary,20%);
         }
     }
     span.body {
