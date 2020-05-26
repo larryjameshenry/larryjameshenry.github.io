@@ -2,7 +2,8 @@
 layout: post
 title: Hunting for the Data Hog in a Microsoft SQL Database
 date: 2019-11-19 08:00:00 +0400
-img: assets/images/posts/2019-11-19-hunting-for-the-data-hog-in-a-microsoft-sql-database/data-hog-image-main.jpg
+author: larry
+image: assets/images/posts/2019-11-19-hunting-for-the-data-hog-in-a-microsoft-sql-database/data-hog-image-main.jpg
 tags: [SQL, Database]
 ---
 

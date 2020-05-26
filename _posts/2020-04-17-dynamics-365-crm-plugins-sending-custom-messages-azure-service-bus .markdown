@@ -2,7 +2,8 @@
 layout: post
 title: Dynamics 365 CRM Plugins Sending Custom Messages Azure Service Bus
 date: 2020-04-17 08:00:00 +0500
-img: assets/images/posts/2020-04-17-dynamics-365-crm-plugins-sending-custom-messages-azure-service-bus/dynamics-crm-service-bus-main.jpg
+author: larry
+image: assets/images/posts/2020-04-17-dynamics-365-crm-plugins-sending-custom-messages-azure-service-bus/dynamics-crm-service-bus-main.jpg
 tags: [Dynamics365, Azure, ServiceBus]
 ---
 
