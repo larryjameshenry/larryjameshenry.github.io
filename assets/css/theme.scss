@@ -7,7 +7,7 @@ $teal: #3868b8;
 $black: #111;
 $primary: $teal;
 $dark:    $black;
-$enable-rounded: false;
+$enable-rounded: true;
 
 @import "bootstrap/functions";
 @import 'bootstrap/variables';
