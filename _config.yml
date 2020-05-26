@@ -17,11 +17,12 @@ authors:
   larry:
     name: Larry
     display_name: Larry
+    avatar: 'assets/images/avatar.jpg'
     gravatar: e56154546cf4be74e393c62d1ae9f9d4
     email: larry@laryjameshenry.com
     web: https:/larryjameshenry.com
     twitter: https://twitter.com/larryjameshenry
-    description: "Author of Mediumish, a Bootstrap Medium styled template available for WordPress, HTML, Ghost and Jekyll. You are currently previewing Jekyll template demo."
+    description: "Larry is a certified Azure Solutions Architect and skilled in Microsoft Azure, Dynamics 365 CRM, Azure DevOps, Cloud Integration, Visual Studio and Software Development."
   john:
     name: John
     display_name: John    
