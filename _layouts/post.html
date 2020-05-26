@@ -6,6 +6,8 @@ post_class: post-template
 ---
 
 <div class="entry-header">
+    <!-- Featured Image -->
+    {% include featured-image.html %}
     <!-- Post Title -->
     <h1 class="posttitle">{{ page.title }}</h1>
     <!-- Author & Date  Box -->
@@ -34,9 +36,6 @@ post_class: post-template
 {% if site.adsense == "enabled" %}
     {% include adsense-under-header.html %}
 {% endif %}
-
-<!-- Featured Image -->
-{% include featured-image.html %}
 
 <!-- Content -->
 {% include article.html %}
