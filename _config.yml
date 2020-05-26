@@ -3,7 +3,7 @@ name: "Larry James Henry"
 title: "Sharing the Journey"
 description: "I will take you on the fabulous world of exploration. Travel, culture, lifestyle. Eat, Pray, Love!"
 logo: 'assets/images/logo.png'
-favicon: 'assets/images/logo.png'
+favicon: 'assets/images/favicon.ico'
 baseurl: /
 google_analytics: 'UA-128290315-2'
 disqus: 'larryjameshenry'
@@ -18,7 +18,7 @@ authors:
     name: Larry
     display_name: Larry
     avatar: 'assets/images/avatar.jpg'
-    gravatar: 
+    #gravatar: 
     email: larry@laryjameshenry.com
     web: https:/larryjameshenry.com
     twitter: https://twitter.com/larryjameshenry
@@ -27,7 +27,7 @@ authors:
     name: John
     display_name: John    
     avatar: 'assets/images/avatar.png'
-    gravatar: 
+    #gravatar: b1cc14991db7a456fcd761680bbc8f81
     email: wowthemesnet@gmail.com
     web: https://www.wowthemes.net
     twitter: https://twitter.com/wowthemesnet
