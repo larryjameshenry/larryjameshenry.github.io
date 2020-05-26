@@ -4,6 +4,7 @@ title: Creating Dev Databases from Production with PowerShell
 date: 2019-10-29 08:00:00 +0500
 author: larry
 image: assets/images/posts/2019-10-29-creating-dev-databases-from-production-with-powerShell/dev-database-image-main.jpg
+imageshadow: true
 tags: [DevOps, PowerShell, Database]
 ---
 

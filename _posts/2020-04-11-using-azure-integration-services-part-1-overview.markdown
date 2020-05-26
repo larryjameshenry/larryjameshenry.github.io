@@ -4,6 +4,7 @@ title: Using Azure Integration Services Part 1 Overview
 date: 2020-04-11 08:00:00 +0500
 author: larry
 image: assets/images/posts/2020-04-11-using-azure-integration-services-part-1-overview/azure-integration-main.jpg
+imageshadow: true
 tags: [Azure, API, AzureFunctions, LogicApps]
 ---
 

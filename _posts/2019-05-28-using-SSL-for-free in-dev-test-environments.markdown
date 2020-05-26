@@ -4,6 +4,7 @@ title: Using SSL for Free in Dev Test Environments
 date: 2019-05-28 08:00:00 +0500
 author: larry
 image: assets/images/posts/2019-05-28-using-SSL-for-free-in-dev-test-environments/ssl-main-image.jpg
+imageshadow: true
 tags: [DevOps, SSL]
 ---
 
