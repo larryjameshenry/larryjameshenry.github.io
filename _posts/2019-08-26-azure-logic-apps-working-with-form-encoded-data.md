@@ -12,15 +12,15 @@ I have been designing Azure Logic apps for some time now and really enjoy the ov
 
 This first thing is you need a simple HTTP trigger to accept the form data post.  You can leave the schema empty since we'll be using an expression to get the the form values.  For demonstration purposes, I'll add a Compose action to the Logic App.  In the Compose action, we can create a JSON output and map in the form data.  Next we need to learn about the triggerFormDataValue() function to access the form post data.
 
-![Logic App HTTP Request Form Variables](/assets/images/posts/2019-08-26-azure-logic-apps-working-with-form-encoded-data/Logic App HTTP Request Form Variables.jpg "Logic App HTTP Request Form Variables")
+![Logic App HTTP Request Form Variables](/assets/img/posts/2019-08-26-azure-logic-apps-working-with-form-encoded-data/Logic App HTTP Request Form Variables.jpg "Logic App HTTP Request Form Variables")
 
 The triggerFormDataValue() expression needs to be used for each form value you want.  You will need to type in the form data name to return that specific value.  To test out this Logic App, I'm going to use Postman, a free application that will let us POST to the Logic Apps webhook URL.
 
-![Postman Triggering Logic App](/assets/images/posts/2019-08-26-azure-logic-apps-working-with-form-encoded-data/Postman Triggering Logic App.jpg "Postman Triggering Logic App")
+![Postman Triggering Logic App](/assets/img/posts/2019-08-26-azure-logic-apps-working-with-form-encoded-data/Postman Triggering Logic App.jpg "Postman Triggering Logic App")
 
 We can then go into the Logic App's run history to view the outcome.
 
-![Logic App Form Variables](/assets/images/posts/2019-08-26-azure-logic-apps-working-with-form-encoded-data/Logic App Form Variables.jpg "Logic App Form Variables")
+![Logic App Form Variables](/assets/img/posts/2019-08-26-azure-logic-apps-working-with-form-encoded-data/Logic App Form Variables.jpg "Logic App Form Variables")
 
 You will see the HTTP trigger with the output body of what we submitted via Postman.  You will also see the input and output of the Compose action.  In there the new JSON payload has our form data.
 
