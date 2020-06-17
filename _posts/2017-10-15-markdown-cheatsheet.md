@@ -32,7 +32,7 @@ From [adam-p/markdown-here](https://github.com/adam-p/markdown-here/wiki/Markdow
 #### H4
 ##### H5
 ###### H6
-
+```
 Alternatively, for H1 and H2, an underline-ish style:
 
 Alt-H1
