@@ -1,8 +1,7 @@
 # SITE CONFIGURATION
 title: Larry James Henry # your site title
 author: Larry # You :P
-description: > # Meta description of Homepage
-  Sharing the Journey.
+description: Sharing the Journey.
 baseurl: "/" # the subpath of your site, e.g. /blog
 url: "https://larryjameshenry.com/" # the base hostname & protocol for your site, e.g. http://example.com
 
@@ -26,7 +25,7 @@ tagline: >
 
 hero_img: posts/sleek_lg.jpg # Main background image: use the path from /assets/img/ => This will output /assets/img/posts/sleek_lg.jpg
 
-email: your-email@domain.com # email for form submission
+email: blog@larryjameshenry.com # email for form submission
 
 twitter_username: larryjameshenry # replace with your_twitter_username or comment to remove link from footer
 github_username:  larryjameshenry # replace with your_github_username or comment to remove link from footer
