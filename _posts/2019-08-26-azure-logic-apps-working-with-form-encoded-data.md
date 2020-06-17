@@ -3,9 +3,9 @@ layout: post
 title: Azure Logic Apps Working with Form Encoded Data
 date: 2019-08-26 08:00:00 +0500
 author: larry
-image: assets/images/posts/2019-08-26-azure-logic-apps-working-with-form-encoded-data/logic-app-main.jpg
+featured-img: assets/images/posts/2019-08-26-azure-logic-apps-working-with-form-encoded-data/logic-app-main.jpg
 imageshadow: true
-tags: [Azure, LogicApps]
+categories: [Azure, LogicApps]
 ---
 
 I have been designing Azure Logic apps for some time now and really enjoy the overall experience be it with Visual Studio using Azure DevOps or spinning up a quick workflow in the Azure Portal. They offer a very nice assortment of tools from the API connectors to process management for each execution.  One thing I have noticed is that not all vendors are able to post JSON documents to communicate.  They are still posting form data and Logic apps are capable when you know how.

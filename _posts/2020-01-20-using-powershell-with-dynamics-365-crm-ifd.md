@@ -3,9 +3,9 @@ layout: post
 title: Using PowerShell with Dynamics 365 CRM IFD
 date: 2020-01-20 08:00:00 +0400
 author: larry
-image: assets/images/posts/2020-01-20-using-powershell-with-dynamics-365-crm-ifd/powershell-main.jpg
+featured-img: assets/images/posts/2020-01-20-using-powershell-with-dynamics-365-crm-ifd/powershell-main.jpg
 imageshadow: true
-tags: [PowerShell, OData, Dynamics365]
+categories: [PowerShell, OData, Dynamics365]
 ---
 
 Sometimes you want to create full blown application to work with your Dynamics installation and sometimes you just need to run a script.  I have found myself needing to pull a small bit of data or run an action through the Web API and that really feels like a script to me.  It is easy if your Dynamics doesn't require claims or ADFS, you can POST and GET and let your network credentials be used.  When times get more complicated (i.e. claims and internet facing deployment), the PowerShell does get longer but it is still possible.

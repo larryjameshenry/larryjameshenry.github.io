@@ -3,9 +3,9 @@ layout: post
 title: Dynamics 365 CRM Plugins Sending Custom Messages Azure Service Bus
 date: 2020-04-17 08:00:00 +0500
 author: larry
-image: assets/images/posts/2020-04-17-dynamics-365-crm-plugins-sending-custom-messages-azure-service-bus/dynamics-crm-service-bus-main.jpg
+featured-img: assets/images/posts/2020-04-17-dynamics-365-crm-plugins-sending-custom-messages-azure-service-bus/dynamics-crm-service-bus-main.jpg
 imageshadow: true
-tags: [Dynamics365, Azure, ServiceBus]
+categories: [Dynamics365, Azure, ServiceBus]
 ---
 
 In the dream world of event driven computing, we often wish for small points in processes to release such events.  Fortunately, Dynamics 365 CRM has several software solutions to invoke custom demand during a change pipeline.  One such one is creating an [Azure-aware Plugin](https://docs.microsoft.com/en-us/dynamics365/customerengagement/on-premises/developer/write-custom-azure-aware-plugin) and registering it to fire it during a particular event. Even thought Dynamics 365 CRM provides the IServiceEndpointNotificationService for Azure-aware Plugins to send the Plugin context to [Azure Service Bus](https://azure.microsoft.com/en-us/services/service-bus/).  This limits you to only sending the data in IPluginExecutionContext.  I have seen examples of adding extra information into the context before sending to the registered service endpoint (i.e. Service Bus), but this still required the receiver/subscriber to know about the IPluginExecutionContext and how to unpack the data it stores.  Wouldn't it be nice to just send an agreed upon message body that could be processed without all the CRM/Xrm assemblies?  Well, there is a possibility.

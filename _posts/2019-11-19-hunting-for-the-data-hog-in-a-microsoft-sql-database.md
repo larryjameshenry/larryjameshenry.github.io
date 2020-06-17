@@ -3,9 +3,9 @@ layout: post
 title: Hunting for the Data Hog in a Microsoft SQL Database
 date: 2019-11-19 08:00:00 +0400
 author: larry
-image: assets/images/posts/2019-11-19-hunting-for-the-data-hog-in-a-microsoft-sql-database/data-hog-image-main.jpg
+featured-img: assets/images/posts/2019-11-19-hunting-for-the-data-hog-in-a-microsoft-sql-database/data-hog-image-main.jpg
 imageshadow: true
-tags: [SQL, Database]
+categories: [SQL, Database]
 ---
 
 I am not a DBA, but I play one when no one is looking.  I typically get asked, "why is my database so large"?  I have found that it's normally a table that no one is watching.  An application's customer table is always watched by everyone and they often offers suggestions to reduce it's size.  No one is looking at a log stored in the database or over indexing of a large table.

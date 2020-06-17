@@ -3,9 +3,9 @@ layout: post
 title: Creating Dev Databases from Production with PowerShell
 date: 2019-10-29 08:00:00 +0500
 author: larry
-image: assets/images/posts/2019-10-29-creating-dev-databases-from-production-with-powerShell/dev-database-image-main.jpg
+featured-img: assets/images/posts/2019-10-29-creating-dev-databases-from-production-with-powerShell/dev-database-image-main.jpg
 imageshadow: true
-tags: [DevOps, PowerShell, Database]
+categories: [DevOps, PowerShell, Database]
 ---
 
 I've had the pleasure of dealing with some extremely customized applications.  Ones that you can not simply install the app in a development environment and deploy the changes to it.  I am not a fan of testing in production and often copying a large database for a developer sandbox isn't an option either.  One trick I have is to use PowerShell and Microsoft.SqlServer.Management.Smo to build a Dev database copying all the domain data, but none of the customer data.

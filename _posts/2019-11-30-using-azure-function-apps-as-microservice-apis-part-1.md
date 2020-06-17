@@ -3,9 +3,9 @@ layout: post
 title: Using Azure Function Apps as Microservice APIs Part 1
 date: 2019-11-30 08:00:00 +0400
 author: larry
-image: assets/images/posts/2019-11-30-using-azure-function-apps-as-microservice-apis-part-1/azure-function-main.jpg
+featured-img: assets/images/posts/2019-11-30-using-azure-function-apps-as-microservice-apis-part-1/azure-function-main.jpg
 imageshadow: true
-tags: [Azure, API, AzureFunctions, Microservices]
+categories: [Azure, API, AzureFunctions, Microservices]
 ---
 
 When you look through all the hoopla microservices brings software design back to single responsibility and simple boundaries.  It provides the flexibility in management, support and advancement of the product.  Whether your product is simple or complex.  You need to take a high level view and identify it's current boundaries and where you may be missing boundaries.  Even if you don't  reduce it to a microservice, your software will be better for it.

@@ -3,9 +3,9 @@ layout: post
 title: Using SSL for Free in Dev Test Environments
 date: 2019-05-28 08:00:00 +0500
 author: larry
-image: assets/images/posts/2019-05-28-using-SSL-for-free-in-dev-test-environments/ssl-main-image.jpg
+featured-img: assets/images/posts/2019-05-28-using-SSL-for-free-in-dev-test-environments/ssl-main-image.jpg
 imageshadow: true
-tags: [DevOps, SSL]
+categories: [DevOps, SSL]
 ---
 
 I have always taken the responsibility for setting up our Dev and Test systems.  I have to admit I am a glutton for punishment.  Whether it be a VMWare or Hyper-V image running on my desktop or an Azure VM, I have scripted them all.  One quirk that I have never liked is having to use a self-signed cert.  I know I just have to do this and then a little that and the everything will be okay, but isn't there an easier way to get a secured Dev/Test environment?

@@ -3,9 +3,9 @@ layout: post
 title: Using Azure Integration Services Part 1 Overview
 date: 2020-04-11 08:00:00 +0500
 author: larry
-image: assets/images/posts/2020-04-11-using-azure-integration-services-part-1-overview/azure-integration-main.jpg
+featured-img: assets/images/posts/2020-04-11-using-azure-integration-services-part-1-overview/azure-integration-main.jpg
 imageshadow: true
-tags: [Azure, API, AzureFunctions, LogicApps]
+categories: [Azure, API, AzureFunctions, LogicApps]
 ---
 
 I've been working on transition my employeers integrations from the old scheduled pull from the data-tier to an event driving cloud first integration.  There are many great cloud integration software solutions.  Since I focus on Microsoft technologies, I have been designing the new integration using [Azure Integration Services](https://azure.microsoft.com/en-us/product-categories/integration/).  For those curious during the last Ignite, Microsoft scooped several of their technologies and branded them Azure Integration Services.  Those technologies include, Azure API Management, Service Bus, Logic Apps and Event grid.  You are not limited to just these services when designing cloud integration, but they are a really good set of tools to have in your toolbox.

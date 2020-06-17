@@ -3,9 +3,9 @@ layout: post
 title: Using Azure Function Apps as Microservice APIs Part 2
 date: 2020-01-22 08:00:00 +0400
 author: larry
-image: assets/images/posts/2020-01-22-using-azure-function-apps-as-microservice-apis-part-2/azure-function-main.jpg
+featured-img: assets/images/posts/2020-01-22-using-azure-function-apps-as-microservice-apis-part-2/azure-function-main.jpg
 imageshadow: true
-tags: [Azure, API, AzureFunctions, Microservices]
+categories: [Azure, API, AzureFunctions, Microservices]
 ---
 
 In a previous post, [Using Azure Function Apps as Microservice APIs Part 1](/using-azure-function-apps-as-microservice-apis-part-1) I go over the thinking behind a payment microservice and method signatures that we will be working with in this post.  I am going to leave out the integration with a payment gateway.  Since this article would become massive and the point is to show Azure Functions providing a RESTful microservice implementation.  I do want to point out that I am using Azure Functions V3 .NET Core for this project.  Therefore, I am limited to accessing the Azure Storage Table using Microsoft.WindowsAzure.Storage.Table.CloudTable.  You may find other bindings to access a storage table in Azure, but it will no longer work.
