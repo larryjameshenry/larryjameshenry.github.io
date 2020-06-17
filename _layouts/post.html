@@ -3,22 +3,15 @@ layout: compress
 ---
 <!DOCTYPE html>
 <html lang="{{ page.lang | default: site.lang | default: "en-US" }}">
-
 {% include head.html %}
-
 <body class="site">
-
 {% if site.google_tag_manager %}
-
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ site.google_tag_manager }}"
                   height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
-
 {% endif %}
-
 {% include header.html %}
-
   {% if page.featured-img %}
   <div class="hero lazyload" data-bg="{{ site.url }}{{ site.baseurl }}/assets/img/posts/{{ page.featured-img }}.jpg">
   {% else %}
@@ -54,18 +47,14 @@ layout: compress
       </p>
     </div>
   </div>
-
   <main class="site__content">
     <div class="container">
       <article class="post-content" itemprop="articleBody">
-
         {{ content }}
-
       </article>
       <div class="post-content controls__inner">
         <div class="controls__item prev">
           {% if page.previous.url %}
-
           <span>Previous</span>
           <a href="{{page.previous.url | relative_url }}">
                 <span>
@@ -77,7 +66,6 @@ layout: compress
           </a>
           {% endif %}
         </div>
-
         <div class="controls__item next">
           {% if page.next.url %}
           <span>Next</span>
@@ -93,25 +81,17 @@ layout: compress
         </div>
       </div>
     </div>
-
     {% if site.disqus.shortname %}
-
     <div class="comments">
       <div class="container">
         <div class="post-content">
-
           {% include disqus.html %}
-
         </div>
       </div>
     </div>
-
     {% endif %}
-
   </main>
-
   {% include footer.html %}
   {% include mathjax.html %}
 </body>
-
 </html>
