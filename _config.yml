@@ -20,8 +20,7 @@ navigation: # Navigation links
   - {name: 'About', link: '/about'}
   - {name: 'Contact', link: '/contact'}
 
-tagline: >
-  Modern Jekyll theme focused on speed performance &amp; SEO best practices
+tagline: Sharing the Journey
 
 hero_img: posts/sleek_lg.jpg # Main background image: use the path from /assets/img/ => This will output /assets/img/posts/sleek_lg.jpg
 
