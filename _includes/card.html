@@ -22,14 +22,7 @@
       {% assign date_format = site.sleek.date_format | default: "%b %-d, %Y" %}
 
         <time>{{ post.date | date: date_format }}</time>
-        {% if post.categories %}
-        {% assign categories = post.categories %}
-          {% for category in categories %}
-            <a href="{{site.baseurl}}/categories/#{{category|slugize}}" class="label"> {{ category }} </a>
-            {% unless forloop.last %}&nbsp;{% endunless %}
-          {% endfor %}
-      {% endif %}
-
+        
     </div>
     
     {% if post.summary %}
@@ -38,4 +31,12 @@
       <p>{{ post.content | strip_html | truncatewords: 30 }}</p>
     {% endif %}
   </a>
+  {% if post.categories %}
+        {% assign categories = post.categories %}
+          {% for category in categories %}
+            <a href="{{site.baseurl}}/categories/#{{category|slugize}}" class="label"> {{ category }} </a>
+            {% unless forloop.last %}&nbsp;{% endunless %}
+          {% endfor %}
+      {% endif %}
+
 </div>
