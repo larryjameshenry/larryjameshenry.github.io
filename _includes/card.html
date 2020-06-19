@@ -20,9 +20,9 @@
     <div class="post-card__header">
       <h2>{{ post.title | strip_html | truncate: 60 }}</h2>
       {% assign date_format = site.sleek.date_format | default: "%b %-d, %Y" %}
-
+      <span class="post-card__meta">
         <time>{{ post.date | date: date_format }}</time>
-        
+      </span>
     </div>
     
     {% if post.summary %}
@@ -32,11 +32,12 @@
     {% endif %}
   </a>
   {% if post.categories %}
-        {% assign categories = post.categories %}
-          {% for category in categories %}
-            <a href="{{site.baseurl}}/categories/#{{category|slugize}}" class="label"> {{ category }} </a>
-            {% unless forloop.last %}&nbsp;{% endunless %}
-          {% endfor %}
-      {% endif %}
-
+  {% assign categories = post.categories %}
+  <span class="post-card__label">
+    {% for category in categories %}
+      <a href="{{site.baseurl}}/categories/#{{category|slugize}}" class="label"> {{ category }} </a>
+      {% unless forloop.last %}&nbsp;{% endunless %}
+    {% endfor %}
+  </span>
+{% endif %}
 </div>
