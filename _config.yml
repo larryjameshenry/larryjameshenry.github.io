@@ -3,7 +3,7 @@ title: Larry James Henry # your site title
 author: Larry # You :P
 description: Sharing the Journey.
 baseurl: "/" # the subpath of your site, e.g. /blog
-url: "https://larryjameshenry.com/" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://larryjameshenry.com" # the base hostname & protocol for your site, e.g. http://example.com
 
 # SEO PLUGIN
 social:
