@@ -30,6 +30,7 @@
     {% else %}
       <p>{{ post.content | strip_html | truncatewords: 30 }}</p>
     {% endif %}
+  </a>
     {% if post.categories %}
     {% assign categories = post.categories %}
     <span class="post-card__label">
@@ -39,6 +40,6 @@
       {% endfor %}
     </span>
   {% endif %}
-  </a>
+
 
 </div>
