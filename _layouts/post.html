@@ -18,19 +18,6 @@ layout: compress
   <div class="hero dark-bg">
   {% endif %}
     <div class="hero__wrap">
-      {% if post.categories or page.categories %}
-        <div class="hero__categories">
-          {% if post %}
-            {% assign categories = post.categories %}
-          {% else %}
-            {% assign categories = page.categories %}
-          {% endif %}
-          {% for category in categories %}
-            <a class="label" href="{{site.baseurl}}/categories/#{{category|slugize}}">{{category}}</a>
-            {% unless forloop.last %}&nbsp;{% endunless %}
-          {% endfor %}
-        </div>
-      {% endif %}
       <h1 class="hero__title">{{ page.title }}</h1>
       <p class="hero__meta">
         <span>
