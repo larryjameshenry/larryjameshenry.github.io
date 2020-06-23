@@ -22,7 +22,7 @@ navigation: # Navigation links
 
 tagline: Sharing the Journey
 
-hero_img: posts/sleek_lg.jpg # Main background image: use the path from /assets/img/ => This will output /assets/img/posts/sleek_lg.jpg
+hero_img: posts/home_lg.jpg # Main background image: use the path from /assets/img/ => This will output /assets/img/posts/sleek_lg.jpg
 
 email: blog@larryjameshenry.com # email for form submission
 
