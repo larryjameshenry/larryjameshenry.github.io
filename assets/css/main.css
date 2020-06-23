@@ -323,9 +323,7 @@ a {
   }
 }
 .post-card__label {
-  top: 1.5rem;
-  left: 2.5rem;
-  z-index: 2;
+ margin-left: 10rem;
 }
 .post-card__inner {
   display: block;
@@ -1182,10 +1180,6 @@ button:disabled :focus {
   .post-card:nth-child(3n + 3) {
     margin-right: 0;
   }
-}
-.post-card__label {
-  width: 100%;
-  z-index: 5;
 }
 .post-card__inner {
   display: block;
