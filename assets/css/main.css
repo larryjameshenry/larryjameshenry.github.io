@@ -323,9 +323,8 @@ a {
   }
 }
 .post-card__label {
-  position: absolute;
   top: 1.5rem;
-  left: 1.5rem;
+  left: 2.5rem;
   z-index: 2;
 }
 .post-card__inner {
