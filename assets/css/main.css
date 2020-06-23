@@ -324,9 +324,9 @@ a {
 }
 .post-card__label {
   display: block;
-  border: 1px solid #000000;
- margin-left: 0.5rem;
- margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
 .post-card__inner {
   display: block;
@@ -444,7 +444,8 @@ a {
   .post-list {
     padding-top: 5em;
   }
-}html {
+}
+html {
   line-height: 1.15;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
