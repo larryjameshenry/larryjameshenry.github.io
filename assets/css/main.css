@@ -323,7 +323,8 @@ a {
   }
 }
 .post-card__label {
- margin-left: 2rem;
+ margin-left: 0.5rem;
+ margin-right: 0.5rem;
 }
 .post-card__inner {
   display: block;
