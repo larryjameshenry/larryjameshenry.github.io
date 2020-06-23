@@ -23,7 +23,7 @@ navigation: # Navigation links
 tagline: Sharing the Journey
 
 hero_img: posts/home_lg.jpg # Main background image: use the path from /assets/img/ => This will output /assets/img/posts/sleek_lg.jpg
-
+hero_img_attrib: "https://www.freepik.com/creativeart Background photo created by creativeart - www.freepik.com"
 email: blog@larryjameshenry.com # email for form submission
 
 twitter_username: larryjameshenry # replace with your_twitter_username or comment to remove link from footer
