@@ -324,7 +324,6 @@ a {
 }
 .post-card__label {
   display: block;
-  margin-bottom: 0.5rem;
   margin-left: 0.5rem;
   margin-right: 0.5rem;
 }
@@ -365,7 +364,7 @@ a {
 }
 .label {
   padding: 0 10px;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   display: inline-block;
   line-height: 20px;
   font-size: 0.75rem;
