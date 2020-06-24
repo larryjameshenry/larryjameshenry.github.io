@@ -3,13 +3,23 @@ html {
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
 }
-body {
-  margin: 0;
-}
 html {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
+html {
+  line-height: 1.15;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+}
+
+body {
+  margin: 0;
+}
+
 body {
   -webkit-overflow-scrolling: touch;
 }
@@ -45,12 +55,49 @@ h1 {
   margin-top: 0;
   margin-bottom: 0.5rem;
 }
+h1,
+h2 {
+  color: #313237;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
 a {
   background-color: transparent;
   -webkit-text-decoration-skip: objects;
 }
+a {
+  color: #277cea;
+  text-decoration: none;
+  border-bottom: 1px dashed #277cea;
+}
 img {
   border-style: none;
+}
+img {
+  max-width: 100%;
+  height: auto;
+  width: auto;
+  vertical-align: middle;
+}
+article,
+aside,
+footer,
+header,
+nav,
+section {
+  display: block;
+}
+figcaption,
+figure,
+main {
+  display: block;
+}
+figure {
+  margin: 1em 40px;
 }
 figure,
 main {
@@ -62,6 +109,11 @@ figure {
 figure {
   margin: 0;
 }
+p {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+}
+
 
 .dark-bg {
   background-color: #313237;
@@ -99,29 +151,7 @@ svg:not(:root) {
   -ms-flex: 1;
   flex: 1;
 }
-img {
-  max-width: 100%;
-  height: auto;
-  width: auto;
-  vertical-align: middle;
-}
 
-
-p {
-  margin-top: 0;
-  margin-bottom: 1.25rem;
-}
-h1,
-h2 {
-  color: #313237;
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-}
-a {
-  color: #277cea;
-  text-decoration: none;
-  border-bottom: 1px dashed #277cea;
-}
 .blur {
   background: #fff;
   filter: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg"><filter id="filter"><feGaussianBlur stdDeviation="16" /></filter></svg>#filter');
@@ -449,34 +479,7 @@ a {
     padding-top: 5em;
   }
 }
-html {
-  line-height: 1.15;
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
-}
-body {
-  margin: 0;
-}
-article,
-aside,
-footer,
-header,
-nav,
-section {
-  display: block;
-}
-h1 {
-  font-size: 2em;
-  margin: 0.67em 0;
-}
-figcaption,
-figure,
-main {
-  display: block;
-}
-figure {
-  margin: 1em 40px;
-}
+
 hr {
   -webkit-box-sizing: content-box;
   box-sizing: content-box;
