@@ -1,8 +1,68 @@
+html {
+  line-height: 1.15;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+}
+html {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+body {
+  -webkit-overflow-scrolling: touch;
+}
+body {
+  background-color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Hiragino Sans GB", "Microsoft YaHei",
+    "WenQuanYi Micro Hei", sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #343851;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+*,
+::after,
+::before {
+  -webkit-box-sizing: inherit;
+  box-sizing: inherit;
+}
+
+header,
+nav,
+section {
+  display: block;
+}
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
 h1 {
   color: #313237;
   margin-top: 0;
   margin-bottom: 0.5rem;
 }
+a {
+  background-color: transparent;
+  -webkit-text-decoration-skip: objects;
+}
+img {
+  border-style: none;
+}
+figure,
+main {
+  display: block;
+}
+figure {
+  margin: 1em 40px;
+}
+figure {
+  margin: 0;
+}
+
 .dark-bg {
   background-color: #313237;
 }
@@ -16,37 +76,6 @@ h1 {
     margin-right: 0;
   }
 }
-html {
-  line-height: 1.15;
-  -ms-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
-}
-body {
-  margin: 0;
-}
-header,
-nav,
-section {
-  display: block;
-}
-h1 {
-  font-size: 2em;
-  margin: 0.67em 0;
-}
-figure,
-main {
-  display: block;
-}
-figure {
-  margin: 1em 40px;
-}
-a {
-  background-color: transparent;
-  -webkit-text-decoration-skip: objects;
-}
-img {
-  border-style: none;
-}
 svg:not(:root) {
   overflow: hidden;
 }
@@ -54,19 +83,7 @@ svg:not(:root) {
   -webkit-appearance: button;
   font: inherit;
 }
-html {
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-}
-body {
-  -webkit-overflow-scrolling: touch;
-}
-*,
-::after,
-::before {
-  -webkit-box-sizing: inherit;
-  box-sizing: inherit;
-}
+
 .site {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -88,20 +105,8 @@ img {
   width: auto;
   vertical-align: middle;
 }
-figure {
-  margin: 0;
-}
-body {
-  background-color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, "Hiragino Sans GB", "Microsoft YaHei",
-    "WenQuanYi Micro Hei", sans-serif;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #343851;
-  -webkit-font-smoothing: antialiased;
-  -webkit-text-size-adjust: 100%;
-}
+
+
 p {
   margin-top: 0;
   margin-bottom: 1.25rem;
