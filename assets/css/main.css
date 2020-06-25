@@ -357,151 +357,6 @@ textarea:focus {
   transition: border-color 0.25s;
 }
 
-
-@media only screen and (min-width: 36em) {
-  .container {
-    max-width: 540px;
-    margin: 0 auto;
-  }
-}
-@media only screen and (min-width: 48em) {
-  .container {
-    max-width: 720px;
-    margin: 0 auto;
-  }
-  .hero__wrap {
-    max-width: 40em;
-  }
-  .hero__wrap .hero__title {
-    padding: 1rem 0;
-    font-size: 2.625em;
-    line-height: 3.125rem;
-  }
-  .post-card {
-    width: 48.4375%;
-    margin-right: 3.125%;
-  }
-  .post-card:last-of-type,
-  .post-card:nth-child(2n + 2) {
-    margin-right: 0;
-  }
-  .post-card {
-    width: 48.4375%;
-    margin-right: 3.125%;
-  }
-  .post-card:last-of-type,
-  .post-card:nth-child(2n + 2) {
-    margin-right: 0;
-  }
-  .post-content {
-    padding-top: 5em;
-  }
-  .post-list {
-    padding-top: 5em;
-  }
-}
-@media only screen and (min-width: 62em) {
-  .container {
-    max-width: 960px;
-    margin: 0 auto;
-  }
-  .hero {
-    margin: 0 auto;
-    height: 36em;
-  }
-  .hero--small {
-    height: 12.5em;
-  }
-}
-@media (min-width: 62em) {
-  .header__toggle {
-    display: none;
-    visibility: hidden;
-  }
-  .header__links {
-    position: static;
-    padding: 0;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    visibility: visible;
-    width: auto;
-    height: 100%;
-  }
-  .header__links-wrapper {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    height: 100%;
-    padding: 0;
-  }
-  .header__link {
-    position: relative;
-    padding: 0.938rem 1rem;
-    border: 0;
-    height: 100%;
-  }
-  .header__link::after {
-    content: "";
-    display: block;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    height: 3px;
-    width: 100%;
-    -webkit-transform: scaleX(0);
-    transform: scaleX(0);
-    background: #277cea;
-    -webkit-transition: color 0.2s ease-in-out,
-      -webkit-transform 0.2s ease-in-out;
-    transition: color 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out;
-    transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
-    transition: color 0.2s ease-in-out, transform 0.2s ease-in-out,
-      -webkit-transform 0.2s ease-in-out;
-  }
-  .header__link:hover {
-    color: #0f4c9c;
-  }
-  .header__link:hover::after,
-  .header__link :active::after,
-  .header__link :focus::after {
-    -webkit-transform: scaleX(1);
-    transform: scaleX(1);
-    color: #0f4c9c;
-    -webkit-transition: -webkit-transform 0.2s ease-in-out;
-    transition: -webkit-transform 0.2s ease-in-out;
-    transition: transform 0.2s ease-in-out;
-    transition: transform 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out;
-  }
-}
-@media only screen and (min-width: 75em) {
-  .container {
-    max-width: 1170px;
-    margin: 0 auto;
-  }
-  .post-card {
-    width: 31.25%;
-    margin-right: 3.125%;
-  }
-  .post-card:nth-child(2n + 2) {
-    margin-right: 3.125%;
-  }
-  .post-card:last-of-type,
-  .post-card:nth-child(3n + 3) {
-    margin-right: 0;
-  }
-}
-@media only screen and (min-width: 350px) {
-  .btn + .btn {
-    margin-top: 0;
-    margin-left: 2em;
-  }
-}
-
 .blog {
   background-color: #f9f9f9;
 }
@@ -1534,4 +1389,147 @@ input[type="button"] :active {
   fill: currentColor;
   height: 1.5rem;
   width: 1.5rem;
+}
+@media only screen and (min-width: 36em) {
+  .container {
+    max-width: 540px;
+    margin: 0 auto;
+  }
+}
+@media only screen and (min-width: 48em) {
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .hero__wrap {
+    max-width: 40em;
+  }
+  .hero__wrap .hero__title {
+    padding: 1rem 0;
+    font-size: 2.625em;
+    line-height: 3.125rem;
+  }
+  .post-card {
+    width: 48.4375%;
+    margin-right: 3.125%;
+  }
+  .post-card:last-of-type,
+  .post-card:nth-child(2n + 2) {
+    margin-right: 0;
+  }
+  .post-card {
+    width: 48.4375%;
+    margin-right: 3.125%;
+  }
+  .post-card:last-of-type,
+  .post-card:nth-child(2n + 2) {
+    margin-right: 0;
+  }
+  .post-content {
+    padding-top: 5em;
+  }
+  .post-list {
+    padding-top: 5em;
+  }
+}
+@media only screen and (min-width: 62em) {
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  .hero {
+    margin: 0 auto;
+    height: 36em;
+  }
+  .hero--small {
+    height: 12.5em;
+  }
+}
+@media (min-width: 62em) {
+  .header__toggle {
+    display: none;
+    visibility: hidden;
+  }
+  .header__links {
+    position: static;
+    padding: 0;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    visibility: visible;
+    width: auto;
+    height: 100%;
+  }
+  .header__links-wrapper {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    height: 100%;
+    padding: 0;
+  }
+  .header__link {
+    position: relative;
+    padding: 0.938rem 1rem;
+    border: 0;
+    height: 100%;
+  }
+  .header__link::after {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 100%;
+    -webkit-transform: scaleX(0);
+    transform: scaleX(0);
+    background: #277cea;
+    -webkit-transition: color 0.2s ease-in-out,
+      -webkit-transform 0.2s ease-in-out;
+    transition: color 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out;
+    transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+    transition: color 0.2s ease-in-out, transform 0.2s ease-in-out,
+      -webkit-transform 0.2s ease-in-out;
+  }
+  .header__link:hover {
+    color: #0f4c9c;
+  }
+  .header__link:hover::after,
+  .header__link :active::after,
+  .header__link :focus::after {
+    -webkit-transform: scaleX(1);
+    transform: scaleX(1);
+    color: #0f4c9c;
+    -webkit-transition: -webkit-transform 0.2s ease-in-out;
+    transition: -webkit-transform 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out, -webkit-transform 0.2s ease-in-out;
+  }
+}
+@media only screen and (min-width: 75em) {
+  .container {
+    max-width: 1170px;
+    margin: 0 auto;
+  }
+  .post-card {
+    width: 31.25%;
+    margin-right: 3.125%;
+  }
+  .post-card:nth-child(2n + 2) {
+    margin-right: 3.125%;
+  }
+  .post-card:last-of-type,
+  .post-card:nth-child(3n + 3) {
+    margin-right: 0;
+  }
+}
+@media only screen and (min-width: 350px) {
+  .btn + .btn {
+    margin-top: 0;
+    margin-left: 2em;
+  }
 }
