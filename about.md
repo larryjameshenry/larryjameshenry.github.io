@@ -4,4 +4,5 @@ title: About
 permalink: /about/
 ---
 
-Larry Henry
+Larry James Henry
+![Larry James Henry](/assets/img/avatar.jpg "Larry James Henry")
