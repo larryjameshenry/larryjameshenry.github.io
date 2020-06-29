@@ -4,7 +4,6 @@ title: Using PowerShell with Dynamics 365 CRM IFD
 date: 2020-01-20 08:00:00 +0400
 author: larry
 featured-img: 2020-01-20-using-powershell-with-dynamics-365-crm-ifd/powershell-main
-imageshadow: true
 categories: [PowerShell, OData, Dynamics365]
 ---
 

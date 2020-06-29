@@ -4,7 +4,6 @@ title: Azure Logic Apps Working with Form Encoded Data
 date: 2019-08-26 08:00:00 +0500
 author: larry
 featured-img: 2019-08-26-azure-logic-apps-working-with-form-encoded-data/logic-app-main
-imageshadow: true
 categories: [Azure, LogicApps]
 ---
 

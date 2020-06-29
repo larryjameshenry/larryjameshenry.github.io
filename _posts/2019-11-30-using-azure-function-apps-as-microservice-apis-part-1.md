@@ -4,7 +4,6 @@ title: Using Azure Function Apps as Microservice APIs Part 1
 date: 2019-11-30 08:00:00 +0400
 author: larry
 featured-img: 2019-11-30-using-azure-function-apps-as-microservice-apis-part-1/azure-function-main
-imageshadow: true
 categories: [Azure, API, AzureFunctions, Microservices]
 ---
 
