@@ -9,5 +9,21 @@ categories: [Dynamics365, PowerPlatform, Azure, LogicApps]
 
 I have been creating Azure Logic Apps for several years and often discredited Power Automate (formerly Flow) as a lesser integration option.  I was concerned about security and process management.  What I am realizing now is that they are formitable partners in the integration space.  Logic Apps have their role and place along with Power Automate.  Let's look into each product and determine when each is the better choice.
 
+
+## Power automate background
 A little background on Power Automate, released 
-asdfadf
+## Logic app background 
+## Compare running scope
+### PA in office365
+### LA in Azure
+## Compare connectors
+### Poll vs push
+### Standard vs Premium
+## Compare editors
+## Compare invoke methods
+## Discuss chaining apps together
+## Simple logic examples 
+## AI examples
+## Event driven examples
+## Which one decision matrix 
+## Summary
