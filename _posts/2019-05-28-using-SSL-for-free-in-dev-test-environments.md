@@ -3,7 +3,7 @@ layout: post
 title: Using SSL for Free in Dev Test Environments
 date: 2019-05-28 08:00:00 +0500
 author: larry
-featured-img: 2019-05-28-using-SSL-for-free in-dev-test-environments/ssl-main-image
+featured-img: 2019-05-28-using-SSL-for-free-in-dev-test-environments/ssl-main-image
 categories: [DevOps, SSL]
 ---
 
@@ -14,13 +14,13 @@ An alternative is to use a free cert from sslforfree.com.  This website will cre
 ### How to
 First navigate to <https://sslforfree.com> and either create a free account or just get started by typing in your website address or wildcard (*.example.com).  When you generate a cert you will have to manually verify by entering a TXT record with the provided value into the DNS settings.  I'm using Azure for this example and the DNS zone is located in the corresponding resource group.   Below is an screen shot of what it looks like.
 
-![DNS Entry](/assets/img/posts/2019-05-28-using-SSL-for-free in-dev-test-environments/DNS Entry.jpg "DNS Entry")
+![DNS Entry](/assets/img/posts/2019-05-28-using-SSL-for-free-in-dev-test-environments/DNS Entry.jpg "DNS Entry")
 
 After you enter the value provided from sslforfree, you can continue the manual verification. 
 
 It will take some time, but then you will be presented with the results, there is an option to DOWNLOAD all files.  You will want choose that to download a zip file containing three files that are the cert, the private key and the CA bundle.  It would be great that ended the situation, but I needed the cert in a PFX format.  Thankfully, I received the help I needed by going to <https://decoder.link/converter/> and find the PEM to PKCS#12 convert.  Fill out the form with the three files you just downloaded.  Also make up a PFX Password to use when importing the cert into the Windows certificate store, then just choose Convert and Download to get the newly combined PFX file.
 
-![Convert PEM to PKCS12](/assets/img/posts/2019-05-28-using-SSL-for-free in-dev-test-environments/Convert PEM to PKCS12.jpg "Convert PEM to PKCS12")
+![Convert PEM to PKCS12](/assets/img/posts/2019-05-28-using-SSL-for-free-in-dev-test-environments/Convert PEM to PKCS12.jpg "Convert PEM to PKCS12")
 
 Once you have the combined PFX file copy it to the ADFS and CRM servers.  Unfortunately, ADFS, doesn't support the new cryptographic provider used to make these wonderful free certs, but that won't stop us.  You just have to use the following certutil parameters to properly import the SSL cert for ADFS to work correctly. 
 
