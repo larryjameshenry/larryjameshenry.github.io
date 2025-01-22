@@ -1,4 +1,4 @@
-baseurl = "https://devcows.github.io/hugo-universal-theme/" # Configure URL. if using gh-pages https://github.com/<username>/hugo-universal-theme URL: https://<username>.github.io/hugo-universal-theme/
+baseurl = "https://larryjameshenry.github.io/hugo-universal-theme/" # Configure URL. if using gh-pages https://github.com/<username>/hugo-universal-theme URL: https://<username>.github.io/hugo-universal-theme/
 title = "Universal"
 theme = "hugo-universal-theme"
 themesDir = "../.."
@@ -18,7 +18,7 @@ pluralizelisttitles = false
 [services]
 [services.disqus]
 # Enable comments by entering your Disqus shortname
-Shortname = "devcows"
+Shortname = "larryjameshenry"
 [services.googleAnalytics]
 # Enable Google Analytics by entering your tracking code
 id = ""
@@ -368,7 +368,7 @@ id = ""
 [[menu.topbar]]
     weight = 2
     name = "GitHub"
-    url = "https://github.com/devcows/hugo-universal-theme"
+    url = "https://github.com/larryjameshenry/hugo-universal-theme"
     pre = "<i class='fab fa-2x fa-github'></i>"
 
 [[menu.topbar]]
@@ -391,10 +391,10 @@ id = ""
 
 [params]
     viewMorePostLink = "/blog/"
-    author = "DevCows"
-    defaultKeywords = ["devcows", "hugo", "go"]
+    author = "larryjameshenry"
+    defaultKeywords = ["larryjameshenry", "hugo", "go"]
     mainSections = ["blog"]
-    defaultDescription = "Site template made by Devcows using Hugo"
+    defaultDescription = "Site template made by larryjameshenry using Hugo"
 
     # Social media
     facebook_site = "" # the Facebook handle of your site ('https://www.facebook.com/HANDLE')
