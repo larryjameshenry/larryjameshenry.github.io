@@ -1,15 +1,14 @@
-baseURL: https://larryjameshenry.github.io
+baseURL = https://larryjameshenry.github.io
 languageCode: en-us
 title: Personal website and blog
 theme: hugo-refresh
-# theme: ../..
 
 #########################################
 ######## Uncomment this option ##########
 #########################################
 # This options specify where to look for the images used in this config
 # The default value is the "asset" directory of this theme
-# assetDir: "static"
+assetDir: "static"
 
 # Option to specify the default language of the theme
 # I.e., the landing language of your root 
