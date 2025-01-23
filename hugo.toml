@@ -1,4 +1,4 @@
-baseurl = "https://larryjameshenry.github.io"
+baseurl = "https://larryjameshenry.github.io/"
 DefaultContentLanguage = "en"
 title = "Beautiful Hugo"
 # Using theme as git submodule
