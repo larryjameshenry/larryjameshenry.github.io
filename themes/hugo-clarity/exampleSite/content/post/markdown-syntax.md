@@ -52,7 +52,7 @@ The following image is located within the Hugo site. Because it has alt text but
 
 The following image is loaded from a remote URL. The alt text is the same (for screen readers and in cases when the image doesn't load) but because a separate title is provided, the title is used for the caption:
 
-![Larry Henry](https://raw.githubusercontent.com/chipzoller/hugo-clarity/master/exampleSite/static/images/larry-henry.png "This is Larry Henry")
+![Larry Henry](../images/larry-henry.png "This is Larry Henry")
 
 ### Image with alt text and no caption
 
