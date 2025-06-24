@@ -6,7 +6,7 @@ baseurl = "https://example.com/" # Include trailing slash
 # canonifyurls = true
 
 theme = "hugo-clarity"
-disqusShortname = ""
+disqusShortname = "larryjameshenry"
 
 DefaultContentLanguage = "en"
 # [languages]
