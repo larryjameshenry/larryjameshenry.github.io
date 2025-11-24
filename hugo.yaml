@@ -15,10 +15,10 @@ outputs:
 enableRobotsTXT: true
 
 #services:
-  #googleAnalytics:
-    #id: G-MEASUREMENT_ID
-  #disqus:
-    #shortname: your-disqus-shortname
+#googleAnalytics:
+#id: G-MEASUREMENT_ID
+#disqus:
+#shortname: your-disqus-shortname
 
 pagination:
   pagerSize: 9
@@ -30,10 +30,10 @@ markup:
 
 Menus:
   main:
-    - identifier: blog
-      name: Blog
+    - identifier: posts
+      name: Posts
       title: Blog posts
-      url: /blogs
+      url: /posts
       weight: 1
     # - identifier: gallery
     #   name: Gallery
@@ -119,8 +119,8 @@ params:
     disableSearch: false
     # searchPlaceholder: "Search"
     stickyNavBar:
-      enable : true
-      showOnScrollUp : true
+      enable: true
+      showOnScrollUp: true
     enableSeparator: false
     menus:
       disableAbout: false
@@ -153,7 +153,6 @@ params:
           url: https://github.com/larryjameshenry
         - icon: fab fa-linkedin
           url: https://www.linkedin.com/in/larryjameshenry
-
 
   # About
   # about:
