@@ -1,0 +1,98 @@
+description = "Expand an article outline into a complete, publication-ready article"
+prompt = """
+CRITICAL WRITING REQUIREMENTS:
+
+Before generating content, review these guidelines:
+1. .gemini/writing-guidelines/words-not-to-use.md - AVOID these phrases
+2. .gemini/writing-guidelines/writing-style.md - FOLLOW this style
+3. .gemini/writing-guidelines/phrase-alternatives.md - USE these alternatives
+
+FORBIDDEN PATTERNS (DO NOT USE):
+- "delve," "leverage," "robust," "seamless," "cutting-edge"
+- "In the realm of," "when it comes to," "at the end of the day"
+- "Let's dive into," "let's explore," "it's worth noting"
+- Vague claims without specific numbers or evidence
+- Starting paragraphs with "Moreover," "Furthermore," "Additionally"
+- Meta-commentary about what you'll cover
+
+REQUIRED PATTERNS (ALWAYS USE):
+- Specific numbers and metrics instead of vague claims
+- Active voice and direct statements
+- Concrete examples with working code
+- Natural transitions without formulaic phrases
+- Technical precision over marketing language
+
+Expand the following article outline into a complete, well-written, publication-ready article.
+
+CONTENT REQUIREMENTS:
+
+## Style and Tone
+- Write in clear, engaging technical prose
+- Use conversational but professional tone
+- Break complex concepts into digestible explanations
+- Use active voice and present tense where appropriate
+- Vary sentence length for better readability
+
+## Structure
+- Maintain the outline's section structure exactly
+- Expand all [PLACEHOLDER] sections with actual content
+- Ensure smooth transitions between sections
+- Use subheadings to improve scannability
+
+## Technical Content
+- Include working code examples (PowerShell preferred when applicable)
+- Add explanatory comments in code
+- Provide practical, real-world examples
+- Explain WHY, not just HOW
+- Include command output examples where relevant
+
+## Code Examples
+- For PowerShell examples:
+- Clear comments explaining what the code does
+- Use proper PowerShell conventions and formatting
+- Include parameter validation where appropriate
+- Show expected output as comments
+
+For other languages, follow their conventions.
+
+## Writing Guidelines
+- Introduction: 150-200 words, engaging hook
+- Each major section: 300-500 words
+- Include at least 2-3 code examples
+- Add 1-2 practical scenarios with step-by-step walkthroughs
+- Use bullet points and numbered lists for clarity
+- Include helpful tips in callout format (> **Tip:** ...)
+
+## Content Depth
+- Explain concepts thoroughly but concisely
+- Anticipate and answer reader questions
+- Provide context for why things work the way they do
+- Include edge cases and limitations
+- Link concepts to practical benefits
+
+## Front Matter
+- Change draft: false (article is ready for review)
+- Update date to current timestamp
+- Keep all other front matter intact
+
+## Conclusion
+- Summarize 3-5 key takeaways
+- Provide clear next steps or call to action
+- If part of series, link to previous/next articles
+- End with empowering or motivating statement
+
+## Quality Checks
+- All technical claims are accurate
+- Code examples are tested and functional
+- No placeholder text remains
+- Proper grammar and spelling
+- Consistent terminology throughout
+- Appropriate technical depth for target audience
+
+CURRENT OUTLINE TO EXPAND:
+{{args}}
+
+Generate the complete, expanded article maintaining the Hugo front matter structure.
+Ensure the article is immediately publishable after author review.
+Target total length: 1500-2500 words depending on topic complexity.
+"""

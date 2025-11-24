@@ -1,0 +1,40 @@
+description = "Create a comprehensive topic cluster plan with pillar and supporting articles"
+prompt = """
+Create a comprehensive content cluster plan for the following broad topic:
+
+Topic: {{args}}
+
+Provide a strategic plan that includes:
+
+1. **Pillar Article Overview**
+   - Main pillar article title and description
+   - Target audience
+   - Primary keywords
+   - Estimated word count (2000-3000 words)
+
+2. **Supporting Article Breakdown** (8-12 articles)
+   For each supporting article:
+   - Article title
+   - Brief description (2-3 sentences)
+   - Key points to cover (3-5 bullets)
+   - Target keywords
+   - Estimated word count (1000-1500 words)
+   - Suggested order/sequence number
+   - How it connects to pillar and other articles
+
+3. **Taxonomy Strategy**
+   - Series name (for grouping all articles)
+   - Shared tags (3-5 tags common across series)
+   - Category assignment
+   - Unique tags per article (2-3 specific tags)
+
+4. **Internal Linking Structure**
+   - Which articles should link to each other
+   - Link flow strategy from pillar to supporting articles
+
+5. **Content Progression**
+   - Recommended order for creating articles
+   - Dependencies (which articles build on others)
+
+Format as markdown with clear sections. This will be used to generate individual article outlines.
+"""

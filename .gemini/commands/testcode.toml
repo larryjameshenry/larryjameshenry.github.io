@@ -1,0 +1,72 @@
+description = "Test code examples in article for syntax and basic logic errors"
+prompt = """
+Extract and validate all code examples from this article.
+
+For each code block:
+
+1. **Identify Language and Context**
+   - What language/technology?
+   - What version is implied or stated?
+   - What's the purpose of this code?
+
+2. **Syntax Validation**
+   - Is syntax correct for the specified language?
+   - Are all brackets, parentheses, quotes properly matched?
+   - Are statements properly terminated?
+   - Are imports/using statements present if needed?
+
+3. **Logic Check**
+   - Does the code do what the article claims?
+   - Are variable names consistent?
+   - Are all variables declared before use?
+   - Is error handling present where needed?
+   - Are there obvious logic errors?
+
+4. **Common Issues**
+   - Undefined variables or functions
+   - Type mismatches
+   - Missing error handling
+   - Hardcoded values that should be parameters
+   - Resource leaks (unclosed files, connections)
+   - Security issues (hardcoded credentials, SQL injection)
+
+5. **Output Validation**
+   - If output is shown in comments, does it match what code would produce?
+   - Are example values realistic?
+
+## OUTPUT FORMAT
+
+For each code block found:
+
+**Code Block #[N]: [Section Name]**
+**Language:** [Detected language]
+**Status:** [✓ Valid | ⚠ Warning | ✗ Error]
+
+**Issues Found:**
+- [List any problems]
+
+**Code:**
+[the code]
+
+**Recommendations:**
+- [Specific fixes or improvements]
+
+---
+
+**OVERALL CODE QUALITY SCORE:** [0-100]
+
+**SUMMARY:**
+- Total code blocks: [N]
+- Valid: [N]
+- Warnings: [N]
+- Errors: [N]
+
+**CRITICAL ISSUES:** [Any must-fix items]
+
+---
+
+ARTICLE TO TEST:
+{{args}}
+
+Be specific about line numbers and exact errors found.
+"""

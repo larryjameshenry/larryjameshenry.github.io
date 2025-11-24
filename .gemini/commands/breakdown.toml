@@ -1,0 +1,35 @@
+description = "Break down a topic cluster plan into individual article outline files"
+prompt = """
+From the provided topic cluster plan, generate a detailed outline for this specific article:
+
+Article Number: {{args}}
+
+Use the plan context to create a Hugo-compatible article outline with:
+
+1. **Front Matter** (YAML format)
+   - title: [article title]
+   - date: [current date]
+   - draft: true
+   - description: [SEO description 150-160 chars]
+   - series: ["[series name]"]
+   - tags: ["tag1", "tag2", "tag3", "tag4"]
+   - categories: ["category"]
+   - weight: [article number for ordering]
+
+2. **Article Structure**
+   - Introduction (what problem/topic this addresses)
+   - 3-5 main sections with subsections
+   - Practical examples placeholder
+   - Code blocks placeholder (PowerShell preferred when relevant)
+   - Conclusion with next steps
+   - Links to related articles in series
+
+3. **Internal Linking Notes**
+   - Which other articles to reference
+   - Suggested anchor text for links
+
+Format as complete Hugo markdown file ready to be researched and expanded.
+
+Include this comment at top after front matter:
+<!-- This outline was generated from topic cluster plan. Ready for research and expansion. -->
+"""

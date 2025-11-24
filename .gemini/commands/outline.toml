@@ -1,0 +1,75 @@
+description = "Generate a detailed article outline with Hugo front matter from research notes"
+prompt = """
+WRITING GUIDELINES:
+- Read and apply: .gemini/writing-guidelines/words-not-to-use.md
+- Follow style principles from: .gemini/writing-guidelines/writing-style.md
+- Avoid ALL phrases and patterns listed in the blocklist
+- Use specific, concrete language with evidence and examples
+- Write naturally as a human technical writer would
+
+Based on the provided research notes and context, create a detailed article outline.
+Topic: {{args}}
+
+Generate a complete Hugo-compatible markdown file with:
+
+## Front Matter (YAML format)
+Include:
+- title: Create an engaging, SEO-friendly title
+- date: Use current date/time
+- draft: true (will be changed when ready to publish)
+- description: Write a compelling 150-160 character meta description
+- series: Array format if part of a series, empty array if standalone
+- tags: 5-7 relevant tags (mix of broad and specific)
+- categories: 1-2 relevant categories
+- weight: Article order number if part of series
+
+## Article Structure
+
+### Introduction (Brief outline)
+- Hook: Engaging opening that captures attention
+- Problem/Context: Why this topic matters
+- What reader will learn: Clear value proposition
+- Preview of main points
+
+### Main Body (3-6 major sections)
+For each section provide:
+- Section heading (H2)
+- 2-4 subsections (H3)
+- Key points to cover (bullet points)
+- [PLACEHOLDER: Code example] where relevant
+- [PLACEHOLDER: Practical example] where relevant
+- Questions to answer in this section
+
+### Practical Examples Section
+- Real-world scenario outline
+- Step-by-step walkthrough structure
+- [PLACEHOLDER: PowerShell code] or relevant technology
+- Expected outcomes
+
+### Best Practices Section
+- Do's and Don'ts outline
+- Common pitfalls to address
+- Performance tips
+- Security considerations (if applicable)
+
+### Troubleshooting/Common Issues (if applicable)
+- Frequent problems
+- Solutions and workarounds
+- Debugging tips
+
+### Conclusion
+- Summary of key takeaways (3-5 points)
+- Call to action or next steps
+- Links to related articles (if part of series)
+
+### Additional Notes for Author
+- Target word count: 1200-1800 words
+- Tone: Professional but conversational, technically accurate
+- Audience level: [Beginner/Intermediate/Advanced]
+- Key terms to define
+- Internal linking opportunities
+
+Format the outline with clear markdown headings and nested bullet points.
+Keep placeholders for code examples and detailed content that will be filled during expansion.
+Make the structure logical and easy to follow.
+"""

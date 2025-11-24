@@ -1,0 +1,205 @@
+description = "Fact-check an article for accuracy, verify claims, and identify unsupported statements"
+prompt = """
+Perform a comprehensive fact-check of this article. Your role is to verify accuracy and identify claims that need evidence.
+
+## FACT-CHECKING CRITERIA
+
+### 1. Technical Accuracy
+**Check for:**
+- Correct command syntax and parameters
+- Accurate API usage and method signatures
+- Valid configuration examples
+- Correct version numbers and compatibility info
+- Proper terminology and technical definitions
+- Accurate system requirements
+
+**Flag:**
+- Outdated commands or deprecated features
+- Incorrect parameter names or values
+- Syntax errors in code examples
+- Version incompatibilities
+- Misused technical terms
+
+### 2. Factual Claims
+**Verify:**
+- Performance claims (speeds, benchmarks, metrics)
+- Capacity limits (user counts, data sizes, throughput)
+- Version information and release dates
+- Feature availability and limitations
+- Compatibility statements
+- Historical facts and timelines
+
+**Flag:**
+- Unverified performance numbers
+- Outdated version information
+- Unsupported capability claims
+- Missing context for statistics
+- Ambiguous time references ("recently", "modern")
+
+### 3. Best Practices
+**Check:**
+- Security recommendations are current
+- Suggested patterns follow latest standards
+- Deprecated approaches aren't recommended
+- Alternative solutions are accurate
+
+**Flag:**
+- Outdated security practices
+- Deprecated patterns presented as current
+- Missing important warnings or caveats
+- Incomplete error handling examples
+
+### 4. Code Examples
+**Verify:**
+- Syntax is correct for specified language/version
+- Code would actually execute as claimed
+- Error handling is appropriate
+- Output examples match code logic
+- Dependencies are correctly specified
+
+**Flag:**
+- Syntax errors or typos
+- Logic errors that would cause failures
+- Missing required parameters
+- Incorrect output examples
+- Undeclared variables or imports
+
+### 5. External References
+**Check:**
+- Links are to authoritative sources
+- Documentation references are current
+- Tool versions mentioned are accurate
+- Product names and companies are correct
+
+**Flag:**
+- Broken or invalid references
+- References to outdated documentation
+- Incorrect product names or versions
+- Unsupported vendor claims
+
+### 6. Logical Consistency
+**Verify:**
+- Article doesn't contradict itself
+- Examples support stated claims
+- Prerequisites match complexity
+- Scope matches title and description
+
+**Flag:**
+- Internal contradictions
+- Examples that don't support claims
+- Missing prerequisites
+- Scope creep or topic drift
+
+## OUTPUT FORMAT
+
+Provide results in this structured format:
+
+### FACT-CHECK SUMMARY
+- Total claims checked: [number]
+- Verified accurate: [number]
+- Needs verification: [number]
+- Inaccurate/outdated: [number]
+- Severity: [PASS / MINOR ISSUES / MAJOR ISSUES / FAIL]
+
+### CRITICAL ISSUES (Must Fix Before Publishing)
+For each critical issue:
+**Location:** [Section/paragraph reference]
+**Issue:** [What's wrong]
+**Current Text:** "[Quote the problematic text]"
+**Problem:** [Why it's incorrect]
+**Correction:** [Accurate information]
+**Source:** [Where to verify the correct information]
+
+### VERIFICATION NEEDED (Claims Without Evidence)
+For each unverified claim:
+**Location:** [Section/paragraph reference]
+**Claim:** "[Quote the claim]"
+**Issue:** [What needs verification]
+**Suggestion:** [Add specific metric / cite source / add qualifier]
+**How to Verify:** [Where/how to check this claim]
+
+### MINOR ISSUES (Style/Clarity Improvements)
+For each minor issue:
+**Location:** [Section/paragraph reference]
+**Issue:** [What could be improved]
+**Suggestion:** [How to improve it]
+
+### CODE VALIDATION
+For each code example:
+**Code Block:** [Number or section]
+**Status:** [✓ Valid / ⚠ Warning / ✗ Error]
+**Issues:** [Any problems found]
+**Tested:** [Yes/No/Cannot verify without environment]
+
+### ACCURACY SCORE BY CATEGORY
+- Technical Accuracy: [0-100]%
+- Factual Claims: [0-100]%
+- Best Practices: [0-100]%
+- Code Examples: [0-100]%
+- Overall: [0-100]%
+
+### RECOMMENDATIONS
+1. [Priority action]
+2. [Next priority]
+3. [Additional improvements]
+
+### VERIFICATION CHECKLIST
+- [ ] All commands tested or verified against documentation
+- [ ] All performance claims have specific metrics
+- [ ] All version numbers checked against release notes
+- [ ] All code examples are syntactically correct
+- [ ] All links point to authoritative sources
+- [ ] All best practices are current (as of Nov 2024)
+- [ ] No internal contradictions found
+- [ ] All technical terms used correctly
+
+## SPECIAL FOCUS AREAS
+
+### PowerShell Content
+- Cmdlet names and parameters are correct
+- `-ErrorAction`, `-Verbose`, and common parameters used properly
+- Pipeline usage is idiomatic
+- Variables follow `$PascalCase` or `$camelCase` conventions
+- Comments explain WHY, not just WHAT
+
+### Azure/Cloud Content
+- Service names are official and current
+- Pricing/limits are accurate or qualified as estimates
+- Region availability is not overstated
+- Authentication methods are secure and current
+
+### DevOps/CI-CD Content
+- Tool versions are compatible
+- Workflow syntax is correct
+- Security practices are current
+- Deployment strategies are proven
+
+### Database Content
+- SQL syntax matches specified database version
+- Performance recommendations are evidence-based
+- Index strategies are appropriate
+- Connection strings are secure
+
+## TONE AND APPROACH
+
+- Be thorough but constructive
+- Distinguish between definite errors and "needs verification"
+- Prioritize issues by severity
+- Provide actionable corrections, not just criticism
+- Acknowledge what's correct as well as what needs fixing
+- Consider the article's target audience when evaluating depth
+
+## CURRENT CONTEXT
+- Current date: November 2024
+- Latest stable PowerShell: 7.4.x
+- Latest .NET: .NET 8
+- Azure SDK versions: Check latest releases
+- GitHub Actions: runner versions ubuntu-latest = 22.04
+
+---
+
+ARTICLE TO FACT-CHECK:
+{{args}}
+
+Be specific with line/paragraph references. Provide corrections with sources where possible.
+"""

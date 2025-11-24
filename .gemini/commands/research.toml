@@ -1,0 +1,65 @@
+description = "Research a topic thoroughly and create a knowledge base for an article"
+prompt = """
+Research the following topic comprehensively:
+
+Topic: {{args}}
+
+Provide a thorough research report including:
+
+## 1. Overview and Definition
+- Clear definition of the topic
+- Core concepts and terminology
+- Why this topic matters (context and relevance)
+
+## 2. Current State (as of November 2024)
+- Latest developments and trends
+- Recent changes or updates
+- Industry adoption and maturity level
+
+## 3. Key Components and Features
+- Main elements or aspects
+- How different parts work together
+- Important variations or approaches
+
+## 4. Practical Applications
+- Common use cases
+- Real-world examples
+- Industry-specific applications
+- When to use and when not to use
+
+## 5. Best Practices
+- Recommended approaches
+- Common patterns and conventions
+- Performance considerations
+- Security considerations (if applicable)
+
+## 6. Common Challenges and Pitfalls
+- Frequent mistakes to avoid
+- Known issues or limitations
+- Troubleshooting tips
+- Edge cases to consider
+
+## 7. Tools and Ecosystem
+- Popular tools and libraries
+- Recommended resources
+- Community and support options
+
+## 8. Learning Path
+- Prerequisites or foundational knowledge needed
+- Recommended learning progression
+- Key skills to develop
+
+## 9. Future Outlook
+- Emerging trends
+- Potential developments
+- Areas of active research or innovation
+
+## 10. References and Resources
+- Official documentation
+- Authoritative sources
+- Tutorials and guides
+- Community resources
+
+Format as detailed markdown that can be used to create comprehensive article outlines.
+Prioritize accurate, up-to-date, and actionable information.
+"""
