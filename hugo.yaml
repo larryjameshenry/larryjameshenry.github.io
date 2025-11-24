@@ -343,7 +343,7 @@ params:
 
   footer:
     recentPosts:
-      path: "blogs"
+      path: "posts"
       count: 3
       title: Recent Posts
       enable: true
