@@ -31,7 +31,7 @@ markup:
 Menus:
   main:
     - identifier: posts
-      name: Posts
+      name: Blog
       title: Blog posts
       url: /posts
       weight: 1
