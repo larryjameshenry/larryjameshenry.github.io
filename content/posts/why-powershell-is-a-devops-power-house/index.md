@@ -3,7 +3,7 @@ title: "Why PowerShell is a DevOps Power House"
 date: 2025-11-24T16:36:59-05:00
 draft: false
 series: ["powershell-automation-for-devops"]
-image: post.jpg
+image: ./post.jpg
 weight: 1
 ---
 
