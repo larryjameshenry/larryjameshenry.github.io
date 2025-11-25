@@ -286,11 +286,11 @@ To use PowerShell effectively and safely in a team environment, follow these bes
 3.  **Authentication Failures in CI/CD:** A script that runs perfectly on your local machine with `Connect-AzAccount` fails in the pipeline.
     *   **Solution:** This is almost always an authentication context issue. Your local session is authenticated with your user credentials. The pipeline needs its own identity. Create a Service Principal (Azure), an IAM Role (AWS), or a similar non-human identity and use it for non-interactive login within the script, as shown in the walkthrough.
 
-## Conclusion
+## Next Steps
 
 PowerShell has matured into an essential tool for modern DevOps. Its cross-platform nature makes it universally applicable, and its object-oriented pipeline provides a more resilient and powerful alternative to traditional text-based shells. By treating infrastructure, configurations, and operational data as objects, you can write clearer, more reliable, and more sophisticated automation.
 
-Here are five actionable takeaways to get you started:
+Here are five next steps to get you started:
 
 1.  **Install PowerShell on Your Machine:** Regardless of your OS, install the latest version of `pwsh` and make it your go-to shell for a week.
 2.  **Convert a Simple Shell Script:** Take a simple Bash or batch script you use and rewrite it in PowerShell. Experience firsthand the difference between parsing text and manipulating objects.
