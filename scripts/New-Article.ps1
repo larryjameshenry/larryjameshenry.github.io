@@ -2,7 +2,7 @@
 .SYNOPSIS
     Create a new article with AI-generated outline
 .DESCRIPTION
-    Uses Gemini CLI to research a topic and generate an article outline.
+    Uses Gemini CLI commands to research a topic and generate an article outline.
     Can optionally be part of a series.
 .PARAMETER Topic
     The article topic/title
@@ -47,37 +47,23 @@ if (Test-Path $ArticlePath) {
 
 Write-Host "Creating new article: $Topic" -ForegroundColor Cyan
 
-# Research phase
+# Research phase using /research command
 Write-Host "Step 1: Researching topic..." -ForegroundColor Yellow
 $ResearchFile = "temp-research-$Slug.md"
 New-Item -ItemType File -Path $ResearchFile -Force | Out-Null
 Write-Output "# Research for: $Topic" | Out-File $ResearchFile -Encoding UTF8
 gemini "/research $Topic" | Out-File $ResearchFile -Append -Encoding UTF8
 
-# Build outline prompt with series/tags if provided
+# Build outline arguments
 Write-Host "Step 2: Generating outline..." -ForegroundColor Yellow
 $CurrentDate = Get-Date -Format "yyyy-MM-dd"
 
-$SeriesLine = if ($Series) { "series: [`"$Series`"]" } else { "" }
-$TagsLine = if ($Tags) {
-    $TagArray = $Tags -split ',' | ForEach-Object { "`"$($_.Trim())`"" }
-    "tags: [$($TagArray -join ', ')]"
-} else {
-    "tags: []"
-}
+$OutlineArgs = "Topic: $Topic`nDate: $CurrentDate`nCategory: $Category"
+if ($Series) { $OutlineArgs += "`nSeries: $Series" }
+if ($Tags) { $OutlineArgs += "`nTags: $Tags" }
 
-$OutlinePrompt = @"
-Topic: $Topic
-Date: $CurrentDate
-Category: $Category
-$SeriesLine
-$TagsLine
-
-Use the research context to create a comprehensive article outline.
-Include front matter with the series and tags provided above.
-"@
-
-gemini --add $ResearchFile "/outline $OutlinePrompt" | Out-File $ArticlePath -Encoding UTF8
+# Use /outline command from TOML
+gemini --add $ResearchFile "/outline $OutlineArgs" | Out-File $ArticlePath -Encoding UTF8
 Remove-Item $ResearchFile -Force
 
 Write-Host "✓ Article outline created: $ArticlePath" -ForegroundColor Green

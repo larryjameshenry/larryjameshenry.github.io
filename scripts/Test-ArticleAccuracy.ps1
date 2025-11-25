@@ -2,18 +2,11 @@
 .SYNOPSIS
     Fact-check an article using Gemini CLI
 .DESCRIPTION
-    Uses Gemini CLI to verify technical accuracy, check claims, validate code,
-    and identify statements that need evidence or correction
+    Uses Gemini CLI to verify technical accuracy by embedding article content in prompt
 .PARAMETER Slug
     The article slug to fact-check
 .PARAMETER OutputFile
     Optional file to save detailed fact-check report
-.PARAMETER AutoFix
-    Attempt to automatically apply suggested corrections (use with caution)
-.EXAMPLE
-    .\scripts\Test-ArticleAccuracy.ps1 -Slug "powershell-automation-basics"
-.EXAMPLE
-    .\scripts\Test-ArticleAccuracy.ps1 -Slug "azure-pipelines" -OutputFile "factcheck-azure.md"
 #>
 
 param(
@@ -21,10 +14,7 @@ param(
     [string]$Slug,
 
     [Parameter(Mandatory=$false)]
-    [string]$OutputFile,
-
-    [Parameter(Mandatory=$false)]
-    [switch]$AutoFix
+    [string]$OutputFile
 )
 
 $ArticlePath = "content/posts/$Slug.md"
@@ -39,32 +29,116 @@ Write-Host "  Article Fact-Check" -ForegroundColor Cyan
 Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Article: $Slug" -ForegroundColor Yellow
-Write-Host "Path: $ArticlePath" -ForegroundColor Gray
 Write-Host ""
-Write-Host "Running comprehensive fact-check..." -ForegroundColor Yellow
-Write-Host "This may take 30-60 seconds..." -ForegroundColor Gray
+Write-Host "Running fact-check (this may take 60-90 seconds)..." -ForegroundColor Yellow
 Write-Host ""
 
 try {
-    # Run fact-check command
-    $FactCheckResult = gemini --add $ArticlePath "/factcheck"
+    # Read article content
+    $ArticleContent = Get-Content $ArticlePath -Raw
+
+    # Build fact-check prompt with article embedded
+    $FactCheckPrompt = @"
+Perform a comprehensive fact-check of this article. Verify accuracy and identify claims that need evidence.
+
+FACT-CHECKING CRITERIA:
+
+1. Technical Accuracy
+   - Correct command syntax and parameters
+   - Accurate API usage and method signatures
+   - Valid configuration examples
+   - Correct version numbers and compatibility info
+
+2. Factual Claims
+   - Performance claims (speeds, benchmarks, metrics)
+   - Capacity limits (user counts, data sizes, throughput)
+   - Version information and release dates
+   - Feature availability and limitations
+
+3. Best Practices
+   - Security recommendations are current
+   - Suggested patterns follow latest standards
+   - No deprecated approaches recommended
+
+4. Code Examples
+   - Syntax is correct for specified language/version
+   - Code would actually execute as claimed
+   - Error handling is appropriate
+   - Output examples match code logic
+
+5. Logical Consistency
+   - Article doesn't contradict itself
+   - Examples support stated claims
+   - Prerequisites match complexity
+
+OUTPUT FORMAT:
+
+# FACT-CHECK SUMMARY
+- Severity: [PASS / MINOR ISSUES / MAJOR ISSUES / FAIL]
+- Technical Accuracy: [0-100]%
+- Factual Claims: [0-100]%
+- Best Practices: [0-100]%
+- Code Examples: [0-100]%
+- Overall: [0-100]%
+
+# CRITICAL ISSUES (Must Fix Before Publishing)
+[List critical issues with location, problem, and correction]
+
+# VERIFICATION NEEDED (Claims Without Evidence)
+[List unverified claims that need sources or metrics]
+
+# MINOR ISSUES (Style/Clarity Improvements)
+[List minor improvements]
+
+# CODE VALIDATION
+[Validate each code block]
+
+# RECOMMENDATIONS
+1. [Priority action]
+2. [Next priority]
+3. [Additional improvements]
+
+Be thorough and specific with locations and corrections.
+
+--- ARTICLE START ---
+$ArticleContent
+--- ARTICLE END ---
+"@
+
+    # Call Gemini CLI
+    $FactCheckResult = & gemini $FactCheckPrompt 2>&1 | Out-String
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "Gemini CLI returned exit code $LASTEXITCODE"
+    }
+
+    # Clean output
+    $Lines = $FactCheckResult -split "`r?`n"
+    $CleanLines = $Lines | Where-Object {
+        $_ -notmatch '^Loaded cached credentials' -and
+        $_ -notmatch '^Loading' -and
+        $_ -notmatch '^Initializing' -and
+        $_ -notmatch '^Using model' -and
+        $_ -notmatch '^Gemini CLI' -and
+        $_ -notmatch '^Generating content'
+    }
+
+    # Remove leading empty lines
+    while ($CleanLines.Count -gt 0 -and [string]::IsNullOrWhiteSpace($CleanLines[0])) {
+        $CleanLines = $CleanLines[1..($CleanLines.Count - 1)]
+    }
+
+    $FactCheckResult = ($CleanLines -join "`n").Trim()
 
     if ([string]::IsNullOrWhiteSpace($FactCheckResult)) {
         throw "Gemini CLI returned empty result"
     }
 
-    # Display results
     Write-Host $FactCheckResult
     Write-Host ""
 
     # Save to file if requested
     if ($OutputFile) {
-        $ReportPath = if ([System.IO.Path]::IsPathRooted($OutputFile)) {
-            $OutputFile
-        } else {
-            Join-Path (Get-Location) $OutputFile
-        }
-
         $ReportContent = @"
 # Fact-Check Report: $Slug
 
@@ -76,18 +150,17 @@ try {
 $FactCheckResult
 "@
 
-        $ReportContent | Out-File $ReportPath -Encoding UTF8
-        Write-Host "✓ Detailed report saved: $ReportPath" -ForegroundColor Green
+        Set-Content -Path $OutputFile -Value $ReportContent -Encoding UTF8
+        Write-Host "✓ Report saved: $OutputFile" -ForegroundColor Green
         Write-Host ""
     }
 
-    # Parse severity from result
+    # Parse severity
     $Severity = "UNKNOWN"
     if ($FactCheckResult -match 'Severity:\s*(PASS|MINOR ISSUES|MAJOR ISSUES|FAIL)') {
         $Severity = $Matches[1]
     }
 
-    # Display summary based on severity
     Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
 
     switch ($Severity) {
@@ -102,7 +175,6 @@ $FactCheckResult
             Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
             Write-Host ""
             Write-Host "Article is mostly accurate with minor improvements needed." -ForegroundColor Yellow
-            Write-Host "Review suggestions above and apply corrections." -ForegroundColor Gray
         }
         "MAJOR ISSUES" {
             Write-Host "  ✗ MAJOR ISSUES FOUND" -ForegroundColor Red
@@ -127,35 +199,18 @@ $FactCheckResult
     }
 
     Write-Host ""
-    Write-Host "Next Steps:" -ForegroundColor Cyan
-
-    if ($Severity -in @("MAJOR ISSUES", "FAIL")) {
-        Write-Host "  1. Review critical issues in detail above" -ForegroundColor White
-        Write-Host "  2. Make corrections to: $ArticlePath" -ForegroundColor White
-        Write-Host "  3. Re-run fact-check: .\scripts\Test-ArticleAccuracy.ps1 -Slug $Slug" -ForegroundColor White
-        Write-Host "  4. Only publish after PASS or MINOR ISSUES status" -ForegroundColor White
-    } elseif ($Severity -eq "MINOR ISSUES") {
-        Write-Host "  1. Review and apply suggested improvements" -ForegroundColor White
-        Write-Host "  2. Optional: Re-run fact-check to verify" -ForegroundColor White
-        Write-Host "  3. Proceed with publishing when ready" -ForegroundColor White
-    } else {
-        Write-Host "  1. Proceed with expansion or publishing" -ForegroundColor White
-        Write-Host "  2. Consider final polish: gemini --add $ArticlePath '/finalize'" -ForegroundColor White
-    }
-
-    Write-Host ""
 
 } catch {
     Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Red
     Write-Host "  Fact-Check Failed" -ForegroundColor Red
     Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Red
     Write-Host ""
-    Write-Error "Failed to run fact-check: $_"
+    Write-Error "Failed to run fact-check: $($_.Exception.Message)"
     Write-Host ""
     Write-Host "Troubleshooting:" -ForegroundColor Yellow
-    Write-Host "  - Verify Gemini CLI is configured: gemini config" -ForegroundColor Gray
-    Write-Host "  - Check article format is valid" -ForegroundColor Gray
-    Write-Host "  - Try manual fact-check: gemini --add $ArticlePath '/factcheck'" -ForegroundColor Gray
+    Write-Host "  - Verify Gemini CLI is working: gemini 'test'" -ForegroundColor Gray
+    Write-Host "  - Check article format is valid: code $ArticlePath" -ForegroundColor Gray
+    Write-Host "  - Wait 5-10 minutes for rate limits" -ForegroundColor Gray
     Write-Host ""
     exit 1
 }

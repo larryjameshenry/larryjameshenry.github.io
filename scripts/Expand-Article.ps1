@@ -2,16 +2,12 @@
 .SYNOPSIS
     Expand an article outline into a full article
 .DESCRIPTION
-    Uses Gemini CLI to expand outline into complete article content with
-    proper code examples, detailed explanations, and publication-ready prose.
+    Uses Gemini CLI to expand outline into complete article content
+    Embeds outline directly in prompt (no --add flag needed)
 .PARAMETER Slug
     The article slug/filename (without .md extension)
 .PARAMETER SkipBackup
     Skip creating backup file before expansion
-.EXAMPLE
-    .\scripts\Expand-Article.ps1 -Slug "powershell-automation-basics"
-.EXAMPLE
-    .\scripts\Expand-Article.ps1 -Slug "azure-devops-pipelines" -SkipBackup
 #>
 
 param(
@@ -24,7 +20,6 @@ param(
 
 $ArticlePath = "content/posts/$Slug.md"
 
-# Validate article exists
 if (-not (Test-Path $ArticlePath)) {
     Write-Error "Article not found: $ArticlePath"
     Write-Host ""
@@ -38,24 +33,14 @@ if (-not (Test-Path $ArticlePath)) {
 # Read current content
 $CurrentContent = Get-Content $ArticlePath -Raw
 
-# Check if already expanded (look for draft: false or significant length)
+# Check if already expanded
 $IsDraft = $CurrentContent -match 'draft:\s*true'
 $ContentLength = $CurrentContent.Length
 
 if (-not $IsDraft) {
     Write-Warning "Article appears to be already published (draft: false)"
-    $Confirm = Read-Host "Continue expansion anyway? This will overwrite existing content. (y/n)"
+    $Confirm = Read-Host "Continue expansion anyway? (y/n)"
     if ($Confirm -ne 'y') {
-        Write-Host "Expansion cancelled." -ForegroundColor Yellow
-        exit 0
-    }
-}
-
-if ($ContentLength -gt 5000) {
-    Write-Warning "Article is already substantial ($ContentLength characters)"
-    $Confirm = Read-Host "This looks like it might already be expanded. Continue? (y/n)"
-    if ($Confirm -ne 'y') {
-        Write-Host "Expansion cancelled." -ForegroundColor Yellow
         exit 0
     }
 }
@@ -65,12 +50,10 @@ Write-Host "  Expanding Article to Full Content" -ForegroundColor Cyan
 Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Article: $Slug" -ForegroundColor Yellow
-Write-Host "Path: $ArticlePath" -ForegroundColor Gray
 Write-Host ""
 
 # Create backup unless skipped
 if (-not $SkipBackup) {
-    $BackupPath = "$ArticlePath.backup"
     $BackupTimestamp = Get-Date -Format "yyyyMMdd-HHmmss"
     $BackupDir = "backups"
 
@@ -79,114 +62,108 @@ if (-not $SkipBackup) {
     }
 
     $TimestampedBackup = "$BackupDir/$Slug-$BackupTimestamp.md"
-
-    Copy-Item $ArticlePath $BackupPath -Force
     Copy-Item $ArticlePath $TimestampedBackup -Force
 
-    Write-Host "✓ Backup created: $BackupPath" -ForegroundColor Green
-    Write-Host "✓ Timestamped backup: $TimestampedBackup" -ForegroundColor Green
+    Write-Host "✓ Backup created: $TimestampedBackup" -ForegroundColor Green
     Write-Host ""
 }
 
 Write-Host "Expanding article using Gemini CLI..." -ForegroundColor Yellow
-Write-Host "This may take 30-60 seconds depending on article complexity..." -ForegroundColor Gray
+Write-Host "This may take 60-120 seconds..." -ForegroundColor Gray
 Write-Host ""
 
 try {
-    # Expand article using Gemini CLI with the outline as context
-    $ExpandedContent = gemini --add $ArticlePath "/expand"
+    # Build expansion prompt with outline embedded
+    $ExpansionPrompt = @"
+Expand the following article outline into a complete, well-written, publication-ready article.
+
+WRITING GUIDELINES:
+- Avoid AI clichés: "delve", "leverage", "robust", "seamless", "cutting-edge"
+- Use specific numbers and metrics instead of vague claims
+- Active voice and direct statements
+- Concrete examples with working code
+- Natural transitions without formulaic phrases
+- Technical precision over marketing language
+
+CONTENT REQUIREMENTS:
+- Word count: 1500-2500 words
+- Include 2-3 complete code examples with comments
+- At least 1 detailed step-by-step walkthrough
+- Best practices section with do's and don'ts
+- Troubleshooting section with 2-3 common issues
+- Conclusion with 5 specific, actionable takeaways
+
+STRUCTURE:
+- Maintain the outline's section structure
+- Expand all placeholder sections
+- Use conversational but professional tone
+- Break complex concepts into digestible explanations
+- Front-load important information
+
+Change draft: true to draft: false when complete.
+
+--- OUTLINE START ---
+$CurrentContent
+--- OUTLINE END ---
+
+Generate the complete, expanded article with Hugo front matter.
+"@
+
+    # Call Gemini with embedded prompt
+    $ExpandedContent = & gemini $ExpansionPrompt 2>&1 | Out-String
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "Gemini CLI returned exit code $LASTEXITCODE"
+    }
+
+    # Clean output (remove debug messages)
+    $Lines = $ExpandedContent -split "`r?`n"
+    $CleanLines = $Lines | Where-Object {
+        $_ -notmatch '^Loaded cached credentials' -and
+        $_ -notmatch '^Loading' -and
+        $_ -notmatch '^Initializing' -and
+        $_ -notmatch '^Using model' -and
+        $_ -notmatch '^Gemini CLI' -and
+        $_ -notmatch '^Generating content' -and
+        $_ -notmatch '^Streaming'
+    }
+
+    # Remove leading empty lines
+    while ($CleanLines.Count -gt 0 -and [string]::IsNullOrWhiteSpace($CleanLines[0])) {
+        $CleanLines = $CleanLines[1..($CleanLines.Count - 1)]
+    }
+
+    $ExpandedContent = ($CleanLines -join "`n").Trim()
 
     if ([string]::IsNullOrWhiteSpace($ExpandedContent)) {
         throw "Gemini CLI returned empty content"
     }
 
-    # Check if expansion actually happened (look for substantial increase)
-    if ($ExpandedContent.Length -le $CurrentContent.Length * 1.2) {
-        Write-Warning "Expansion may not have worked properly (content length similar)"
-        Write-Host "Original: $($CurrentContent.Length) chars" -ForegroundColor Gray
-        Write-Host "Expanded: $($ExpandedContent.Length) chars" -ForegroundColor Gray
-        Write-Host ""
+    # Write expanded content
+    Set-Content -Path $ArticlePath -Value $ExpandedContent -Encoding UTF8 -NoNewline
 
-        $Confirm = Read-Host "Continue saving anyway? (y/n)"
-        if ($Confirm -ne 'y') {
-            Write-Host "Expansion cancelled. Original file unchanged." -ForegroundColor Yellow
-            if (-not $SkipBackup) {
-                Remove-Item $BackupPath -Force -ErrorAction SilentlyContinue
-            }
-            exit 0
-        }
-    }
-
-    # Write expanded content back to file
-    $ExpandedContent | Out-File $ArticlePath -Encoding UTF8 -NoNewline
-
-    # Remove temporary backup if successful (keep timestamped one)
-    if (-not $SkipBackup) {
-        Remove-Item $BackupPath -Force -ErrorAction SilentlyContinue
-    }
-
-    $FinalLength = $ExpandedContent.Length
     $WordCount = ($ExpandedContent -split '\s+').Count
 
     Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
     Write-Host "  Article Expanded Successfully!" -ForegroundColor Green
     Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "Statistics:" -ForegroundColor Yellow
-    Write-Host "  Characters: $FinalLength" -ForegroundColor Gray
-    Write-Host "  Words: ~$WordCount" -ForegroundColor Gray
-    Write-Host "  File: $ArticlePath" -ForegroundColor Gray
+    Write-Host "Word Count: ~$WordCount words" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "Next Steps:" -ForegroundColor Cyan
-    Write-Host "  1. Review the full article:" -ForegroundColor White
-    Write-Host "     code $ArticlePath" -ForegroundColor Gray
+    Write-Host "  1. Review: code $ArticlePath" -ForegroundColor White
+    Write-Host "  2. Test: hugo server --buildDrafts" -ForegroundColor White
+    Write-Host "  3. Fact-check: .\scripts\Test-ArticleAccuracy.ps1 -Slug $Slug" -ForegroundColor White
+    Write-Host "  4. Publish: .\scripts\Publish-Article.ps1 -Slug $Slug" -ForegroundColor White
     Write-Host ""
-    Write-Host "  2. Test locally with drafts:" -ForegroundColor White
-    Write-Host "     hugo server --buildDrafts --navigateToChanged" -ForegroundColor Gray
-    Write-Host ""
-    Write-Host "  3. Optional - Get AI polish and suggestions:" -ForegroundColor White
-    Write-Host "     gemini --add $ArticlePath '/finalize' > review-$Slug.md" -ForegroundColor Gray
-    Write-Host "     code review-$Slug.md" -ForegroundColor Gray
-    Write-Host ""
-  
-    Write-Host "  4. When ready to publish:" -ForegroundColor White
-    Write-Host "     .\scripts\Publish-Article.ps1 -Slug $Slug" -ForegroundColor Gray
-    Write-Host ""
-    Write-Host "  RECOMMENDED: Run fact-check before publishing:" -ForegroundColor Yellow
-    Write-Host "     .\scripts\Test-ArticleAccuracy.ps1 -Slug $Slug" -ForegroundColor Gray
-    Write-Host ""
-
-    Write-Host "  5. When ready to publish:" -ForegroundColor White
-    Write-Host "     .\scripts\Publish-Article.ps1 -Slug $Slug" -ForegroundColor Gray
-    Write-Host ""
-
-    if (-not $SkipBackup) {
-        Write-Host "Backup available at: $TimestampedBackup" -ForegroundColor DarkGray
-        Write-Host ""
-    }
 
 } catch {
-    Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Red
-    Write-Host "  Expansion Failed!" -ForegroundColor Red
-    Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Red
-    Write-Host ""
-    Write-Error "Failed to expand article: $_"
-    Write-Host ""
-
-    if (-not $SkipBackup -and (Test-Path $BackupPath)) {
-        Write-Host "Restoring from backup..." -ForegroundColor Yellow
-        Copy-Item $BackupPath $ArticlePath -Force
-        Remove-Item $BackupPath -Force
-        Write-Host "✓ Original file restored" -ForegroundColor Green
-    }
-
+    Write-Error "Failed to expand article: $($_.Exception.Message)"
     Write-Host ""
     Write-Host "Troubleshooting:" -ForegroundColor Yellow
-    Write-Host "  - Check Gemini CLI is configured: gemini config" -ForegroundColor Gray
-    Write-Host "  - Verify API key is set: gemini auth" -ForegroundColor Gray
-    Write-Host "  - Check outline format is valid" -ForegroundColor Gray
-    Write-Host "  - Try expanding manually: gemini --add $ArticlePath '/expand'" -ForegroundColor Gray
-    Write-Host ""
-
+    Write-Host "  1. Check if outline is properly formatted: code $ArticlePath" -ForegroundColor Gray
+    Write-Host "  2. Wait 5-10 minutes for rate limits" -ForegroundColor Gray
+    Write-Host "  3. Try manually with: gemini 'Expand this outline: ...' " -ForegroundColor Gray
+    Write-Host "  4. Restore backup: Copy-Item $TimestampedBackup $ArticlePath -Force" -ForegroundColor Gray
     exit 1
 }

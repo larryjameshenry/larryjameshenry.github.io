@@ -1,28 +1,18 @@
 <#
 .SYNOPSIS
-    Test all code examples in an article for syntax and logic errors
+    Test all code examples in an article
 .DESCRIPTION
-    Extracts code blocks and validates syntax, checks for common errors,
-    and optionally attempts to execute PowerShell code blocks
+    Uses Gemini CLI to validate code syntax and logic by embedding article content
 .PARAMETER Slug
     The article slug to test
-.PARAMETER ExecutePowerShell
-    Actually execute PowerShell code blocks in isolated runspace (use with caution)
 .PARAMETER OutputFile
     Optional file to save test results
-.EXAMPLE
-    .\scripts\Test-ArticleCode.ps1 -Slug "powershell-basics"
-.EXAMPLE
-    .\scripts\Test-ArticleCode.ps1 -Slug "azure-functions" -ExecutePowerShell -OutputFile "code-test-results.md"
 #>
 
 param(
     [Parameter(Mandatory=$true)]
     [string]$Slug,
-    
-    [Parameter(Mandatory=$false)]
-    [switch]$ExecutePowerShell,
-    
+
     [Parameter(Mandatory=$false)]
     [string]$OutputFile
 )
@@ -41,68 +31,115 @@ Write-Host ""
 Write-Host "Article: $Slug" -ForegroundColor Yellow
 Write-Host ""
 
-# Run Gemini code test
-Write-Host "Running AI code validation..." -ForegroundColor Yellow
-$TestResult = gemini --add $ArticlePath "/testcode"
+# Read article
+$ArticleContent = Get-Content $ArticlePath -Raw
 
-Write-Host $TestResult
-Write-Host ""
+# Build test prompt with article embedded
+$TestPrompt = @"
+Extract and validate all code examples from this article.
 
-# If PowerShell execution enabled, extract and test PS code blocks
-if ($ExecutePowerShell) {
-    Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
-    Write-Host "  PowerShell Code Execution Test" -ForegroundColor Cyan
-    Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
-    Write-Host ""
-    
-    $Content = Get-Content $ArticlePath -Raw
-    
-    # Extract PowerShell code blocks
-    $PSCodeBlocks = [regex]::Matches($Content, '``````', 
-        [System.Text.RegularExpressions.RegexOptions]::Singleline)
-    
-    if ($PSCodeBlocks.Count -eq 0) {
-        Write-Host "No PowerShell code blocks found." -ForegroundColor Gray
-    } else {
-        Write-Host "Found $($PSCodeBlocks.Count) PowerShell code block(s)" -ForegroundColor Yellow
-        Write-Host ""
-        
-        $BlockNum = 1
-        foreach ($Match in $PSCodeBlocks) {
-            $Code = $Match.Groups[1].Value
-            
-            Write-Host "Testing PowerShell Block #$BlockNum..." -ForegroundColor Cyan
-            
-            try {
-                # Parse the code (syntax check)
-                $null = [System.Management.Automation.PSParser]::Tokenize($Code, [ref]$null)
-                Write-Host "  ✓ Syntax check passed" -ForegroundColor Green
-                
-                # Optional: Try to execute in constrained mode
-                # WARNING: This executes code - use only on trusted content
-                Write-Host "  ⚠ Execution skipped (use -ExecutePowerShell carefully)" -ForegroundColor Yellow
-                
-            } catch {
-                Write-Host "  ✗ Syntax error: $_" -ForegroundColor Red
-            }
-            
-            Write-Host ""
-            $BlockNum++
-        }
+For each code block:
+
+1. Identify language and context
+2. Check syntax is correct for the language/version
+3. Verify logic matches what article claims
+4. Look for common issues:
+   - Undefined variables or functions
+   - Type mismatches
+   - Missing error handling
+   - Security issues (hardcoded credentials, injection vulnerabilities)
+   - Resource leaks
+5. Validate output examples match code logic
+
+OUTPUT FORMAT:
+
+# CODE VALIDATION SUMMARY
+- Overall Code Quality Score: [0-100]
+- Total code blocks: [N]
+- Valid (no issues): [N]
+- Warnings (minor issues): [N]
+- Errors (critical issues): [N]
+- Status: [✓ ALL PASS / ⚠ WARNINGS PRESENT / ✗ ERRORS FOUND]
+
+# DETAILED CODE ANALYSIS
+
+For each code block:
+
+**Code Block #[N]: [Section Name or Line Number]**
+- Language: [detected language and version]
+- Status: [✓ Valid | ⚠ Warning | ✗ Error]
+- Issues Found:
+  - [List specific issues with line numbers]
+- Recommendations:
+  - [Specific fixes or improvements]
+
+# CRITICAL ISSUES (Must Fix)
+[List code blocks with critical errors that prevent execution]
+
+# WARNINGS (Should Fix)
+[List code blocks with warnings that could cause problems]
+
+# SECURITY ANALYSIS
+- Security Issues Found: [Number]
+- [List any security concerns with severity]
+
+# RECOMMENDATIONS
+1. [Priority action]
+2. [Next priority]
+
+Be specific about line numbers and exact errors found.
+
+--- ARTICLE START ---
+$ArticleContent
+--- ARTICLE END ---
+"@
+
+Write-Host "Running code validation (this may take 30-60 seconds)..." -ForegroundColor Yellow
+
+try {
+    # Call Gemini CLI with embedded prompt
+    $TestResult = & gemini $TestPrompt 2>&1 | Out-String
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "Gemini CLI returned exit code $LASTEXITCODE"
     }
-}
 
-# Save results if requested
-if ($OutputFile) {
-    $ReportContent = @"
+    # Clean output - remove debug messages
+    $Lines = $TestResult -split "`r?`n"
+    $CleanLines = $Lines | Where-Object {
+        $_ -notmatch '^Loaded cached credentials' -and
+        $_ -notmatch '^Loading' -and
+        $_ -notmatch '^Initializing' -and
+        $_ -notmatch '^Using model' -and
+        $_ -notmatch '^Gemini CLI' -and
+        $_ -notmatch '^Generating content' -and
+        $_ -notmatch '^Streaming'
+    }
+
+    # Remove leading empty lines
+    while ($CleanLines.Count -gt 0 -and [string]::IsNullOrWhiteSpace($CleanLines[0])) {
+        $CleanLines = $CleanLines[1..($CleanLines.Count - 1)]
+    }
+
+    $TestResult = ($CleanLines -join "`n").Trim()
+
+    if ([string]::IsNullOrWhiteSpace($TestResult)) {
+        throw "Gemini CLI returned empty result"
+    }
+
+    Write-Host ""
+    Write-Host $TestResult
+    Write-Host ""
+
+    # Save results if requested
+    if ($OutputFile) {
+        $ReportContent = @"
 # Code Validation Report: $Slug
 
 **Date:** $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
 **Article:** $ArticlePath
 
 ---
-
-## AI Code Validation
 
 $TestResult
 
@@ -113,8 +150,60 @@ $TestResult
 - Review any flagged issues before publishing
 - Consider manual testing for complex code examples
 "@
-    
-    $ReportContent | Out-File $OutputFile -Encoding UTF8
-    Write-Host "✓ Test results saved: $OutputFile" -ForegroundColor Green
+
+        Set-Content -Path $OutputFile -Value $ReportContent -Encoding UTF8
+        Write-Host "✓ Test results saved: $OutputFile" -ForegroundColor Green
+        Write-Host ""
+    }
+
+    # Parse status
+    $Status = "UNKNOWN"
+    if ($TestResult -match 'Status:\s*(✓ ALL PASS|⚠ WARNINGS PRESENT|✗ ERRORS FOUND)') {
+        $Status = $Matches[1]
+    }
+
+    Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
+
+    switch -Wildcard ($Status) {
+        "*ALL PASS*" {
+            Write-Host "  ✓ CODE VALIDATION PASSED" -ForegroundColor Green
+            Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
+            Write-Host ""
+            Write-Host "All code examples are valid!" -ForegroundColor Green
+        }
+        "*WARNINGS*" {
+            Write-Host "  ⚠ WARNINGS FOUND" -ForegroundColor Yellow
+            Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
+            Write-Host ""
+            Write-Host "Code has minor issues that should be addressed." -ForegroundColor Yellow
+        }
+        "*ERRORS*" {
+            Write-Host "  ✗ ERRORS FOUND" -ForegroundColor Red
+            Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
+            Write-Host ""
+            Write-Host "Code has critical errors that must be fixed." -ForegroundColor Red
+        }
+        default {
+            Write-Host "  ? CODE VALIDATION COMPLETE" -ForegroundColor Yellow
+            Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
+            Write-Host ""
+            Write-Host "Review the validation results above." -ForegroundColor Yellow
+        }
+    }
+
     Write-Host ""
+
+} catch {
+    Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Red
+    Write-Host "  Code Validation Failed" -ForegroundColor Red
+    Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Red
+    Write-Host ""
+    Write-Error "Failed to run code validation: $($_.Exception.Message)"
+    Write-Host ""
+    Write-Host "Troubleshooting:" -ForegroundColor Yellow
+    Write-Host "  - Verify Gemini CLI is working: gemini 'test'" -ForegroundColor Gray
+    Write-Host "  - Check article exists: Test-Path $ArticlePath" -ForegroundColor Gray
+    Write-Host "  - Wait 5-10 minutes for rate limits" -ForegroundColor Gray
+    Write-Host ""
+    exit 1
 }

@@ -1,79 +1,126 @@
 <#
 .SYNOPSIS
-    Promote an outline from plans/ to content/posts/ for further work
+    Promote an outline from plans/ to content/posts/
 .DESCRIPTION
-    Moves an article outline to the Hugo content directory where it can be
-    researched more deeply and expanded into a full article
+    Moves an outline file from the plans directory to Hugo content directory
+    and extracts proper metadata from the outline
 .PARAMETER SeriesName
     The series/plan name
 .PARAMETER Number
-    The outline number to promote (e.g., 1, 2, 3)
-.PARAMETER Slug
-    Optional custom slug (auto-generated from outline title if not provided)
+    The article number to promote (e.g., 1 for article 1)
+.PARAMETER Pillar
+    Promote the pillar article instead of numbered article
 #>
 
 param(
     [Parameter(Mandatory=$true)]
     [string]$SeriesName,
 
-    [Parameter(Mandatory=$true)]
-    [int]$Number,
+    [Parameter(Mandatory=$false)]
+    [int]$Number = 0,
 
     [Parameter(Mandatory=$false)]
-    [string]$Slug
+    [switch]$Pillar
 )
 
-$OutlineFile = "plans/$SeriesName/outlines/{0:D2}-article-{0}.md" -f $Number
+$PlanDir = "plans/$SeriesName"
+$OutlinesDir = "$PlanDir/outlines"
+$ContentDir = "content/posts"
+
+# Determine which outline to promote
+if ($Pillar) {
+    $OutlineFile = "$OutlinesDir/00-pillar.md"
+    $ArticleName = "pillar"
+} elseif ($Number -gt 0) {
+    $OutlineFile = "$OutlinesDir/{0:D2}-article-{0}.md" -f $Number
+    $ArticleName = "article-$Number"
+} else {
+    Write-Error "Specify either -Number [N] or -Pillar"
+    exit 1
+}
 
 if (-not (Test-Path $OutlineFile)) {
-    Write-Error "Outline file not found: $OutlineFile"
+    Write-Error "Outline not found: $OutlineFile"
+    Write-Host ""
+    Write-Host "Available outlines:" -ForegroundColor Yellow
+    Get-ChildItem $OutlinesDir -Filter "*.md" | ForEach-Object {
+        Write-Host "  - $($_.Name)" -ForegroundColor Gray
+    }
     exit 1
 }
 
-Write-Host "Promoting outline to content..." -ForegroundColor Cyan
+Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "  Promoting Outline to Content" -ForegroundColor Cyan
+Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host ""
 
-# Read outline to extract title for slug
+# Read outline
 $OutlineContent = Get-Content $OutlineFile -Raw
 
-# Extract title from front matter
-if ($OutlineContent -match '(?ms)^---\s*$.+?^title:\s*["\']?([^"\'\r\n]+)["\']?\s*$.+?^---') {
+# Extract title from front matter or content
+$Title = ""
+if ($OutlineContent -match '(?ms)^---\s*$.+?^title:\s*["\x27]?([^"\x27\r\n]+)["\x27]?\s*$') {
     $Title = $Matches[1].Trim()
+} elseif ($OutlineContent -match '(?m)^#\s+(.+)$') {
+    $Title = $Matches[1].Trim()
+}
+
+# Generate slug from title or use default
+if ($Title) {
+    $Slug = $Title.ToLower() -replace '[^\w\s-]', '' -replace '\s+', '-'
+    Write-Host "Extracted title: $Title" -ForegroundColor Yellow
 } else {
-    Write-Error "Could not extract title from outline front matter"
-    exit 1
+    $Slug = "$SeriesName-$ArticleName"
+    Write-Host "No title found, using default slug" -ForegroundColor Yellow
 }
 
-# Generate slug if not provided
-if (-not $Slug) {
-    $Slug = $Title.ToLower() -replace '[^a-z0-9\s-]', '' -replace '\s+', '-'
-}
+$DestFile = "$ContentDir/$Slug.md"
 
-$DestFile = "content/posts/$Slug.md"
-
-# Check if already exists
+# Check if destination already exists
 if (Test-Path $DestFile) {
-    Write-Error "Article already exists at: $DestFile"
-    exit 1
+    Write-Warning "Article already exists: $DestFile"
+    $Confirm = Read-Host "Overwrite? (y/n)"
+    if ($Confirm -ne 'y') {
+        exit 0
+    }
 }
 
-# Update the outline with proper date and additional research context
-$UpdatedContent = $OutlineContent -replace 'date:\s*[\d\-T:+Z]+', "date: $(Get-Date -Format 'yyyy-MM-ddTHH:mm:ssK')"
+# Update front matter with proper values
+$UpdatedContent = $OutlineContent
 
-# Add comment about promotion
-$UpdatedContent = $UpdatedContent -replace '(---\s*\r?\n)', "`$1`n<!-- Promoted from plan: $SeriesName, outline #$Number -->`n<!-- Ready for deep research and expansion -->`n`n"
+# If title is still placeholder, try to extract from content
+if ($UpdatedContent -match 'title:\s*"Article \d+"') {
+    if ($Title -and $Title -notmatch '^Article \d+$') {
+        $UpdatedContent = $UpdatedContent -replace 'title:\s*"Article \d+"', "title: `"$Title`""
+    } else {
+        # Ask user for title
+        Write-Host ""
+        $UserTitle = Read-Host "Enter article title (or press Enter to keep default)"
+        if ($UserTitle) {
+            $Title = $UserTitle
+            $Slug = $Title.ToLower() -replace '[^\w\s-]', '' -replace '\s+', '-'
+            $DestFile = "$ContentDir/$Slug.md"
+            $UpdatedContent = $UpdatedContent -replace 'title:\s*"Article \d+"', "title: `"$Title`""
+        }
+    }
+}
+
+# Ensure draft: true is set
+if ($UpdatedContent -notmatch 'draft:\s*true') {
+    $UpdatedContent = $UpdatedContent -replace '(---\s*\n)', "`$1draft: true`n"
+}
 
 # Copy to content directory
-$UpdatedContent | Out-File $DestFile -Encoding UTF8
+Set-Content -Path $DestFile -Value $UpdatedContent -Encoding UTF8
 
-Write-Host "✓ Outline promoted: $DestFile" -ForegroundColor Green
+Write-Host ""
+Write-Host "✓ Outline promoted successfully!" -ForegroundColor Green
+Write-Host ""
+Write-Host "Location: $DestFile" -ForegroundColor Yellow
+Write-Host "Slug: $Slug" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "Next Steps:" -ForegroundColor Cyan
-Write-Host "  1. Deep research on this specific topic:" -ForegroundColor White
-Write-Host "     gemini --add $DestFile '/research [specific aspect]'" -ForegroundColor Gray
-Write-Host ""
-Write-Host "  2. Test draft locally:" -ForegroundColor White
-Write-Host "     hugo server --buildDrafts" -ForegroundColor Gray
-Write-Host ""
-Write-Host "  3. When ready, expand to full article:" -ForegroundColor White
-Write-Host "     .\scripts\Expand-Article.ps1 -Slug $Slug" -ForegroundColor Gray
+Write-Host "  1. Review and edit: code $DestFile" -ForegroundColor White
+Write-Host "  2. Expand to full article: .\scripts\Expand-Article.ps1 -Slug $Slug" -ForegroundColor White
+Write-Host "  3. Preview with Hugo: hugo server --buildDrafts" -ForegroundColor White
 Write-Host ""

@@ -2,7 +2,7 @@ description = "Fact-check an article for accuracy, verify claims, and identify u
 prompt = """
 Perform a comprehensive fact-check of this article. Your role is to verify accuracy and identify claims that need evidence.
 
-## FACT-CHECKING CRITERIA
+## Fact-Checking Criteria
 
 ### 1. Technical Accuracy
 **Check for:**
@@ -90,60 +90,96 @@ Perform a comprehensive fact-check of this article. Your role is to verify accur
 - Missing prerequisites
 - Scope creep or topic drift
 
-## OUTPUT FORMAT
-
-Provide results in this structured format:
+## Output Format
 
 ### FACT-CHECK SUMMARY
-- Total claims checked: [number]
-- Verified accurate: [number]
-- Needs verification: [number]
-- Inaccurate/outdated: [number]
-- Severity: [PASS / MINOR ISSUES / MAJOR ISSUES / FAIL]
+**Overall Severity:** [PASS / MINOR ISSUES / MAJOR ISSUES / FAIL]
 
-### CRITICAL ISSUES (Must Fix Before Publishing)
-For each critical issue:
-**Location:** [Section/paragraph reference]
-**Issue:** [What's wrong]
-**Current Text:** "[Quote the problematic text]"
-**Problem:** [Why it's incorrect]
-**Correction:** [Accurate information]
-**Source:** [Where to verify the correct information]
-
-### VERIFICATION NEEDED (Claims Without Evidence)
-For each unverified claim:
-**Location:** [Section/paragraph reference]
-**Claim:** "[Quote the claim]"
-**Issue:** [What needs verification]
-**Suggestion:** [Add specific metric / cite source / add qualifier]
-**How to Verify:** [Where/how to check this claim]
-
-### MINOR ISSUES (Style/Clarity Improvements)
-For each minor issue:
-**Location:** [Section/paragraph reference]
-**Issue:** [What could be improved]
-**Suggestion:** [How to improve it]
-
-### CODE VALIDATION
-For each code example:
-**Code Block:** [Number or section]
-**Status:** [✓ Valid / ⚠ Warning / ✗ Error]
-**Issues:** [Any problems found]
-**Tested:** [Yes/No/Cannot verify without environment]
-
-### ACCURACY SCORE BY CATEGORY
+**Scores:**
 - Technical Accuracy: [0-100]%
 - Factual Claims: [0-100]%
 - Best Practices: [0-100]%
 - Code Examples: [0-100]%
-- Overall: [0-100]%
+- **Overall Accuracy:** [0-100]%
 
-### RECOMMENDATIONS
-1. [Priority action]
-2. [Next priority]
-3. [Additional improvements]
+**Statistics:**
+- Total claims checked: [number]
+- Verified accurate: [number]
+- Needs verification: [number]
+- Inaccurate/outdated: [number]
+
+---
+
+### CRITICAL ISSUES (Must Fix Before Publishing)
+
+For each critical issue:
+
+**Issue #[N]: [Brief description]**
+- **Location:** [Section/paragraph/line reference]
+- **Current Text:** "[Quote the problematic text]"
+- **Problem:** [Detailed explanation of what's wrong]
+- **Correct Information:** [Accurate statement with specifics]
+- **Source/Verification:** [Where to verify - documentation URL, version notes, etc.]
+- **Impact:** [Why this matters - user confusion, security risk, etc.]
+
+---
+
+### VERIFICATION NEEDED (Claims Without Evidence)
+
+For each unverified claim:
+
+**Claim #[N]: [Brief description]**
+- **Location:** [Section/paragraph reference]
+- **Statement:** "[Quote the claim]"
+- **Issue:** [What needs verification - missing metrics, unsupported claim, etc.]
+- **Suggestion:** [How to fix - add specific metric, cite source, add qualifier]
+- **How to Verify:** [Where/how to check this claim]
+
+---
+
+### MINOR ISSUES (Style/Clarity Improvements)
+
+For each minor issue:
+
+**Minor Issue #[N]:**
+- **Location:** [Section/paragraph reference]
+- **Current:** "[Quote]"
+- **Issue:** [What could be improved]
+- **Suggestion:** [How to improve it]
+
+---
+
+### CODE VALIDATION
+
+For each code example:
+
+**Code Block #[N]: [Section name or line number]**
+- **Status:** [✓ Valid / ⚠ Warning / ✗ Error]
+- **Language/Version:** [Detected language and version]
+- **Issues Found:** [List any problems]
+- **Tested:** [Yes / No / Cannot verify without environment]
+- **Recommendations:** [Improvements if any]
+
+---
+
+### DETAILED ANALYSIS BY CATEGORY
+
+**Technical Accuracy: [Score]%**
+- [List specific technical items verified or flagged]
+
+**Factual Claims: [Score]%**
+- [List factual statements verified or questioned]
+
+**Best Practices: [Score]%**
+- [List practices evaluated]
+
+**Code Examples: [Score]%**
+- [Summary of code quality]
+
+---
 
 ### VERIFICATION CHECKLIST
+
 - [ ] All commands tested or verified against documentation
 - [ ] All performance claims have specific metrics
 - [ ] All version numbers checked against release notes
@@ -152,54 +188,58 @@ For each code example:
 - [ ] All best practices are current (as of Nov 2024)
 - [ ] No internal contradictions found
 - [ ] All technical terms used correctly
+- [ ] Security recommendations are up-to-date
+- [ ] Error handling is appropriate
 
-## SPECIAL FOCUS AREAS
+---
 
-### PowerShell Content
-- Cmdlet names and parameters are correct
-- `-ErrorAction`, `-Verbose`, and common parameters used properly
-- Pipeline usage is idiomatic
-- Variables follow `$PascalCase` or `$camelCase` conventions
-- Comments explain WHY, not just WHAT
+### RECOMMENDATIONS
 
-### Azure/Cloud Content
-- Service names are official and current
-- Pricing/limits are accurate or qualified as estimates
-- Region availability is not overstated
-- Authentication methods are secure and current
+**Immediate Actions (Priority Order):**
+1. [Most critical fix needed]
+2. [Second priority]
+3. [Third priority]
 
-### DevOps/CI-CD Content
-- Tool versions are compatible
-- Workflow syntax is correct
-- Security practices are current
-- Deployment strategies are proven
+**Before Publishing:**
+- [Action item 1]
+- [Action item 2]
+- [Action item 3]
 
-### Database Content
-- SQL syntax matches specified database version
-- Performance recommendations are evidence-based
-- Index strategies are appropriate
-- Connection strings are secure
+**Future Improvements:**
+- [Enhancement 1]
+- [Enhancement 2]
 
-## TONE AND APPROACH
+---
 
-- Be thorough but constructive
+### CURRENT CONTEXT (as of November 2024)
+
+**Technology Versions:**
+- PowerShell: 7.4.x (latest stable)
+- .NET: 8.0 LTS
+- Azure: Check latest service versions
+- GitHub Actions: ubuntu-latest = 22.04
+
+**Consider when reviewing:**
+- Is article using current versions?
+- Are deprecation warnings mentioned?
+- Are migration paths clear if using older versions?
+
+---
+
+## Approach
+
+- Be thorough and specific with line/paragraph references
+- Provide corrections with authoritative sources where possible
 - Distinguish between definite errors and "needs verification"
-- Prioritize issues by severity
-- Provide actionable corrections, not just criticism
+- Prioritize issues by severity and user impact
+- Be constructive - explain WHY something is wrong
 - Acknowledge what's correct as well as what needs fixing
 - Consider the article's target audience when evaluating depth
-
-## CURRENT CONTEXT
-- Current date: November 2024
-- Latest stable PowerShell: 7.4.x
-- Latest .NET: .NET 8
-- Azure SDK versions: Check latest releases
-- GitHub Actions: runner versions ubuntu-latest = 22.04
+- Focus on factual accuracy, not stylistic preferences
 
 ---
 
 ARTICLE TO FACT-CHECK:
-{{args}}
 
-Be specific with line/paragraph references. Provide corrections with sources where possible.
+{{args}}
 """
