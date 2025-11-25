@@ -3,7 +3,7 @@ title: "Why PowerShell is a DevOps Power House"
 date: 2025-11-24T16:36:59-05:00
 draft: false
 series: ["powershell-automation-for-devops"]
-image: ./post.jpg
+image: images/post.jpg
 weight: 1
 ---
 
@@ -21,7 +21,7 @@ The game changed in 2016 when Microsoft announced PowerShell Core. Released as a
 *   **Open-Source Development:** The source code is available on GitHub, fostering community contributions and increasing transparency. New releases now arrive independently of the Windows release cycle, allowing for a much faster pace of development.
 *   **Side-by-Side Installation:** You can install and run `pwsh` alongside the legacy `powershell.exe` on Windows, ensuring backward compatibility is not an issue for older scripts.
 
-This evolution transformed PowerShell from a Windows administration feature into a versatile, platform-agnostic automation language. For a DevOps team, this means you can write a single script to manage resources across your entire estateΓÇöwhether itΓÇÖs a Windows Server running IIS, a Linux container in Kubernetes, or a serverless function in AWS or Azure.
+This evolution transformed PowerShell from a Windows administration feature into a versatile, platform-agnostic automation language. For a DevOps team, this means you can write a single script to manage resources across your entire estate'whether it's a Windows Server running IIS, a Linux container in Kubernetes, or a serverless function in AWS or Azure.
 
 ## The Power of the Object-Oriented Pipeline
 
@@ -50,7 +50,7 @@ Get-Process | Sort-Object -Property WorkingSet -Descending | Select-Object -Firs
 Here's what happens:
 1.  `Get-Process` doesn't return text. It returns an array of `System.Diagnostics.Process` objects.
 2.  Each object has properties like `ProcessName`, `Id`, `CPU`, and `WorkingSet` (memory usage).
-3.  The pipe (`|`) sends these complete objectsΓÇönot textΓÇöto `Sort-Object`.
+3.  The pipe (`|`) sends these complete objects'not text'to `Sort-Object`.
 4.  `Sort-Object` accesses the `WorkingSet` property of each object directly and sorts them. No text parsing is needed.
 5.  `Select-Object` then picks the first five objects from the sorted list.
 
@@ -83,7 +83,7 @@ This is where PowerShell truly shines, thanks to its rich ecosystem of modules f
 
 #### Step-by-Step Walkthrough: Provisioning an Azure Storage Account
 
-Let's walk through a common IaC task: creating an Azure Storage Account and uploading a file to it. This demonstrates authentication, resource creation, and interactionΓÇöall within one script.
+Let's walk through a common IaC task: creating an Azure Storage Account and uploading a file to it. This demonstrates authentication, resource creation, and interaction'all within one script.
 
 **Prerequisites:**
 *   PowerShell (`pwsh`) installed.
