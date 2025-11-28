@@ -38,14 +38,23 @@ if (-not $Slug) {
     $Slug = $Topic.ToLower() -replace '[^a-z0-9\s-]', '' -replace '\s+', '-'
 }
 
-$ArticlePath = "content/posts/$Slug.md"
+# Use Bundle format by default
+$ArticleDir = "content/posts/$Slug"
+$ArticlePath = "$ArticleDir/index.md"
 
-if (Test-Path $ArticlePath) {
-    Write-Error "Article already exists at: $ArticlePath"
+if (Test-Path $ArticleDir) {
+    Write-Error "Article bundle already exists at: $ArticleDir"
+    exit 1
+}
+if (Test-Path "content/posts/$Slug.md") {
+    Write-Error "Legacy article file already exists at: content/posts/$Slug.md"
     exit 1
 }
 
-Write-Host "Creating new article: $Topic" -ForegroundColor Cyan
+# Create bundle directory
+New-Item -ItemType Directory -Path $ArticleDir -Force | Out-Null
+
+Write-Host "Creating new article bundle: $Topic" -ForegroundColor Cyan
 
 # Research phase using /research command
 Write-Host "Step 1: Researching topic..." -ForegroundColor Yellow
@@ -63,7 +72,7 @@ if ($Series) { $OutlineArgs += "`nSeries: $Series" }
 if ($Tags) { $OutlineArgs += "`nTags: $Tags" }
 
 # Use /outline command from TOML
-gemini --add $ResearchFile "/outline $OutlineArgs" | Out-File $ArticlePath -Encoding UTF8
+Get-Content $ResearchFile -Raw | gemini "/outline $OutlineArgs" | Out-File $ArticlePath -Encoding UTF8
 Remove-Item $ResearchFile -Force
 
 Write-Host "✓ Article outline created: $ArticlePath" -ForegroundColor Green

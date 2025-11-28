@@ -13,15 +13,23 @@
 param(
     [Parameter(Mandatory=$true)]
     [string]$Slug,
-
+    
     [Parameter(Mandatory=$false)]
     [switch]$ShowAll
 )
 
-$ArticlePath = "content/posts/$Slug.md"
+# Logic to determine path: check for bundle first, then standalone file
+$BundlePath = "content/posts/$Slug/index.md"
+$StandalonePath = "content/posts/$Slug.md"
 
-if (-not (Test-Path $ArticlePath)) {
-    Write-Error "Article not found: $ArticlePath"
+if (Test-Path $BundlePath) {
+    $ArticlePath = $BundlePath
+    Write-Host "Checking article bundle: $ArticlePath" -ForegroundColor Gray
+} elseif (Test-Path $StandalonePath) {
+    $ArticlePath = $StandalonePath
+    Write-Host "Checking standalone article: $ArticlePath" -ForegroundColor Gray
+} else {
+    Write-Error "Article not found: $Slug"
     exit 1
 }
 
@@ -97,7 +105,7 @@ if ($Issues.Count -eq 0) {
 } else {
     $HighIssues = $Issues | Where-Object { $_.Severity -eq 'HIGH' }
     $MediumIssues = $Issues | Where-Object { $_.Severity -eq 'MEDIUM' }
-
+    
     if ($HighIssues) {
         Write-Host "✗ HIGH Priority Issues:" -ForegroundColor Red
         foreach ($Issue in $HighIssues) {
@@ -106,7 +114,7 @@ if ($Issues.Count -eq 0) {
         }
         Write-Host ""
     }
-
+    
     if ($MediumIssues -and $ShowAll) {
         Write-Host "⚠ Medium Priority Issues:" -ForegroundColor Yellow
         foreach ($Issue in $MediumIssues) {

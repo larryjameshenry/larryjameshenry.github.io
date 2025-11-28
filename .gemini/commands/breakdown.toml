@@ -180,4 +180,14 @@ weight: [article number for ordering, 0 for pillar]
 Format the outline with clear markdown headings and nested structure.
 Keep all placeholders clearly marked with [PLACEHOLDER: description].
 Ensure the structure is logical, comprehensive, and easy to expand into a full article.
+
+CRITICAL INSTRUCTIONS:
+1.  **USE THE PROVIDED TEXT BELOW.** The topic cluster plan is provided in the input. Do NOT search for files. Do NOT read files.
+2.  **OUTPUT RAW MARKDOWN ONLY.** Do NOT use the "write_file" tool. Do NOT use any tools.
+3.  **NO CONVERSATION.** Do not include "Here is the outline..." or any other text. Start directly with the markdown front matter.
+
+---
+PLAN CONTEXT:
+{{stdin}}
+---
 """

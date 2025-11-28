@@ -7,6 +7,7 @@ Input: {{args}}
 Generate a complete Hugo-compatible markdown file with:
 
 ## Front Matter (YAML format)
+
 ---
 title: "[Create an engaging, SEO-friendly title]"
 date: [Use current date from args or generate: YYYY-MM-DDTHH:MM:SS]
@@ -24,7 +25,7 @@ weight: [Article order number if part of series, otherwise omit]
 
 **Hook:** [Engaging opening - question, statistic, problem, or surprising fact]
 
-**Problem/Context:**
+**Problem/Context:** 
 - Why this topic matters
 - Current challenges or pain points
 - Who this affects

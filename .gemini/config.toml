@@ -1,0 +1,372 @@
+# Gemini CLI Configuration for Content Generation Workflow
+# This configuration optimizes the Gemini CLI for the content generation pipeline
+
+[defaults]
+# Use latest Gemini 2.0 Flash for speed and cost efficiency
+# Falls back to Gemini 1.5 Pro if needed for complex tasks
+model = "gemini-2.0-flash"
+
+# Output format
+output-format = "text"
+
+# Enable streaming for faster response time
+stream = true
+
+# Timeout in seconds (content generation can take time)
+timeout = 300
+
+[system]
+# System role/context
+role = "content-generation-assistant"
+
+# Temperature: balance between creativity and consistency
+temperature = 0.7
+
+# Top-p: diversity in responses
+top-p = 0.95
+
+# Top-k: limit token choices
+top-k = 40
+
+# Max output tokens: allow substantial responses
+max-output-tokens = 8000
+
+# Disable automatic tool calling for generation tasks
+[tools]
+enabled = true
+
+[content-generation]
+# Settings specific to content generation workflows
+
+# Research stage settings
+[content-generation.research]
+model = "gemini-2.0-flash"
+temperature = 0.6
+max-output-tokens = 2000
+timeout = 60
+
+# Planning stage settings
+[content-generation.planning]
+model = "gemini-2.0-flash"
+temperature = 0.7
+max-output-tokens = 3000
+timeout = 90
+
+# Outline generation
+[content-generation.outline]
+model = "gemini-2.0-flash"
+temperature = 0.6
+max-output-tokens = 2500
+timeout = 75
+
+# Article expansion (where quality matters most)
+[content-generation.expansion]
+# Use Gemini 1.5 Pro for higher quality on expansion
+# More context window for article coherence
+model = "gemini-1.5-pro"
+temperature = 0.7
+max-output-tokens = 4000
+timeout = 120
+
+# Testing/validation
+[content-generation.testing]
+model = "gemini-2.0-flash"
+temperature = 0.3
+max-output-tokens = 3000
+timeout = 90
+
+[safety]
+# Safety settings for content generation
+# Adjust based on your content policies
+
+# HARM_CATEGORY_UNSPECIFIED
+category-unspecified = "BLOCK_NONE"
+
+# HARM_CATEGORY_DEROGATORY_CONTENT
+derogatory = "BLOCK_MEDIUM_AND_ABOVE"
+
+# HARM_CATEGORY_VIOLENCE
+violence = "BLOCK_HIGH"
+
+# HARM_CATEGORY_SEXUAL_CONTENT
+sexual = "BLOCK_HIGH"
+
+# HARM_CATEGORY_MEDICAL
+medical = "BLOCK_MEDIUM_AND_ABOVE"
+
+# HARM_CATEGORY_DANGEROUS_CONTENT
+dangerous = "BLOCK_HIGH"
+
+# HARM_CATEGORY_HARASSMENT
+harassment = "BLOCK_MEDIUM_AND_ABOVE"
+
+# HARM_CATEGORY_HATE_SPEECH
+hate-speech = "BLOCK_MEDIUM_AND_ABOVE"
+
+# HARM_CATEGORY_SEXUALLY_EXPLICIT
+sexually-explicit = "BLOCK_HIGH"
+
+[caching]
+# Cache settings to optimize repeated requests
+enable-cache = true
+cache-ttl = 3600  # Cache for 1 hour
+
+[rate-limiting]
+# Rate limit handling for free tier
+max-requests-per-minute = 15
+max-requests-per-day = 1500
+retry-on-429 = true
+max-retries = 3
+backoff-strategy = "exponential"
+initial-backoff-seconds = 10
+max-backoff-seconds = 120
+
+[logging]
+# Logging configuration
+level = "info"
+format = "json"
+output = "stderr"
+
+# Log content generation stages
+[logging.stages]
+research = true
+planning = true
+outline = true
+expansion = true
+testing = true
+publishing = true
+
+[context]
+# Global context for all requests
+system-prompt = """You are an expert technical content generation assistant specializing in high-quality blog articles for technical audiences.
+
+Your role includes:
+1. Researching topics comprehensively
+2. Planning content strategy with content clusters
+3. Creating detailed outlines
+4. Expanding outlines into complete articles
+5. Validating technical accuracy
+
+CRITICAL WRITING GUIDELINES:
+- Avoid AI clichés: never use "delve", "leverage", "robust", "seamless", "cutting-edge", "game-changer"
+- Never use vague phrases: "in the realm of", "when it comes to", "at the end of the day"
+- Always support claims with specific metrics: "2-3x faster", "43% improvement", not vague claims
+- Use active voice: "The script executes" not "Execution occurs"
+- Include working code examples with explanatory comments
+- Provide real-world context and practical applications
+
+For all responses:
+- Be specific and concrete
+- Include evidence and metrics
+- Show examples and use cases
+- Front-load important information
+- Use clear, scannable structure with subheadings
+- Explain WHY, not just HOW"""
+
+# Include workflow context from gemini.md
+workflow-file = ".gemini/gemini.md"
+
+[models]
+# Model configurations for different tasks
+
+# Fast research and planning
+[models."gemini-2.0-flash"]
+description = "Latest Gemini Flash - Fast, cost-efficient"
+context-window = 1000000
+cost-per-1k-input = 0.000075
+cost-per-1k-output = 0.0003
+best-for = ["research", "planning", "testing", "code-analysis"]
+max-output-tokens = 8000
+
+# Premium model for complex expansion tasks
+[models."gemini-1.5-pro"]
+description = "Gemini 1.5 Pro - High quality, larger context"
+context-window = 2000000
+cost-per-1k-input = 0.0015
+cost-per-1k-output = 0.006
+best-for = ["article-expansion", "complex-analysis", "detailed-planning"]
+max-output-tokens = 8000
+
+# Preview model for testing new features
+[models."gemini-2.0-flash-preview"]
+description = "Gemini 2.0 Flash Preview - Beta features"
+context-window = 1000000
+cost-per-1k-input = 0.000075
+cost-per-1k-output = 0.0003
+best-for = ["testing", "experimentation"]
+max-output-tokens = 8000
+experimental = true
+
+[performance]
+# Performance optimization settings
+
+# Cache responses for identical queries
+cache-responses = true
+
+# Use streaming for faster time-to-first-token
+streaming = true
+
+# Parallel requests (within rate limits)
+max-parallel-requests = 2
+
+# Request batching
+batch-similar-requests = true
+
+# Connection pooling
+connection-pool-size = 10
+
+[development]
+# Development mode settings
+debug = false
+verbose = false
+dry-run = false
+
+# Save all requests/responses for analysis
+save-requests = false
+request-log-dir = ".gemini/logs"
+
+# Pretty print responses
+pretty-print = true
+
+[validation]
+# Content validation settings
+
+# Verify article quality scores
+min-quality-score = 0.7
+
+# Check for prohibited words
+prohibited-words = [
+  "delve",
+  "leverage",
+  "robust",
+  "seamless",
+  "cutting-edge",
+  "game-changer",
+  "in the realm of",
+  "when it comes to",
+  "at the end of the day",
+  "Let's dive into",
+  "It's worth noting"
+]
+
+# Require minimum word counts
+min-words-research = 800
+min-words-outline = 1000
+min-words-article = 1500
+
+# Require code examples for technical articles
+require-code-examples = true
+min-code-examples = 2
+
+# Require specific metrics/numbers
+require-specific-metrics = true
+
+[templates]
+# Template management
+
+# Search paths for templates
+search-paths = [
+  ".gemini/templates",
+  ".gemini/prompts",
+  "~/.gemini/templates"
+]
+
+# Default templates for each stage
+[templates.defaults]
+research = "research.md"
+planning = "planning.md"
+outline = "outline.md"
+expansion = "expansion.md"
+testing = "testing.md"
+
+[export]
+# Export and output settings
+
+# Default export format
+format = "markdown"
+
+# Export destination
+output-dir = "./content/posts"
+
+# Include metadata in export
+include-metadata = true
+
+# Auto-generate front matter
+generate-front-matter = true
+
+# Front matter defaults
+[export.front-matter-defaults]
+draft = true
+series = ""
+category = "Technical"
+tags = []
+
+[ci-cd]
+# CI/CD integration settings
+
+# Fail on warnings
+fail-on-warnings = false
+
+# Fail on quality score below threshold
+min-quality-threshold = 0.7
+
+# Generate quality reports
+generate-reports = true
+report-output-dir = ".gemini/reports"
+
+# Publish-ready criteria
+[ci-cd.publish-ready]
+min-word-count = 1500
+no-placeholders = true
+quality-score-min = 0.8
+code-examples-min = 2
+all-links-valid = true
+all-tests-pass = true
+
+[experimental]
+# Experimental features (use at your own risk)
+
+# Streaming structured responses
+structured-responses = false
+
+# Multi-turn conversations
+multi-turn = false
+
+# Function calling
+function-calling = false
+
+# Vertex AI integration
+vertex-ai = false
+
+# Custom fine-tuning
+fine-tuning = false
+
+[notes]
+# Configuration notes and reminders
+
+# This configuration is optimized for:
+# - Free tier usage with Smart caching
+# - Content quality over speed
+# - Incremental/chunked workflows
+# - Rate limit compliance
+
+# Model selection:
+# - Use Gemini 2.0 Flash for most tasks (fast, cheap)
+# - Use Gemini 1.5 Pro for expansion (better quality)
+# - Preview models for experimentation only
+
+# Rate limiting:
+# - Free tier: 15 req/min, 1500 req/day
+# - Respects exponential backoff on 429 errors
+# - Automatic retry with increasing delays
+
+# Caching:
+# - Enabled for identical queries
+# - Reduces costs and improves performance
+# - Cache TTL: 1 hour
+
+# For production use:
+# - Consider upgrading to paid tier
+# - Increases rate limits dramatically
+# - Enables high-volume content generation
+# - More cost-effective at scale

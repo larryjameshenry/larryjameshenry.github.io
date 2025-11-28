@@ -1,6 +1,6 @@
 ---
 title: "Mastering PowerShell Core Concepts: Cmdlets, Pipeline, and Objects"
-date: 2025-11-26T12:50:00
+date: 2025-11-26T14:41:29-05:00
 draft: true
 description: "Deep dive into PowerShell's foundational elements: mastering cmdlets, leveraging the object-based pipeline, and understanding the power of objects in DevOps."
 series: ["powershell-automation-for-devops"]
@@ -8,7 +8,6 @@ tags: ["PowerShell", "DevOps", "Scripting", "Automation", "Pipelines"]
 categories: ["Automation"]
 weight: 2
 ---
-
 ## Article Structure Outline
 
 ### Introduction (150-200 words target)
@@ -152,6 +151,10 @@ weight: 2
 - Next: [Article 3: Tooling Up for PowerShell DevOps]
 
 ---
+
+
+<!-- Promoted from plan: powershell-automation-for-devops, outline #2 -->
+<!-- Ready for deep research and expansion -->
 
 ## Author Notes (Not in final article)
 

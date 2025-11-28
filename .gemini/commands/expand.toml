@@ -61,7 +61,6 @@ For PowerShell:
 - Use proper PowerShell conventions and formatting
 - Include parameter validation where appropriate
 - Show expected output as comments
-
 Example:
 Get processes using more than 100MB RAM
 Get-Process | Where-Object { $.WorkingSet -gt 100MB } |
@@ -71,7 +70,6 @@ Output:
 Name MemoryMB
 ---- --------
 chrome 256.45
-
 
 For other languages, follow their conventions.
 
@@ -163,4 +161,14 @@ Replace ALL [PLACEHOLDER] markers with actual content.
 Ensure the article is immediately publishable after author review.
 Write naturally as a human expert would write, not as an AI trying to sound smart.
 BE SPECIFIC. USE NUMBERS. SHOW, DON'T JUST TELL.
+
+CRITICAL INSTRUCTIONS:
+1.  **USE THE PROVIDED TEXT BELOW.** The article outline is provided in the input. Do NOT search for files.
+2.  **OUTPUT RAW MARKDOWN ONLY.** Do NOT use the "write_file" tool. Do NOT use any tools.
+3.  **NO CONVERSATION.** Start directly with the markdown content.
+
+---
+OUTLINE CONTEXT:
+{{stdin}}
+---
 """

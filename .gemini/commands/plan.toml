@@ -118,4 +118,9 @@ IMPORTANT FORMATTING:
 - Each article should be clearly delineated with the "Article [NUMBER]:" prefix
 
 Format as markdown with clear sections. This will be used to generate individual article outlines.
+
+CRITICAL INSTRUCTION:
+- Output ONLY the markdown content.
+- Do NOT use the "write_file" tool or any other tool to save the file.
+- The content you generate will be piped to a file automatically by the caller.
 """

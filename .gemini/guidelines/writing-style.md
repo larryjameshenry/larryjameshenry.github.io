@@ -75,6 +75,8 @@
 4. **Application**: When to use it
 
 ### Example
+Error handling prevents scripts from failing silently.
+
 ```powershell
 try {
     $result = Invoke-RestMethod -Uri $apiUrl
@@ -83,12 +85,12 @@ try {
     exit 1
 }
 ```
+
 The try-catch block captures errors from the API call. If the call fails,
 the script logs a descriptive error and exits with a non-zero code.
 
 Use this pattern for any external API calls, file operations, or network requests
 where failures are possible.
-
 
 ## PowerShell-Specific Guidelines
 
@@ -109,7 +111,6 @@ Name MemoryMB
 ---- --------
 chrome 256.45
 code 189.23
-
 
 ## Section Headings
 
@@ -173,6 +174,7 @@ $data = Get-Content "config.json" -ErrorAction Stop
 # Provide helpful error message with troubleshooting hint
 Write-Error "Config file not found. Run: New-Config.ps1"
 exit 1
+}
 ```
 
 ## Linking and References
@@ -204,10 +206,12 @@ exit 1
 Scenario: Deploy Multiple Apps with Single Script
 You manage 5 web applications that need daily deployment. Manual deployment
 takes 30 minutes per app.
-This script automates the entire process:
-[code example]
-The script reduces deployment time to 5 minutes total and eliminates human error.
 
+This script automates the entire process:
+
+[code example]
+
+The script reduces deployment time to 5 minutes total and eliminates human error.
 
 ## Conclusions
 

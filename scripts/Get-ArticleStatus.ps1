@@ -20,16 +20,23 @@
 param(
     [Parameter(Mandatory=$false)]
     [switch]$ShowDraftsOnly,
-    
+
     [Parameter(Mandatory=$false)]
     [switch]$ShowPublishedOnly,
-    
+
     [Parameter(Mandatory=$false)]
     [ValidateSet('Title', 'Date', 'WordCount', 'Status')]
     [string]$SortBy = 'Date'
 )
 
-$Articles = Get-ChildItem "content/posts" -Filter "*.md" -ErrorAction SilentlyContinue
+$Articles = @()
+# Get standalone markdown files
+$Articles += Get-ChildItem "content/posts" -Filter "*.md" -ErrorAction SilentlyContinue
+# Get bundles (directories with index.md)
+$Bundles = Get-ChildItem "content/posts" -Directory | Where-Object { Test-Path "$($_.FullName)/index.md" }
+if ($Bundles) {
+    $Articles += $Bundles | ForEach-Object { Get-Item "$($_.FullName)/index.md" }
+}
 
 if (-not $Articles) {
     Write-Host "No articles found in content/posts/" -ForegroundColor Yellow
@@ -46,23 +53,30 @@ $ArticleData = @()
 foreach ($Article in $Articles) {
     $Content = Get-Content $Article.FullName -Raw
     
+    # Determine Slug: if it's index.md, use parent directory name; otherwise use filename
+    if ($Article.Name -eq 'index.md') {
+        $Slug = $Article.Directory.Name
+    } else {
+        $Slug = $Article.BaseName
+    }
+
     # Extract metadata
-    $Title = if ($Content -match 'title:\s*["\']?([^"\'\r\n]+)["\']?') { $Matches } else { $Article.BaseName }[1]
+    $Title = if ($Content -match 'title:\s*["\']?([^"\'\r\n]+)["\']?') { $Matches } else { $Slug }[1]
     $Date = if ($Content -match 'date:\s*([\d\-T:+Z]+)') { $Matches } else { "Unknown" }[1]
     $IsDraft = $Content -match 'draft:\s*true'
     $WordCount = ($Content -split '\s+').Count
-    $Series = if ($Content -match 'series:\s*$$"?([^"$$]+)"?$$') { $Matches[1] } else { "" }
-    
+    $Series = if ($Content -match 'series:\s*$$"?([^"$$]+)"?$$') { $Matches } else { "" }[1]
+
     $Status = if ($IsDraft) { "Draft" } else { "Published" }
     $StatusColor = if ($IsDraft) { "Yellow" } else { "Green" }
-    
+
     # Apply filters
     if ($ShowDraftsOnly -and -not $IsDraft) { continue }
     if ($ShowPublishedOnly -and $IsDraft) { continue }
-    
+
     $ArticleData += [PSCustomObject]@{
         Title = $Title
-        Slug = $Article.BaseName
+        Slug = $Slug
         Status = $Status
         StatusColor = $StatusColor
         Date = $Date

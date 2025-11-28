@@ -1,6 +1,13 @@
+Here is the breakdown for Article 1, formatted as a Hugo-compatible markdown outline.
+
+```markdown
 ---
+
+<!-- Promoted from plan: powershell-automation-for-devops, outline #1 -->
+<!-- Ready for deep research and expansion -->
+
 title: "Introduction to PowerShell for DevOps: Bridging the Gap"
-date: 2025-11-26T12:38:00
+date: 2025-11-26T14:11:03-05:00
 draft: true
 description: "Discover how PowerShell bridges the gap between development and operations. Learn its cross-platform capabilities and strategic value in modern CI/CD pipelines."
 series: ["powershell-automation-for-devops"]
@@ -8,6 +15,10 @@ tags: ["PowerShell", "DevOps", "Automation", "CI/CD", "Cloud"]
 categories: ["DevOps", "PowerShell"]
 weight: 1
 ---
+
+
+<!-- Promoted from plan: powershell-automation-for-devops, outline #1 -->
+<!-- Ready for deep research and expansion -->
 
 ## Article Structure Outline
 
@@ -147,3 +158,5 @@ A JSON string representing the endpoint health, identical on both OSes, ready to
 **Related Articles in This Series:**
 - Next: Article 2 - Mastering PowerShell Core Concepts
 - Related: Article 3 - Tooling Up for PowerShell DevOps
+```
+

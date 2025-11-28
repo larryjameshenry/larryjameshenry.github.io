@@ -40,15 +40,33 @@ param(
     [switch]$Force
 )
 
-$ArticlePath = "content/posts/$Slug.md"
+# Logic to determine path: check for bundle first, then standalone file
+$BundlePath = "content/posts/$Slug/index.md"
+$StandalonePath = "content/posts/$Slug.md"
 
-# Validate article exists
-if (-not (Test-Path $ArticlePath)) {
-    Write-Error "Article not found: $ArticlePath"
+if (Test-Path $BundlePath) {
+    $ArticlePath = $BundlePath
+    $IsBundle = $true
+    Write-Host "✓ Found article bundle: $ArticlePath" -ForegroundColor Gray
+} elseif (Test-Path $StandalonePath) {
+    $ArticlePath = $StandalonePath
+    $IsBundle = $false
+    Write-Host "✓ Found standalone article: $ArticlePath" -ForegroundColor Gray
+} else {
+    Write-Error "Article not found: $Slug"
     Write-Host ""
     Write-Host "Available articles:" -ForegroundColor Yellow
+    
+    # List bundles
+    Get-ChildItem "content/posts" -Directory | ForEach-Object {
+        if (Test-Path "$($_.FullName)/index.md") {
+            Write-Host "  - $($_.Name) (bundle)" -ForegroundColor Gray
+        }
+    }
+    
+    # List standalone files
     Get-ChildItem "content/posts" -Filter "*.md" | ForEach-Object {
-        Write-Host "  - $($_.BaseName)" -ForegroundColor Gray
+        Write-Host "  - $($_.BaseName) (file)" -ForegroundColor Gray
     }
     exit 1
 }
@@ -195,7 +213,6 @@ if (-not $SkipCheck) {
     }
 }
 
-
 # Preview before publishing
 if (-not $SkipPreview) {
     Write-Host "Opening local preview..." -ForegroundColor Yellow
@@ -251,7 +268,14 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # Stage the article
-git add $ArticlePath
+if ($IsBundle) {
+    # For bundles, stage the entire directory to catch images/assets
+    $BundleDir = Split-Path $ArticlePath -Parent
+    git add $BundleDir
+} else {
+    # For standalone files, stage just the file
+    git add $ArticlePath
+}
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Failed to stage article"
@@ -262,7 +286,7 @@ if ($LASTEXITCODE -ne 0) {
 if (-not $CommitMessage) {
     # Extract title for better commit message
     if ($Content -match 'title:\s*["\']?([^"\'\r\n]+)["\']?') {
-        $Title = $Matches.Trim()
+        $Title = $Matches.Trim()[1]
         $CommitMessage = "Publish article: $Title"
     } else {
         $CommitMessage = "Publish article: $Slug"
@@ -302,7 +326,7 @@ $RemoteUrl = git config --get remote.origin.url
 $RepoPath = ""
 
 if ($RemoteUrl -match 'github\.com[:/](.+?)(?:\.git)?$') {
-    $RepoPath = $Matches
+    $RepoPath = $Matches[1]
 }
 
 Write-Host "═══════════════════════════════════════════════════════" -ForegroundColor Cyan
@@ -330,7 +354,7 @@ Write-Host "  - Monitor GitHub Actions for deployment status" -ForegroundColor W
 Write-Host "  - Share article on social media" -ForegroundColor White
 Write-Host "  - Update any related documentation" -ForegroundColor White
 
-if ($Content -match-match 'series:\s*$$"?([^"$$]+)"?$$') {
+if ($Content -match 'series:\s*$$"?([^"$$]+)"?$$') {
     $SeriesName = $Matches[1]
     Write-Host "  - Consider publishing next article in '$SeriesName' series" -ForegroundColor White
 }
