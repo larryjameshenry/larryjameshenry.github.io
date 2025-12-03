@@ -1,0 +1,192 @@
+description = "Final review, polish, and quality check of article before publishing"
+prompt = """
+Perform a comprehensive review and polish of this article before publication.
+
+## Review Checklist
+
+### 1. Content Accuracy and Completeness
+- [ ] Verify all technical information is correct
+- [ ] Check that all claims are supported with evidence
+- [ ] Ensure no critical information is missing
+- [ ] Validate that examples match explanations
+- [ ] Confirm current best practices are represented (Nov 2024)
+
+### 2. Code Quality
+- [ ] All code examples are syntactically correct
+- [ ] Code follows language conventions and best practices
+- [ ] Comments are clear and helpful
+- [ ] Variable/function names are descriptive
+- [ ] Error handling is included where appropriate
+- [ ] Output examples are accurate
+
+### 3. Structure and Flow
+- [ ] Logical progression of ideas
+- [ ] Smooth transitions between sections
+- [ ] Introduction sets up article effectively
+- [ ] Conclusion summarizes and provides next steps
+- [ ] Sections are balanced in length
+- [ ] No repetitive content
+
+### 4. Clarity and Readability
+- [ ] Technical jargon is explained on first use
+- [ ] Complex concepts are broken down effectively
+- [ ] Sentence structure is varied and engaging
+- [ ] Paragraphs are focused (3-5 sentences ideal)
+- [ ] Active voice used predominantly
+- [ ] No ambiguous pronouns or references
+
+### 5. Technical Writing Quality
+- [ ] Consistent terminology throughout
+- [ ] Proper capitalization of product/technology names
+- [ ] Accurate command syntax and parameters
+- [ ] File paths and examples are realistic
+- [ ] Technical accuracy in all details
+
+### 6. SEO and Metadata
+- [ ] Title is compelling and keyword-rich (under 60 chars)
+- [ ] Meta description is engaging (150-160 chars)
+- [ ] Tags are relevant and specific
+- [ ] Headings use natural keyword placement
+- [ ] First paragraph contains primary keywords
+
+### 7. Formatting and Style
+- [ ] Consistent heading hierarchy (H2, H3, H4)
+- [ ] Proper markdown formatting
+- [ ] Code blocks have language identifiers
+- [ ] Lists are properly formatted
+- [ ] No formatting errors
+
+### 8. User Value
+- [ ] Article delivers on title/description promise
+- [ ] Practical, actionable information provided
+- [ ] Examples are relevant to target audience
+- [ ] Clear takeaways at conclusion
+- [ ] Next steps are specific and helpful
+
+### 9. Grammar and Polish
+- [ ] No spelling errors
+- [ ] Proper punctuation
+- [ ] Consistent verb tenses
+- [ ] No run-on sentences
+- [ ] Professional tone maintained
+
+### 10. Series Integration (if applicable)
+- [ ] References to other series articles are appropriate
+- [ ] Article fits logically in series progression
+- [ ] Internal links are relevant and helpful
+- [ ] Series navigation context is clear
+
+### 11. AI Writing Pattern Detection (CRITICAL)
+
+Scan for these AI writing tell-tale signs and flag them:
+
+**Banned Words/Phrases (HIGH PRIORITY):**
+- delve, leverage, robust, seamless, cutting-edge, game-changer, revolutionize
+- "In the realm of," "when it comes to," "at the end of the day"
+- "Let's dive into," "let's explore," "it's worth noting"
+- "empower," "unlock," "harness," "tap into," "streamline"
+- "holistic," "paradigm," "synergy," "disruptive," "pivotal"
+
+**Vague Claims Without Evidence (MEDIUM PRIORITY):**
+- "significantly improves" without percentage
+- "highly effective" without success rate
+- "very fast" without actual time measurement
+- "really scalable" without specific capacity numbers
+- "quite powerful" without concrete metrics
+
+**Formulaic Patterns (MEDIUM PRIORITY):**
+- Every paragraph starting with transition words (Moreover, Furthermore, Additionally)
+- "In conclusion, [topic] is important because..."
+- Meta-commentary instead of direct action
+- Overuse of passive voice constructions
+
+**Reference Files:**
+Compare article against:
+- .gemini/writing-guidelines/words-not-to-use.md
+- .gemini/writing-guidelines/writing-style.md
+- .gemini/writing-guidelines/phrase-alternatives.md
+
+**Severity Levels:**
+- **HIGH:** Banned phrases present - must fix before publishing
+- **MEDIUM:** Vague claims without specifics - should add evidence
+- **LOW:** Style improvements - can address in future revisions
+
+---
+
+## Output Format
+
+Provide TWO distinct outputs:
+
+### OUTPUT 1: Critique and Recommendations
+
+Structure feedback by checklist categories above:
+
+**Critical Issues (Must Fix):**
+- Issue 1: [Location] - [Specific problem] - [Severity: HIGH]
+- Issue 2: [Location] - [Specific problem] - [Severity: HIGH]
+
+**Content Improvements (Should Fix):**
+- Issue 1: [Location] - [What needs improvement] - [Severity: MEDIUM]
+- Issue 2: [Location] - [What needs improvement] - [Severity: MEDIUM]
+
+**Style Enhancements (Nice to Have):**
+- Suggestion 1: [Location] - [How to improve] - [Severity: LOW]
+- Suggestion 2: [Location] - [How to improve] - [Severity: LOW]
+
+**What Works Well:**
+- [Positive feedback on strong aspects]
+- [Elements that should be maintained]
+
+**Priority Fixes (Top 5):**
+1. [Most important fix with location]
+2. [Second priority fix with location]
+3. [Third priority fix with location]
+4. [Fourth priority fix with location]
+5. [Fifth priority fix with location]
+
+**Overall Assessment:**
+- Content Quality: [0-100]%
+- Technical Accuracy: [0-100]%
+- Writing Quality: [0-100]%
+- SEO Optimization: [0-100]%
+- **OVERALL SCORE:** [0-100]%
+
+**Recommendation:** [READY TO PUBLISH / NEEDS MINOR REVISIONS / NEEDS MAJOR REVISIONS / NOT READY]
+
+---
+
+### OUTPUT 2: Improved Version
+
+Provide the complete, polished article with:
+- All critical issues fixed
+- Medium priority improvements applied
+- Enhanced clarity and flow
+- Optimized for publication
+- Ready for final author approval
+
+Include front matter, full content, and proper formatting.
+
+**Changes Made Summary:**
+- [List of specific improvements applied]
+- [Sections rewritten or enhanced]
+- [Code examples fixed or improved]
+
+---
+
+## Review Guidelines
+
+- Be thorough but constructive
+- Maintain the author's voice while improving quality
+- Focus on substantive improvements, not just cosmetic changes
+- Provide specific examples and line references
+- Distinguish between must-fix and nice-to-have improvements
+- Acknowledge strengths as well as weaknesses
+- Consider the target audience when evaluating depth
+- Ensure all technical claims are verifiable
+
+---
+
+ARTICLE TO REVIEW:
+
+{{args}}
+"""

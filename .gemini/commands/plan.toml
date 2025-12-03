@@ -1,0 +1,46 @@
+description = "Create a strategic content cluster plan based on research and specified article counts."
+prompt = """
+Based on the provided research document about "{{topic}}", act as an expert content strategist.
+
+Your task is to create a strategic content plan for a topic cluster. The plan should include one central "Pillar Post" and between {{min_articles}} and {{max_articles}} supporting "Cluster Posts".
+
+The final output must be in Markdown format and strictly follow this structure:
+
+ARTICLE_COUNT: [Total number of cluster articles, excluding the pillar post]
+
+---
+
+### **Pillar Post**
+- **Proposed Title:** [Catchy and comprehensive title]
+- **Description:** [A 2-3 sentence summary of the pillar post's purpose and scope. It should link all cluster posts together.]
+- **Target Audience:** [Primary audience from research]
+- **Primary Keywords:** [3-5 primary keywords]
+- **Key Questions Answered:**
+    - [Question 1]
+    - [Question 2]
+    - ...
+
+---
+
+### **Cluster Posts**
+
+**Cluster Post 1: [Proposed Title]**
+- **Description:** [A 1-2 sentence summary.]
+- **Target Audience:** [Specific audience for this post]
+- **Primary Keywords:** [2-3 focused keywords]
+- **Key Questions Answered:**
+    - [Question 1]
+    - [Question 2]
+    - ...
+
+**Cluster Post 2: [Proposed Title]**
+- **Description:** [A 1-2 sentence summary.]
+- **Target Audience:** [Specific audience for this post]
+- **Primary Keywords:** [2-3 focused keywords]
+- **Key Questions Answered:**
+    - [Question 1]
+    - [Question 2]
+    - ...
+
+... continue for all cluster posts, up to a maximum of {{max_articles}}.
+"""

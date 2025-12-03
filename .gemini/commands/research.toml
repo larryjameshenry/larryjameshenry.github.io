@@ -1,0 +1,44 @@
+description = "Research a topic thoroughly and create a knowledge base for an article"
+prompt = """
+Research the following topic comprehensively to create a "solid, not too long, but all-inclusive" knowledge base.
+
+Topic: {{args}}
+
+Provide a thorough research report including:
+
+## 1. Executive Summary & User Intent
+- **Core Definition:** Concise definition of the topic.
+- **User Intent:** What is the reader strictly looking for? (e.g., "How to fix X," "Comparison of A vs B," "Deep dive into theory").
+- **Relevance:** Why does this matter *right now*?
+
+## 2. Key Technical Concepts & "All-Inclusive" Details
+- **Core Components:** The building blocks.
+- **How it Works:** Brief technical explanation.
+- **Key Terminology:** Definitions of jargon.
+- **Specific Metrics/Limits:** (e.g., "Max file size is 50MB", "Timeout is 30s").
+
+## 3. Practical Implementation (The "Solid" Part)
+- **Standard Patterns:** The most common way to do this.
+- **Code/Config Snippets:** (Crucial) Pseudo-code or specific command patterns.
+- **Tools & Libraries:** specific names of tools (e.g., "Use `pandas` for X, not `numpy`").
+
+## 4. Best Practices vs. Anti-Patterns
+- **Do This:** Proven, production-ready advice.
+- **Don't Do This:** Common mistakes and why they fail.
+- **Performance Tips:** How to make it fast/efficient.
+
+## 5. Edge Cases & Troubleshooting
+- **What goes wrong?** Common errors.
+- **Limitations:** Where does this solution break?
+
+## 6. Industry Context (As of Current Date)
+- **Trends:** What's changing?
+- **Alternatives:** What else solves this problem?
+
+## 7. References & Authority
+- **Key Sources:** Official docs, authoritative guides.
+- **Further Reading:** Where to go for deep dives.
+
+Format as detailed markdown.
+**CRITICAL:** Focus on *density* of information. We want facts, numbers, and concrete details, not fluff.
+"""

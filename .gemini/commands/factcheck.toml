@@ -1,0 +1,245 @@
+description = "Fact-check an article for accuracy, verify claims, and identify unsupported statements"
+prompt = """
+Perform a comprehensive fact-check of this article. Your role is to verify accuracy and identify claims that need evidence.
+
+## Fact-Checking Criteria
+
+### 1. Technical Accuracy
+**Check for:**
+- Correct command syntax and parameters
+- Accurate API usage and method signatures
+- Valid configuration examples
+- Correct version numbers and compatibility info
+- Proper terminology and technical definitions
+- Accurate system requirements
+
+**Flag:**
+- Outdated commands or deprecated features
+- Incorrect parameter names or values
+- Syntax errors in code examples
+- Version incompatibilities
+- Misused technical terms
+
+### 2. Factual Claims
+**Verify:**
+- Performance claims (speeds, benchmarks, metrics)
+- Capacity limits (user counts, data sizes, throughput)
+- Version information and release dates
+- Feature availability and limitations
+- Compatibility statements
+- Historical facts and timelines
+
+**Flag:**
+- Unverified performance numbers
+- Outdated version information
+- Unsupported capability claims
+- Missing context for statistics
+- Ambiguous time references ("recently", "modern")
+
+### 3. Best Practices
+**Check:**
+- Security recommendations are current
+- Suggested patterns follow latest standards
+- Deprecated approaches aren't recommended
+- Alternative solutions are accurate
+
+**Flag:**
+- Outdated security practices
+- Deprecated patterns presented as current
+- Missing important warnings or caveats
+- Incomplete error handling examples
+
+### 4. Code Examples
+**Verify:**
+- Syntax is correct for specified language/version
+- Code would actually execute as claimed
+- Error handling is appropriate
+- Output examples match code logic
+- Dependencies are correctly specified
+
+**Flag:**
+- Syntax errors or typos
+- Logic errors that would cause failures
+- Missing required parameters
+- Incorrect output examples
+- Undeclared variables or imports
+
+### 5. External References
+**Check:**
+- Links are to authoritative sources
+- Documentation references are current
+- Tool versions mentioned are accurate
+- Product names and companies are correct
+
+**Flag:**
+- Broken or invalid references
+- References to outdated documentation
+- Incorrect product names or versions
+- Unsupported vendor claims
+
+### 6. Logical Consistency
+**Verify:**
+- Article doesn't contradict itself
+- Examples support stated claims
+- Prerequisites match complexity
+- Scope matches title and description
+
+**Flag:**
+- Internal contradictions
+- Examples that don't support claims
+- Missing prerequisites
+- Scope creep or topic drift
+
+## Output Format
+
+### FACT-CHECK SUMMARY
+**Overall Severity:** [PASS / MINOR ISSUES / MAJOR ISSUES / FAIL]
+
+**Scores:**
+- Technical Accuracy: [0-100]%
+- Factual Claims: [0-100]%
+- Best Practices: [0-100]%
+- Code Examples: [0-100]%
+- **Overall Accuracy:** [0-100]%
+
+**Statistics:**
+- Total claims checked: [number]
+- Verified accurate: [number]
+- Needs verification: [number]
+- Inaccurate/outdated: [number]
+
+---
+
+### CRITICAL ISSUES (Must Fix Before Publishing)
+
+For each critical issue:
+
+**Issue #[N]: [Brief description]**
+- **Location:** [Section/paragraph/line reference]
+- **Current Text:** "[Quote the problematic text]"
+- **Problem:** [Detailed explanation of what's wrong]
+- **Correct Information:** [Accurate statement with specifics]
+- **Source/Verification:** [Where to verify - documentation URL, version notes, etc.]
+- **Impact:** [Why this matters - user confusion, security risk, etc.]
+
+---
+
+### VERIFICATION NEEDED (Claims Without Evidence)
+
+For each unverified claim:
+
+**Claim #[N]: [Brief description]**
+- **Location:** [Section/paragraph reference]
+- **Statement:** "[Quote the claim]"
+- **Issue:** [What needs verification - missing metrics, unsupported claim, etc.]
+- **Suggestion:** [How to fix - add specific metric, cite source, add qualifier]
+- **How to Verify:** [Where/how to check this claim]
+
+---
+
+### MINOR ISSUES (Style/Clarity Improvements)
+
+For each minor issue:
+
+**Minor Issue #[N]:**
+- **Location:** [Section/paragraph reference]
+- **Current:** "[Quote]"
+- **Issue:** [What could be improved]
+- **Suggestion:** [How to improve it]
+
+---
+
+### CODE VALIDATION
+
+For each code example:
+
+**Code Block #[N]: [Section name or line number]**
+- **Status:** [✓ Valid / ⚠ Warning / ✗ Error]
+- **Language/Version:** [Detected language and version]
+- **Issues Found:** [List any problems]
+- **Tested:** [Yes / No / Cannot verify without environment]
+- **Recommendations:** [Improvements if any]
+
+---
+
+### DETAILED ANALYSIS BY CATEGORY
+
+**Technical Accuracy: [Score]%**
+- [List specific technical items verified or flagged]
+
+**Factual Claims: [Score]%**
+- [List factual statements verified or questioned]
+
+**Best Practices: [Score]%**
+- [List practices evaluated]
+
+**Code Examples: [Score]%**
+- [Summary of code quality]
+
+---
+
+### VERIFICATION CHECKLIST
+
+- [ ] All commands tested or verified against documentation
+- [ ] All performance claims have specific metrics
+- [ ] All version numbers checked against release notes
+- [ ] All code examples are syntactically correct
+- [ ] All links point to authoritative sources
+- [ ] All best practices are current (as of Nov 2024)
+- [ ] No internal contradictions found
+- [ ] All technical terms used correctly
+- [ ] Security recommendations are up-to-date
+- [ ] Error handling is appropriate
+
+---
+
+### RECOMMENDATIONS
+
+**Immediate Actions (Priority Order):**
+1. [Most critical fix needed]
+2. [Second priority]
+3. [Third priority]
+
+**Before Publishing:**
+- [Action item 1]
+- [Action item 2]
+- [Action item 3]
+
+**Future Improvements:**
+- [Enhancement 1]
+- [Enhancement 2]
+
+---
+
+### CURRENT CONTEXT (as of November 2024)
+
+**Technology Versions:**
+- PowerShell: 7.4.x (latest stable)
+- .NET: 8.0 LTS
+- Azure: Check latest service versions
+- GitHub Actions: ubuntu-latest = 22.04
+
+**Consider when reviewing:**
+- Is article using current versions?
+- Are deprecation warnings mentioned?
+- Are migration paths clear if using older versions?
+
+---
+
+## Approach
+
+- Be thorough and specific with line/paragraph references
+- Provide corrections with authoritative sources where possible
+- Distinguish between definite errors and "needs verification"
+- Prioritize issues by severity and user impact
+- Be constructive - explain WHY something is wrong
+- Acknowledge what's correct as well as what needs fixing
+- Consider the article's target audience when evaluating depth
+- Focus on factual accuracy, not stylistic preferences
+
+---
+
+ARTICLE TO FACT-CHECK:
+
+{{args}}
+"""
