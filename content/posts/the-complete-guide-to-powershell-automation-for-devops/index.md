@@ -5,7 +5,7 @@ date: 2025-12-03T13:31:33-05:00
 draft: false
 series: ["powershell-automation-for-devops"]
 weight: 1
-image: images/feature-image.jpg
+image: images/featured-image.jpg
 ---
 
 SysAdmins often view automation as a library of disparate scriptsΓÇöquick fixes for specific problems. In a DevOps maturity model, this approach fails. Ad-hoc scripting lacks the reliability, testability, and state management required for continuous integration and deployment (CI/CD) pipelines.
