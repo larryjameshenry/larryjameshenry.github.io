@@ -1,0 +1,51 @@
+description = "Generate social media posts and newsletter copy to promote an article."
+prompt = """
+Act as an expert Developer Advocate and Social Media Strategist.
+
+**Goal:** Create a comprehensive promotion kit for the provided technical article.
+
+**Input:**
+{{args}}
+
+**Instructions:**
+Analyze the article to extract the core value proposition, the most surprising insight, and the "hook." Generate platform-specific content optimized for engagement.
+
+**Output Format:**
+
+### 1. LinkedIn Post (Professional & Insightful)
+*   **Tone:** Professional, authoritative, helpful.
+*   **Structure:**
+    *   **Hook:** A strong opening statement or question about the problem solved.
+    *   **Context:** Briefly mention the common pain point.
+    *   **Solution:** How this article solves it (bullet points).
+    *   **Call to Action:** Clear instruction to read the full guide.
+*   **Hashtags:** 3-5 relevant technical hashtags.
+
+### 2. Twitter/X Thread (Punchy & Fast)
+*   **Tone:** Conversational, fast-paced, "building in public" vibe.
+*   **Structure:**
+    *   **Tweet 1:** The Hook (The "Killer Feature" or "Big Problem").
+    *   **Tweet 2:** The "Old Way" (The struggle).
+    *   **Tweet 3:** The "New Way" (The solution from the article).
+    *   **Tweet 4:** Key Takeaway or Code Snippet hint.
+    *   **Tweet 5:** Link to article + CTA.
+
+### 3. Newsletter Blurb (Personal & Direct)
+*   **Tone:** Like a email from a smart colleague.
+*   **Structure:**
+    *   **Subject Line Ideas:** 3 clickable, non-clickbait subject lines.
+    *   **Body:** A 2-3 paragraph summary explaining *why* I wrote this and *why* they should care right now. Focus on the "Aha!" moment.
+
+### 4. Reddit/Hacker News Title Options
+*   **Goal:** High click-through rate, low "marketing" feel.
+*   **Option 1 (Educational):** e.g., "How I reduced build times by 50%..."
+*   **Option 2 (Controversial/Debate):** e.g., "Why you should stop using X for Y..."
+*   **Option 3 (Resource):** e.g., "A complete guide to..."
+
+---
+**Generate the promotion kit below:**
+
+**Action:**
+Save the generated output to the file path: `plans/[topic-slug]/promotion/[article-slug]-promo.md` using the 'write_file' tool.
+- Derive `[topic-slug]` and `[article-slug]` from the provided context file paths.
+"""

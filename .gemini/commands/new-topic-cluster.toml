@@ -1,0 +1,87 @@
+description = "Create a comprehensive topic cluster plan (Research + Strategy) for a given topic."
+prompt = """
+Act as an expert SEO analyst and content strategist. Your task is to perform a deep-dive research analysis and then create a strategic content topic cluster plan for the topic: "{{topic}}".
+
+This is a two-phase process.
+
+---
+
+### Phase 1: Comprehensive Research
+
+Conduct a thorough analysis of the topic to inform the content strategy.
+
+**1. Core Concepts & Definitions:**
+   - Define the topic clearly.
+   - Explain the fundamental principles.
+
+**2. Target Audience Analysis:**
+   - **Primary Audience:** Who are they? What is their role?
+   - **Secondary Audience:** Who else might benefit?
+   - **Goals:** What are they trying to achieve?
+   - **Pain Points:** What problems are they solving?
+   - **Expertise Level:** Beginner, Intermediate, or Advanced?
+
+**3. Key Sub-topics & Entities:**
+   - Identify the most important sub-topics and related concepts.
+   - These will form the basis of the cluster articles.
+
+**4. Search Intent & Common Questions:**
+   - List common questions people ask (Who, What, Where, Why, How).
+   - Group them by intent: **Informational**, **Commercial**, **Transactional**.
+
+**5. Competitor Analysis (Hypothetical):**
+   - What are the common angles used by competitors?
+   - What are the content gaps we can exploit?
+
+---
+
+### Phase 2: Strategic Topic Cluster Plan
+
+Based **strictly** on the research above, create a topic cluster plan consisting of **1 Pillar Post** and **{{min_articles}} to {{max_articles}} Cluster Posts**.
+
+**Structure Requirements:**
+
+1.  **Pillar Post:** A comprehensive, broad guide that covers the core topic and links out to all cluster posts.
+2.  **Cluster Posts:** Focused, specific articles that target long-tail keywords and specific sub-topics/questions identified in the research.
+
+**Output Format:**
+
+Please provide the final output in the following Markdown format:
+
+# Research Analysis: {{topic}}
+
+[Insert Phase 1 Research Content Here]
+
+---
+
+# Topic Cluster Plan: {{topic}}
+
+**Strategy Summary:**
+- **Pillar Topic:** {{topic}}
+- **Cluster Article Count:** [Total Number]
+
+## **Pillar Post**
+- **Proposed Title:** [Catchy, SEO-friendly Title]
+- **Description:** [2-3 sentence summary of scope]
+- **Target Audience:** [Primary Audience]
+- **Primary Keywords:** [3-5 keywords]
+- **Key Questions Answered:**
+  - [Question 1]
+  - [Question 2]
+
+## **Cluster Posts**
+
+**Cluster Post 1: [Proposed Title]**
+- **Description:** [1-2 sentence summary]
+- **Target Audience:** [Specific segment]
+- **Primary Keywords:** [2-3 keywords]
+- **Key Questions Answered:**
+  - [Question]
+  - [Question]
+
+**Cluster Post 2: [Proposed Title]**
+... [Continue for all cluster posts up to {{max_articles}}] ...
+
+**Action:**
+Save the generated output to the file path: `plans/[topic-slug]/plan.md` using the 'write_file' tool. (Convert the 'topic' argument to a kebab-case slug for the folder name).
+"""

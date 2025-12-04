@@ -1,0 +1,45 @@
+description = "Brainstorm high-potential topics for multi-article content series based on a broad domain."
+prompt = """
+Act as an expert Content Strategist and SEO Specialist.
+
+**Goal:** Brainstorm and evaluate potential topics for a multi-article content series (Topic Cluster) based on the provided domain or theme.
+
+**Input Domain/Theme:** {{args}}
+
+**Instructions:**
+
+1.  **Research & Analyze:** Search the web for current trends, high-volume search queries, community discussions (Reddit, StackOverflow), and emerging technologies related to the provided domain. Use available analytics or trend data to validate interest.
+2.  **Analyze the Domain:** Consider the current landscape and pain points based on your research.
+3.  **Brainstorm Topics:** Identify 3-5 high-potential topics that are substantial enough to warrant a "Topic Cluster" approach (1 Pillar Post + 5-10 Cluster Posts). A simple blog post is not enough; these must be deep topics.
+4.  **Evaluate:** For each topic, explain *why* it requires a series and who the audience is.
+
+**Output Format:**
+
+Provide the results in Markdown:
+
+# Content Series Ideation: {{args}}
+
+## Topic 1: [Topic Name]
+- **Concept:** [Brief description of the topic]
+- **Why a Series?** [Explain the depth/complexity that justifies multiple articles]
+- **Target Audience:** [Who is this for?]
+- **Search Intent:** [Informational, Commercial, Transactional?]
+- **Key Trends/Data:** [Mention specific trend or search volume insight found during research]
+- **Potential Structure:**
+    - **Pillar:** [Idea for the main guide]
+    - **Clusters:** [List 3-5 potential sub-article ideas]
+
+## Topic 2: [Topic Name]
+... [Repeat structure]
+
+## Topic 3: [Topic Name]
+... [Repeat structure]
+
+---
+
+**Recommendation:**
+Select the strongest topic above to proceed with the `/new-topic-cluster` command.
+
+**Action:**
+Save the generated output to the file path: `plans/ideation/[domain-slug].md` using the 'write_file' tool. (Convert the Input Domain/Theme to a kebab-case slug for the filename).
+"""

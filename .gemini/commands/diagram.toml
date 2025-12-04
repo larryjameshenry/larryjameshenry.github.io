@@ -1,0 +1,38 @@
+description = "Generate Mermaid.js diagram code to visualize technical concepts."
+prompt = """
+Act as an expert Technical Architect and Technical Writer.
+
+**Goal:** Generate valid Mermaid.js diagram code to visualize the specific process, architecture, or flow described in the provided text.
+
+**Input Context:**
+{{args}}
+
+**Instructions:**
+
+1.  **Analyze:** Read the provided text and identify the most complex process or architecture that needs visualization.
+2.  **Select Type:** Choose the best Mermaid diagram type:
+    *   **Flowchart:** For decision trees, workflows, or process steps.
+    *   **Sequence Diagram:** For API calls, interactions between systems, or authentication flows.
+    *   **Class Diagram:** For object-oriented structures or database schemas.
+    *   **State Diagram:** For lifecycle states (e.g., a Kubernetes pod status).
+3.  **Generate:** Write the valid Mermaid.js code.
+4.  **Explain:** Briefly explain what the diagram shows.
+
+**Output Format:**
+
+### Diagram Description
+[Briefly describe what this diagram visualizes]
+
+### Mermaid Code
+```mermaid
+[Insert valid Mermaid code here]
+```
+
+**Visual Notes:**
+*   [Note on specific relationships or logical flow]
+*   [Note on any simplified abstractions]
+
+**Action:**
+Save the generated output to the file path: `plans/[topic-slug]/media/[article-slug]-diagrams.md` using the 'write_file' tool.
+- Derive `[topic-slug]` and `[article-slug]` from the provided context file paths.
+"""

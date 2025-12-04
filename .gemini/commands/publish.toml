@@ -1,0 +1,39 @@
+description = "Publish an article from the planning stage to the content/posts folder"
+prompt = """
+Act as an expert Content Manager and Publisher.
+
+**Goal:** Promote an article from the `plans/` directory to the `content/posts/` directory, following the Hugo Page Bundle structure.
+
+**Input Context:**
+{{args}}
+
+**Instructions:**
+1.  **Analyze the Request:**
+    *   Identify the `[topic-slug]` and `[article-slug]` from the provided file path in the `plans/` directory (e.g., `plans/[topic-slug]/ready/[article-slug].md`).
+2.  **Locate Source Files:**
+    *   Find the "finalized" article file in `plans/[topic-slug]/ready/[article-slug].md`.
+    *   Locate any associated media files in `plans/[topic-slug]/media/`.
+    *   Locate any research or other support files in `plans/[topic-slug]/research/`.
+3.  **Create Destination Structure:**
+    *   Create a new directory: `content/posts/[article-slug]/`.
+    *   Create subdirectories: `content/posts/[article-slug]/images/` and `content/posts/[article-slug]/files/`.
+4.  **Move & Rename Content:**
+    *   **Main Article:** Move `plans/[topic-slug]/ready/[article-slug].md` to `content/posts/[article-slug]/index.md`.
+    *   **Research/Support Files:** Move files from `plans/[topic-slug]/research/` and other relevant folders (except media) to `content/posts/[article-slug]/files/`.
+    *   **Media:** Move image and diagram files from `plans/[topic-slug]/media/` to `content/posts/[article-slug]/images/`.
+5.  **Output Confirmation:**
+    *   Confirm the files have been moved and the folder structure is correct.
+
+**Action:**
+Execute the file operations using `run_shell_command` to move the files.
+- `mkdir -p content/posts/[article-slug]/images`
+- `mkdir -p content/posts/[article-slug]/files`
+- `mv plans/[topic-slug]/ready/[article-slug].md content/posts/[article-slug]/index.md`
+- `mv plans/[topic-slug]/media/* content/posts/[article-slug]/images/` (if any exist)
+- `mv plans/[topic-slug]/research/* content/posts/[article-slug]/files/` (if any exist)
+- `mv plans/[topic-slug]/qa/* content/posts/[article-slug]/files/` (if any exist)
+- `mv plans/[topic-slug]/promotion/* content/posts/[article-slug]/files/` (if any exist)
+- `mv plans/[topic-slug]/outlines/* content/posts/[article-slug]/files/` (if any exist)
+
+(Note: Ensure you handle cases where source directories might be empty or missing gracefully).
+"""
