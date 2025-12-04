@@ -1,87 +1,126 @@
-# Usage Examples for Each Command
+# Gemini CLI Content Workflow (Interactive Mode)
 
-## Using research.toml
-```powershell
-# Basic research
-gemini "/research PowerShell error handling patterns"
+This document outlines the standard workflow for creating content using the Gemini CLI command templates directly within the interactive session.
 
-# Save research to file
-gemini "/research Azure DevOps pipeline optimization" > research-notes.md
+In this mode, you don't type `gemini` at the start of every line. Instead, you simply type the slash command.
 
-# Use in article creation script
-gemini "/research $Topic" | Out-File $ResearchFile -Append -Encoding UTF8
+**Note on Redirecting Output (`>`)**:
+In interactive mode, you cannot directly redirect output to a file using `>` like in PowerShell. You will see the output in the chat window. To save it, copy the output to a file, or ask the assistant to "save the last response to [filename]".
+
+## 1. Ideation & Brainstorming
+**Command:** `/ideate`
+**Goal:** Brainstorm high-potential topics for a multi-article series based on a broad domain, utilizing web research and trend analysis.
+
+```text
+/ideate "DevOps Automation"
+```
+*Action: Review the suggested topics and select one to proceed with for the Topic Cluster Planning step.*
+
+## 2. Topic Cluster Planning
+**Command:** `/new-topic-cluster`
+**Goal:** Create a strategic content plan with a Pillar Post and supporting Cluster Posts.
+
+```text
+/new-topic-cluster topic:"Azure DevOps Pipelines" min_articles:5 max_articles:8
+```
+*Action: Copy the output and save it to `plans/azure-devops-pipelines.md`*
+
+## 3. Individual Article Outline
+**Command:** `/outline`
+**Goal:** Generate a detailed Hugo-compatible outline for a specific article from your plan or research.
+
+You must first **add the context file** to your session so the command can see it.
+
+```text
+@plans/azure-devops-pipelines.md /outline "Article 1"
+```
+*Action: Copy the output and save it to `content/posts/azure-pipelines-intro/index.md`*
+
+## 4. Deep Research
+**Command:** `/research`
+**Goal:** Conduct specific technical research to fill in the gaps of your outline.
+
+```text
+@content/posts/azure-pipelines-intro/index.md /research "Azure DevOps Pipelines"
+```
+*Action: Copy the output and save it to `content/posts/azure-pipelines-intro/files/research.md`*
+
+## 5. Expand to Full Article
+**Command:** `/expand`
+**Goal:** Turn the outline and research into a full, publication-ready draft.
+
+You can reference multiple files to give the model all the necessary context.
+
+```text
+@content/posts/azure-pipelines-intro/files/research.md @content/posts/azure-pipelines-intro/index.md /expand
+```
+*Action: Copy the Markdown output and overwrite `content/posts/azure-pipelines-intro/index.md`*
+
+## 6. Technical Visualization
+**Command:** `/diagram`
+**Goal:** Generate Mermaid.js code to visualize complex architectures, flows, or processes described in your article.
+
+```text
+@content/posts/azure-pipelines-intro/index.md /diagram "CI/CD Build Pipeline Flow"
+```
+*Action: Copy the mermaid code block into your article markdown file.*
+
+## 7. Quality Assurance & Validation
+
+### Code Validation
+**Command:** `/testcode`
+**Goal:** Check all code blocks for syntax, logic, and security issues.
+
+```text
+@content/posts/azure-pipelines-intro/index.md /testcode
 ```
 
-## Using outline.toml
-```powershell
-# Generate outline with research context
-gemini --add research-notes.md "/outline PowerShell Automation Best Practices"
+### Fact-Checking
+**Command:** `/factcheck`
+**Goal:** Verify technical claims, version numbers, and accuracy.
 
-# With date and series info
-$OutlinePrompt = @"
-Topic: SQL Server Performance Tuning
-Date: 2025-11-23
-Series: SQL Performance Series
-Tags: sql, performance, database, optimization
-"@
-gemini --add research-notes.md "/outline $OutlinePrompt"
-```
-## Using expand.toml
-```powershell
-# Expand outline to full article
-gemini --add content/posts/my-article.md "/expand"
-
-# Or pass the content directly
-$OutlineContent = Get-Content "content/posts/my-article.md" -Raw
-gemini "/expand $OutlineContent"
+```text
+@content/posts/azure-pipelines-intro/index.md /factcheck
 ```
 
-## Using finalize.toml
-```powershell
-# Final polish before publishing
-gemini --add content/posts/my-article.md "/finalize"
+## 8. Visuals
+**Command:** `/image-prompt`
+**Goal:** Generate prompts for text-to-image tools (Midjourney, DALL-E 3) for your featured image.
 
-# Review both critique and improved version
-gemini --add content/posts/my-article.md "/finalize" | Out-File review-results.md
-
-# Then manually review and apply changes
-code review-results.md
+```text
+@content/posts/azure-pipelines-intro/index.md /image-prompt
 ```
 
-## Command Chaining Example
+## 9. Final Polish
+**Command:** `/finalize`
+**Goal:** Final editorial review and polish before publishing.
 
-```powershell
-$Topic = "PowerShell DSC Configuration Management"
-$Slug = "powershell-dsc-basics"
-
-# 1. Research
-Write-Host "Researching..." -ForegroundColor Yellow
-gemini "/research $Topic" > "temp-research.md"
-
-# 2. Create outline
-Write-Host "Creating outline..." -ForegroundColor Yellow
-gemini --add "temp-research.md" "/outline $Topic" > "content/posts/$Slug.md"
-
-# 3. Review outline
-code "content/posts/$Slug.md"
-Read-Host "Press Enter after reviewing outline..."
-
-# 4. Expand to full article
-Write-Host "Expanding to full article..." -ForegroundColor Yellow
-$Expanded = gemini --add "content/posts/$Slug.md" "/expand"
-$Expanded | Out-File "content/posts/$Slug.md" -Encoding UTF8
-
-# 5. Review expanded article
-code "content/posts/$Slug.md"
-Read-Host "Press Enter after reviewing article..."
-
-# 6. Final polish
-Write-Host "Final polish and review..." -ForegroundColor Yellow
-gemini --add "content/posts/$Slug.md" "/finalize" > "review-$Slug.md"
-
-# 7. Review suggestions and apply manually
-code "review-$Slug.md"
-
-# Cleanup
-Remove-Item "temp-research.md" -Force
+```text
+@content/posts/azure-pipelines-intro/index.md /finalize
 ```
+
+## 10. Promotion
+**Command:** `/promote`
+**Goal:** Generate social media copy (LinkedIn, Twitter/X) and newsletter blurbs to distribute your content.
+
+```text
+@content/posts/azure-pipelines-intro/index.md /promote
+```
+*Action: Save the output to a `promotion.md` file or schedule your posts immediately.*
+
+## 11. Publish Article
+**Command:** `/publish`
+**Goal:** Promote the finalized article and its associated files from the `plans/` directory to the `content/posts/` directory in Hugo Page Bundle format.
+
+```text
+@plans/azure-devops-pipelines/ready/pillar-post.md /publish
+```
+*Action: The article and its assets are moved to `content/posts/` ready for Hugo to build.*
+
+---
+
+## Tips for Interactive Mode
+
+1.  **Context (`@`):** Always use `@filename` to "attach" the relevant file to your prompt. This is how the command knows what to research, expand, or test.
+2.  **Saving Output:** Since you can't use `> file.md`, you can simply tell the assistant: *"Save that output to content/posts/my-article/index.md"* after it generates the text.
+3.  **Chaining:** You can ask follow-up questions naturally. For example, after running `/factcheck`, you can say *"Fix issue #2 and #3 in the article."*

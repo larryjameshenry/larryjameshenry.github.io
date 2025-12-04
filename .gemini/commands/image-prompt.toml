@@ -16,4 +16,8 @@ For each variation provide:
 
 Article Content:
 {{args}}
+
+**Action:**
+Save the generated output to the file path: `plans/[topic-slug]/media/[article-slug]-images.md` using the 'write_file' tool.
+- Derive `[topic-slug]` and `[article-slug]` from the provided context file paths.
 """

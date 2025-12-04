@@ -1,44 +1,55 @@
-description = "Research a topic thoroughly and create a knowledge base for an article"
+description = "Research a topic thoroughly based on a provided outline or topic to create a knowledge base."
 prompt = """
-Research the following topic comprehensively to create a "solid, not too long, but all-inclusive" knowledge base.
+Act as an expert technical researcher.
 
-Topic: {{args}}
+**Goal:** Conduct deep-dive research to create a "solid, not too long, but all-inclusive" knowledge base for an article.
 
-Provide a thorough research report including:
+**Input:**
+You have been provided with context (via --add) which is the **Article Outline** or **Draft Content**.
+**Topic/Focus:** {{args}}
+
+**Instructions:**
+Using the provided outline/content as your scope, perform comprehensive research to fill in the gaps. Do not just summarize the outline; expand upon it with specific facts, data, and technical details.
+
+**Output Format:**
+Provide a thorough research report in Markdown covering:
 
 ## 1. Executive Summary & User Intent
-- **Core Definition:** Concise definition of the topic.
-- **User Intent:** What is the reader strictly looking for? (e.g., "How to fix X," "Comparison of A vs B," "Deep dive into theory").
+- **Core Definition:** Concise definition of the main topic.
+- **User Intent:** What is the reader strictly looking for? (e.g., "How to fix X," "Comparison of A vs B").
 - **Relevance:** Why does this matter *right now*?
 
-## 2. Key Technical Concepts & "All-Inclusive" Details
-- **Core Components:** The building blocks.
-- **How it Works:** Brief technical explanation.
-- **Key Terminology:** Definitions of jargon.
+## 2. Key Technical Concepts & Details
+- **Core Components:** The technical building blocks.
+- **How it Works:** Brief technical explanation (under the hood).
+- **Key Terminology:** Definitions of jargon used in the outline.
 - **Specific Metrics/Limits:** (e.g., "Max file size is 50MB", "Timeout is 30s").
 
-## 3. Practical Implementation (The "Solid" Part)
-- **Standard Patterns:** The most common way to do this.
-- **Code/Config Snippets:** (Crucial) Pseudo-code or specific command patterns.
-- **Tools & Libraries:** specific names of tools (e.g., "Use `pandas` for X, not `numpy`").
+## 3. Practical Implementation Data
+- **Standard Patterns:** The industry-standard way to implement this.
+- **Code snippets / Configuration:** Pseudo-code or specific command patterns.
+- **Tools & Libraries:** Specific names of recommended tools (e.g., "Use `pandas` for X").
 
 ## 4. Best Practices vs. Anti-Patterns
 - **Do This:** Proven, production-ready advice.
 - **Don't Do This:** Common mistakes and why they fail.
-- **Performance Tips:** How to make it fast/efficient.
+- **Performance Tips:** Specific ways to optimize.
 
 ## 5. Edge Cases & Troubleshooting
-- **What goes wrong?** Common errors.
+- **Common Errors:** Specific error messages or failure modes.
 - **Limitations:** Where does this solution break?
 
-## 6. Industry Context (As of Current Date)
-- **Trends:** What's changing?
-- **Alternatives:** What else solves this problem?
+## 6. Industry Context (Current Date)
+- **Trends:** What's changing in this field?
+- **Alternatives:** What other tools solve this problem?
 
 ## 7. References & Authority
-- **Key Sources:** Official docs, authoritative guides.
-- **Further Reading:** Where to go for deep dives.
+- **Key Sources:** Official documentation links, RFCs, authoritative guides.
 
-Format as detailed markdown.
-**CRITICAL:** Focus on *density* of information. We want facts, numbers, and concrete details, not fluff.
+**CRITICAL:** Focus on *density* of information. Provide facts, numbers, and concrete details, not fluff.
+
+**Action:**
+Save the generated output to the file path: `plans/[topic-slug]/research/[article-slug].md` using the 'write_file' tool.
+- Identify `[topic-slug]` from the parent folder of the context file provided (e.g., `plans/my-topic/outlines/article.md` -> `my-topic`).
+- Identify `[article-slug]` from the context filename (e.g., `article.md` -> `article`).
 """

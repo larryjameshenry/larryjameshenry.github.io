@@ -1,198 +1,147 @@
-description = "Generate a detailed article outline with Hugo front matter from research notes"
+description = "Generate a detailed article outline with Hugo front matter from research notes or a topic cluster plan."
 prompt = """
-Based on the provided research notes and context, create a detailed article outline.
+Act as an expert technical content strategist and writer.
 
-Input: {{args}}
+**Goal:** Create a comprehensive, production-ready article outline in Markdown format, including Hugo Front Matter.
 
-Generate a complete Hugo-compatible markdown file with:
+**Input Context:**
+You have been provided with text context (via --add), which is either:
+1.  **Research Notes:** Raw research about a topic.
+2.  **Topic Cluster Plan:** A structured plan listing a Pillar Post and multiple Cluster Posts.
+
+**Target:** {{args}}
+
+**Instructions:**
+
+1.  **Analyze the Input:**
+    - If the context is a **Topic Cluster Plan** and {{args}} specifies a specific article (e.g., "Pillar Post", "Article 1", "Cluster Post 3"):
+        - Locate that specific article's definition in the plan.
+        - Extract its specific Title, Description, Audience, Keywords, and Questions.
+        - Extract the `Series Name` from the plan metadata.
+        - Use the article number (if available) for the `weight` field (0 for Pillar).
+    - If the context is **Research Notes** or {{args}} is a general topic:
+        - Use {{args}} as the main topic title.
+        - Synthesize the research notes to build the outline.
+
+2.  **Generate the Outline:**
+    - Produce a complete Hugo-compatible markdown file.
+    - strictly follow the structure below.
+
+---
 
 ## Front Matter (YAML format)
+```yaml
 ---
-title: "[Create an engaging, SEO-friendly title]"
-date: [Use current date from args or generate: YYYY-MM-DDTHH:MM:SS]
+title: "[Title from Plan OR Optimized SEO Title]"
+date: [Current Date YYYY-MM-DDTHH:MM:SS]
 draft: true
-description: "[Write a compelling 150-160 character meta description]"
-series: [[Extract from args if provided, otherwise empty array]]
-tags: ["[tag1]", "[tag2]", "[tag3]", "[tag4]", "[tag5]"]
-categories: ["[Extract from args or default to 'Technical']"]
-weight: [Article order number if part of series, otherwise omit]
+description: "[Description from Plan OR 150-160 char summary]"
+series: ["[Series Name from Plan OR leave empty]"]
+tags: ["[Keyword 1]", "[Keyword 2]", "[Keyword 3]"]
+categories: ["PowerShell", "DevOps"]
+weight: [Article Number OR omit]
 ---
+```
 
 ## Article Structure
 
-### Introduction (Brief outline)
+### Introduction (150-200 words)
+**Hook:** [Engaging opening - question, statistic, or problem statement]
+**Problem/Context:** [Why this topic matters now]
+**Value Proposition:** [3-5 specific outcomes/takeaways]
+**Preview:** [Brief overview of main sections]
 
-**Hook:** [Engaging opening - question, statistic, problem, or surprising fact]
+### [Main Section 1: Title from Plan/Topic]
 
-**Problem/Context:**
-- Why this topic matters
-- Current challenges or pain points
-- Who this affects
-
-**Value Proposition:**
-[What reader will learn - be specific with 3-5 concrete outcomes]
-
-**Preview:**
-[Brief overview of what's covered in each main section]
-
-### [Main Section 1: Title]
-
-#### [Subsection 1.1: Title]
-**Key Points to Cover:**
+#### [Subsection 1.1: Key Concept]
+**Key Points:**
 - [Point 1]
 - [Point 2]
-- [Point 3]
 
 **Content Elements:**
 - [PLACEHOLDER: Explanation of concept]
-- [PLACEHOLDER: Code example]
-- [PLACEHOLDER: Practical scenario]
+- [PLACEHOLDER: Diagram or visual description]
 
-#### [Subsection 1.2: Title]
-**Key Points to Cover:**
+#### [Subsection 1.2: Practical Application]
+**Key Points:**
 - [Point 1]
 - [Point 2]
 
 **Content Elements:**
-- [PLACEHOLDER: Comparison or contrast]
-- [PLACEHOLDER: Visual representation]
+- [PLACEHOLDER: Code example]
+- [PLACEHOLDER: Real-world scenario]
 
 ### [Main Section 2: Title]
 
 #### [Subsection 2.1: Title]
-**Key Points to Cover:**
+**Key Points:**
 - [Point 1]
 - [Point 2]
-- [Point 3]
 
 **Content Elements:**
-- [PLACEHOLDER: Step-by-step process]
-- [PLACEHOLDER: PowerShell code example with comments]
-- [PLACEHOLDER: Output example]
-
-#### [Subsection 2.2: Title]
-[Continue pattern]
+- [PLACEHOLDER: Step-by-step guide]
+- [PLACEHOLDER: PowerShell code block]
+- [PLACEHOLDER: Expected output]
 
 ### [Main Section 3: Title]
-[Continue with 3-6 total main sections]
+[Continue structure...]
 
-### Hands-On Example: [Specific Scenario]
+### Hands-On Example: [Scenario Name]
 
-**Scenario Description:**
-[Real-world use case that readers can relate to]
+**Scenario:** [Real-world use case description]
+**Prerequisites:** [Tools/Access needed]
 
-**Prerequisites:**
-- [What reader needs before starting]
-- [Required tools or knowledge]
+**Implementation Steps:**
+1. [Step 1]
+2. [Step 2]
+3. [Step 3]
 
-**Step-by-Step Implementation:**
-1. [Step 1 with brief description]
-2. [Step 2 with brief description]
-3. [Step 3 with brief description]
-4. [Step 4 with brief description]
-
-**Code Implementation:**
-[PLACEHOLDER: Complete, working code example]
+**Code Solution:**
+[PLACEHOLDER: Complete working script/code]
 
 **Verification:**
-[How to verify it works correctly]
+[How to confirm success]
 
-**Expected Output:**
-[What success looks like]
+### Best Practices & Optimization
 
-### Best Practices
+**Do's:**
+- ✓ [Practice 1]
+- ✓ [Practice 2]
 
-**Recommended Approaches:**
-- ✓ [Best practice 1 with rationale]
-- ✓ [Best practice 2 with rationale]
-- ✓ [Best practice 3 with rationale]
-- ✓ [Best practice 4 with rationale]
+**Don'ts:**
+- ✗ [Anti-pattern 1]
+- ✗ [Anti-pattern 2]
 
-**Anti-Patterns to Avoid:**
-- ✗ [Common mistake 1 and why to avoid]
-- ✗ [Common mistake 2 and why to avoid]
-- ✗ [Common mistake 3 and why to avoid]
-
-**Performance Optimization:**
+**Performance & Security:**
 - [Tip 1]
 - [Tip 2]
-- [Tip 3]
 
-**Security Considerations:**
-- [Security aspect 1]
-- [Security aspect 2]
-- [Security aspect 3]
+### Troubleshooting Common Issues
 
-### Troubleshooting
+**Issue 1: [Error/Problem]**
+- **Cause:** [Why it happens]
+- **Solution:** [How to fix it]
 
-**Common Issue 1: [Problem]**
-- **Symptoms:** [How it manifests]
-- **Cause:** [Root cause]
-- **Solution:** [Step-by-step fix]
-- **Prevention:** [How to avoid in future]
-
-**Common Issue 2: [Problem]**
-- **Symptoms:** [How it manifests]
-- **Cause:** [Root cause]
-- **Solution:** [Step-by-step fix]
+**Issue 2: [Error/Problem]**
+- **Cause:** [Why it happens]
+- **Solution:** [How to fix it]
 
 ### Conclusion
 
-**Summary of Key Takeaways:**
-1. [Main point 1 - specific and actionable]
-2. [Main point 2 - specific and actionable]
-3. [Main point 3 - specific and actionable]
-4. [Main point 4 - specific and actionable]
-5. [Main point 5 - specific and actionable]
+**Key Takeaways:**
+1. [Takeaway 1]
+2. [Takeaway 2]
+3. [Takeaway 3]
 
-**Immediate Next Actions:**
-- [Specific action 1 reader can take now]
-- [Specific action 2 reader can take now]
-
-**Further Learning:**
-- [Related topic to explore next]
-- [Advanced concept to investigate]
-
-**Related Articles:**
-[If part of series, list previous/next articles]
+**Next Steps:**
+- [Actionable advice]
 
 ---
 
-## Writing Guidelines for Expansion
+<!-- Outline generated by Gemini. Ready for expansion. -->
 
-**Target Metrics:**
-- Word Count: 1200-1800 words
-- Reading Time: 6-9 minutes
-- Code Examples: 2-4 complete examples
-- Practical Scenarios: 1-2 detailed walkthroughs
-
-**Tone and Style:**
-- Professional but conversational
-- Active voice predominantly
-- Technical accuracy essential
-- Assume intelligent audience, explain concepts clearly
-
-**Audience Level:** [Beginner/Intermediate/Advanced based on research]
-
-**Key Terms Requiring Definition:**
-- [Term 1]
-- [Term 2]
-- [Term 3]
-
-**Internal Linking Strategy:**
-[Note opportunities to link to related content]
-
-**SEO Considerations:**
-- Primary Keyword: [keyword]
-- Secondary Keywords: [keyword list]
-- Long-tail Opportunities: [specific phrases]
-
----
-
-<!-- Article outline generated from research. Ready for expansion. -->
-
-Ensure all section headings are clear and descriptive.
-Mark all placeholders with [PLACEHOLDER: specific content type].
-Structure should flow logically from introduction through conclusion.
-Each section should build on previous sections naturally.
+**Action:**
+Save the generated output to the file path: `plans/[topic-slug]/outlines/[article-slug].md` using the 'write_file' tool.
+- Identify `[topic-slug]` from the parent folder of the context file provided (e.g., if context is `plans/my-topic/plan.md`, then `topic-slug` is `my-topic`).
+- Identify `[article-slug]` by converting the article title to kebab-case.
 """

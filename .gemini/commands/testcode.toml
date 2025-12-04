@@ -235,4 +235,8 @@ For each security issue:
 ARTICLE TO TEST:
 
 {{args}}
+
+**Action:**
+Save the generated output to the file path: `plans/[topic-slug]/qa/[article-slug]-code.md` using the 'write_file' tool.
+- Derive `[topic-slug]` and `[article-slug]` from the provided context file paths.
 """

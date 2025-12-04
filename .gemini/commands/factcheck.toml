@@ -242,4 +242,8 @@ For each code example:
 ARTICLE TO FACT-CHECK:
 
 {{args}}
+
+**Action:**
+Save the generated output to the file path: `plans/[topic-slug]/qa/[article-slug]-factcheck.md` using the 'write_file' tool.
+- Derive `[topic-slug]` and `[article-slug]` from the provided context file paths.
 """

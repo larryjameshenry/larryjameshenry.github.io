@@ -189,4 +189,8 @@ Include front matter, full content, and proper formatting.
 ARTICLE TO REVIEW:
 
 {{args}}
+
+**Action:**
+Save the 'OUTPUT 2: Improved Version' (the full article) to the file path: `plans/[topic-slug]/ready/[article-slug].md` using the 'write_file' tool.
+- Derive `[topic-slug]` and `[article-slug]` from the provided context file paths.
 """
