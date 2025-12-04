@@ -5,7 +5,6 @@ draft: true
 series: ["powershell-automation-for-devops"]
 weight: 3
 ---
-YOLO mode is enabled. All tool calls will be automatically approved.
 **Article Outline: Testing Infrastructure with Pester: Beyond Unit Tests**
 **Title:** Testing Infrastructure with Pester: Beyond Unit Tests
 **Description:** This article addresses the testing and quality assurance gap by teaching users how to leverage Pester not just for code logic, but to validate infrastructure states. It will differentiate between unit testing code and testing infrastructure within a DevOps context.

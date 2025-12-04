@@ -5,7 +5,6 @@ draft: true
 series: ["powershell-automation-for-devops"]
 weight: 2
 ---
-YOLO mode is enabled. All tool calls will be automatically approved.
 **Outline for Article 2: Integrating PowerShell into CI/CD Pipelines**
 **Title:** Integrating PowerShell into CI/CD Pipelines (Azure DevOps & GitHub Actions)
 **Description:** This article provides a practical guide on embedding PowerShell scripts within modern CI/CD workflows, focusing on integration with Azure DevOps and GitHub Actions. It covers key aspects like YAML pipeline integration, secure variable passing, and graceful build failure.

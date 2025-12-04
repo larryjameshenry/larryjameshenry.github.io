@@ -5,7 +5,6 @@ draft: true
 series: ["powershell-automation-for-devops"]
 weight: 4
 ---
-YOLO mode is enabled. All tool calls will be automatically approved.
 ## Outline for Article 4: PowerShell on Linux: Managing Cross-Platform Environments
 **Description:** This article explores how to install and leverage PowerShell Core on Linux to effectively manage hybrid environments, dispelling the misconception that PowerShell is exclusive to Windows.
 ### Main Section Headings:

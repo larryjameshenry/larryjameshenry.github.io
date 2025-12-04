@@ -5,8 +5,7 @@ draft: true
 series: ["powershell-automation-for-devops"]
 weight: 6
 ---
-YOLO mode is enabled. All tool calls will be automatically approved.
-**Title:** Robust Error Handling and Logging for Production PowerShell Scripts
+**Title:** Error Handling and Logging for Production PowerShell Scripts
 **Description:** This article guides intermediate scripters and DevOps Engineers beyond basic scripts, focusing on professional-grade techniques for error handling and comprehensive logging to create resilient and easily debuggable automation workflows.
 **Main Section Headings:**
 *   **Understanding PowerShell Error Types**

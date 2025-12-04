@@ -111,7 +111,6 @@ For other languages, follow their conventions.
 - Cite sources for claims where appropriate.
 
 ### Front Matter
-- Change `draft: false` (article is ready for review).
 - Update `date` to current timestamp.
 - Keep all other front matter intact (series, tags, categories, weight).
 

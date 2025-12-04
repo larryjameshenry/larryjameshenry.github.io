@@ -5,7 +5,6 @@ draft: true
 series: ["powershell-automation-for-devops"]
 weight: 5
 ---
-YOLO mode is enabled. All tool calls will be automatically approved.
 **Title:** Hardening PowerShell: Secrets Management and Security Best Practices
 **Description:** This crucial guide focuses on production-grade security patterns for PowerShell scripts, covering how to manage secrets and implement best practices to avoid hardcoding sensitive information.
 **Main Section Headings:**
