@@ -184,8 +184,6 @@ Navigate to the "Create" page in Backstage. You should see your "Node.js Service
 *   **Cause:** The underlying boilerplates (node versions, libraries) drift over time, causing new projects to fail immediately.
 *   **Solution:** Treat templates as code. Implement a CI pipeline that runs your scaffolder in a test environment weekly to verify that generated projects still build and deploy correctly.
 
-## Conclusion
-
 **Key Takeaways:**
 1.  **Platform Engineering** is about reducing friction and cognitive load, not just building shiny tools.
 2.  **Golden Paths** are the deliverable; the IDP is just the interface. Focus on the workflow first.

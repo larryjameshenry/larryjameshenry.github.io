@@ -159,8 +159,6 @@ jobs:
 *   **Performance:** Use ephemeral build agents to ensure clean environments and reduce costs.
 *   **Security:** Implement "Just-in-Time" (JIT) access for production debugging; avoid permanent admin keys.
 
-## Conclusion
-
 **Key Takeaways:**
 1.  **Shift to Platforms:** Move from servicing tickets to building self-service capabilities.
 2.  **Integrate Early:** Security and Cost must be part of the automation, not afterthoughts.

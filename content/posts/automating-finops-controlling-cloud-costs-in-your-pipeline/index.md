@@ -186,8 +186,6 @@ Open a new Pull Request with a Terraform change. The Infracost GitHub Action wil
 *   **Cause:** Alert fatigue is a common problem. Developers may ignore comments if they are too frequent, show negligible changes, or lack clear actionability.
 *   **Solution:** Configure Infracost (or any cost reporting tool) to only comment if the cost increase or decrease exceeds a specific, meaningful threshold (e.g., `diff-threshold: 50` for a change greater than $50/month). Ensure comments are concise and provide immediate value.
 
-## Conclusion
-
 **Key Takeaways:**
 1.  **Visibility changes behavior:** When developers gain immediate visibility into the cost implications of their choices, they naturally become more cost-aware and self-regulate their resource provisioning habits.
 2.  **Automation is cleaner:** Automated "Reaper" scripts and lifecycle management policies consistently enforce cost controls, eliminating human error. Scripts do not forget to turn off the lights; humans often do.

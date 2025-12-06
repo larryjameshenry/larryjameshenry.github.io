@@ -182,7 +182,6 @@ Your Git folder structure dictates your operational workflow. For scalability, a
 *   **Cause:** The External Secrets Operator might not have permission to read the cloud provider's vault.
 *   **Solution:** Check the ServiceAccount IAM role bindings and trust policies for the ESO controller.
 
-## Conclusion
 
 **Key Takeaways:**
 1.  **ApplicationSets** are the secret weapon for multi-cluster management, automating the targeting of workloads.

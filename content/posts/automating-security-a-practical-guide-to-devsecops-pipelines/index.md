@@ -159,8 +159,6 @@ CVE-2024-5678 exp:2025-01-01
 *   **Cause:** Public vulnerability database providers often enforce API rate limits, which your CI/CD NAT gateway might hit.
 *   **Solution:** Host a local mirror of the vulnerability database within your own network or artifact registry to ensure reliable, fast access without hitting public rate limits.
 
-## Conclusion
-
 **Key Takeaways:**
 1.  **Shift Left:** Fix bugs when they are cheap—in the IDE or PR—rather than in Production where remediation is costly and stressful.
 2.  **Automate the Gate:** Make security a non-negotiable quality standard, automated just like your unit tests.

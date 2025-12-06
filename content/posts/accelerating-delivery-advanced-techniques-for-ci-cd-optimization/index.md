@@ -290,4 +290,3 @@ Trigger the new workflow. The first run will populate the caches. On the second 
 **Next Steps:**
 *   Audit your `Dockerfile`: Are you installing dependencies *before* copying source code?
 *   Enable BuildKit remote caching on your CI runner to persist layers between jobs.
-*   Read the next guide: *Conclusion: Your Roadmap to DevOps Mastery*.
