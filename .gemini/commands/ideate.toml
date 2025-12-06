@@ -41,5 +41,5 @@ Provide the results in Markdown:
 Select the strongest topic above to proceed with the `/new-topic-cluster` command.
 
 **Action:**
-Save the generated output to the file path: `plans/ideation/[domain-slug].md` using the 'write_file' tool. (Convert the Input Domain/Theme to a kebab-case slug for the filename).
+Save the generated output to the file path: `plans/[domain-slug]/ideation.md` using the 'write_file' tool. (Convert the Input Domain/Theme to a kebab-case slug for the filename).
 """

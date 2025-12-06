@@ -49,7 +49,8 @@ Provide a thorough research report in Markdown covering:
 **CRITICAL:** Focus on *density* of information. Provide facts, numbers, and concrete details, not fluff.
 
 **Action:**
-Save the generated output to the file path: `plans/[topic-slug]/research/[article-slug].md` using the 'write_file' tool.
-- Identify `[topic-slug]` from the parent folder of the context file provided (e.g., `plans/my-topic/outlines/article.md` -> `my-topic`).
-- Identify `[article-slug]` from the context filename (e.g., `article.md` -> `article`).
+Append the generated research report to the existing outline file.
+1. Identify the input file path provided (e.g., `plans/[topic-slug]/outlines/[article-slug].md`).
+2. Use the 'read_file' tool to get the current content of that file.
+3. Write the generated research content file `plans/[topic-slug]/research/[article-slug].md` with this content using the 'write_file' tool.
 """

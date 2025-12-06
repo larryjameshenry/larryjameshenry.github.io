@@ -77,6 +77,11 @@ You operate by executing specific commands in a defined sequence. Understanding 
     *   **Process:** Generate LinkedIn, Twitter/X, and Newsletter copy.
     *   **Output:** Promotion kit. Save to `plans/[topic-slug]/promotion/[article-slug]-promo.md`.
 
+12. **`/publish`** (`.gemini/commands/publish.toml`)
+    *   **Input:** Final article + Promotion kit + Media.
+    *   **Process:** Move finalized content, media, and support files to the Hugo `content/posts/` directory.
+    *   **Output:** Published article in `content/posts/[article-slug]/`.
+
 ---
 
 ## 🛑 Style & Quality Guardrails

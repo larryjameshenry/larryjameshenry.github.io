@@ -30,9 +30,10 @@ In interactive mode, you cannot directly redirect output to a file using `>` lik
 **Goal:** Generate a detailed Hugo-compatible outline for a specific article from your plan or research.
 
 You must first **add the context file** to your session so the command can see it.
+example:
 
 ```text
-@plans/azure-devops-pipelines.md /outline "Article 1"
+@plans/azure-devops-pipelines.md /outline "The Ultimate Guide to DevOps Automation in 2025: From CI/CD to Platform Engineering"
 ```
 *Action: Copy the output and save it to `content/posts/azure-pipelines-intro/index.md`*
 
@@ -41,7 +42,7 @@ You must first **add the context file** to your session so the command can see i
 **Goal:** Conduct specific technical research to fill in the gaps of your outline.
 
 ```text
-@content/posts/azure-pipelines-intro/index.md /research "Azure DevOps Pipelines"
+@plans/[slug]/outlines/[article].md /research
 ```
 *Action: Copy the output and save it to `content/posts/azure-pipelines-intro/files/research.md`*
 

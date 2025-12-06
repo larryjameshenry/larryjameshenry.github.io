@@ -1,18 +1,21 @@
 description = "Generate image generation prompts for an article"
 prompt = """
-Analyze the following article and generate 3 distinct, high-quality text-to-image prompts that could be used to generate a featured image (hero image) for this blog post.
+Analyze the following article and generate 3 distinct, high-quality text-to-image prompts that could be used to generate a featured image (hero image) for this blog post using **Nano Banana Pro**.
 
 Target Audience: Technical professionals (DevOps, Developers, IT).
 Vibe: Modern, clean, professional, slightly abstract or futuristic tech.
 
 Create 3 variations:
-1. **Photorealistic / Cinematic:** High detail, dramatic lighting, office or server room context but stylized.
-2. **3D Abstract / Isometric:** Clean 3D shapes, pipelines, code blocks, connecting nodes, soft lighting (like Spline/Blender 3D).
+1. **Photorealistic / Cinematic:** High detail, dramatic lighting, office or server room context but stylized. Focus on depth of field and realistic textures.
+2. **3D Abstract / Isometric:** Clean 3D shapes, pipelines, code blocks, connecting nodes, soft lighting (like Spline/Blender 3D). Focus on clean rendering and soft shadows.
 3. **Minimalist Vector / Flat:** Clean lines, symbolic representation, suitable for a technical diagram or icon style.
 
 For each variation provide:
 - **Concept:** Brief explanation of the idea.
-- **Prompt:** The exact prompt to copy-paste into tools like Midjourney, DALL-E 3, or Imagen. Include keywords for style, lighting, and aspect ratio (--ar 16:9).
+- **Prompt:** The exact prompt to copy-paste into **Nano Banana Pro**.
+    - **Must Include:** "high quality", "masterpiece", "8k resolution", "sharp focus".
+    - **Aspect Ratio:** Include `--ar 16:9` (or equivalent for the tool).
+- **Negative Prompt:** Suggest a negative prompt to avoid common issues (e.g., "text, watermark, blurry, low quality, deformed, ugly, bad anatomy").
 
 Article Content:
 {{args}}
