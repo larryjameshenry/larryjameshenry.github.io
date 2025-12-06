@@ -1,7 +1,7 @@
 ---
 title: "GitOps at Scale: Managing Multi-Cluster Kubernetes with ArgoCD"
 date: 2025-12-04T00:00:00
-draft: true
+draft: false
 description: "Master the GitOps operating model for complex infrastructure. Learn to manage multi-cluster environments, secrets, and directory structures using ArgoCD."
 series: ["DevOps Automation"]
 tags: ["gitops tutorial", "argocd guide", "multi-cluster kubernetes", "declarative infrastructure"]

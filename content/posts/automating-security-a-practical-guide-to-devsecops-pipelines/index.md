@@ -1,7 +1,7 @@
 ---
 title: "Automating Security: A Practical Guide to DevSecOps Pipelines"
 date: 2025-12-04T00:00:00
-draft: true
+draft: false
 description: "Learn how to embed security checks like SAST, DAST, and container scanning directly into your CI/CD pipelines without slowing down velocity."
 series: ["DevOps Automation"]
 tags: ["devsecops pipeline", "automated security testing", "ci/cd security tools", "shift left security"]
