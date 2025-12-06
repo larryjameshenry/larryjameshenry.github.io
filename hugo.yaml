@@ -23,6 +23,11 @@ enableRobotsTXT: true
 pagination:
   pagerSize: 9
 
+taxonomies:
+  category: categories
+  tag: tags
+  series: series
+
 markup:
   goldmark:
     renderer:
@@ -35,6 +40,21 @@ Menus:
       title: Blog posts
       url: /posts
       weight: 1
+    - identifier: series
+      name: Series
+      title: Series
+      url: /series
+      weight: 2
+    - identifier: categories
+      name: Categories
+      title: Categories
+      url: /categories
+      weight: 3
+    - identifier: tags
+      name: Tags
+      title: Tags
+      url: /tags
+      weight: 4
     # - identifier: gallery
     #   name: Gallery
     #   title: Blog posts
