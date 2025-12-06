@@ -46,7 +46,7 @@
         <div id="stickySideBar" class="sticky-sidebar">
 
           {{ if .Params.series }}
-          <aside class="series">
+          <aside class="tags">
             <h5>{{ .Site.Params.terms.series | default "Series" }}</h5>
             <ul class="tags-ul list-unstyled list-inline">
               {{range .Params.series}}
@@ -59,7 +59,7 @@
           {{end}}
 
           {{ if .Params.categories }}
-          <aside class="categories">
+          <aside class="tags">
             <h5>{{ .Site.Params.terms.categories | default "Categories" }}</h5>
             <ul class="tags-ul list-unstyled list-inline">
               {{range .Params.categories}}
