@@ -126,7 +126,7 @@
 
   // To set height of sticky sidebar dynamically
   let stickySideBarElem = document.getElementById("stickySideBar");
-  let stickyNavBar = {{ .Site.Params.navbar.stickyNavBar.enable | default false }};
+  let stickyNavBar = true;
   if(stickyNavBar) {
     let headerElem = document.getElementById("profileHeader");
     let headerHeight = headerElem.offsetHeight + 15;
