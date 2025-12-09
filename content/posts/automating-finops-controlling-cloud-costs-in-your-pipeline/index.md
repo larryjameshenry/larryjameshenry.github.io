@@ -163,7 +163,6 @@ Some niche or newly released Azure resources may not yet be mapped in the Infrac
 **"Developers ignore the cost comments"**
 Alert fatigue is real. If every PR shows a change of $0.01, developers will stop reading. Configure Infracost or your CI pipeline to fail the build only if the cost increase exceeds a specific threshold (e.g., > $50/month), or use the `behavior: update` setting to keep the noise to a single comment per PR.
 
-## Conclusion
 
 Visibility changes behavior. When developers see the financial impact of their code immediately, they self-regulate. When you combine this "Shift Left" approach with "Shift Right" automation like Reaper scripts and Policy enforcement, you bridge the gap between Engineering and Finance.
 
