@@ -12,7 +12,7 @@ weight: 4
 ## Article Structure
 
 ### Introduction (150-200 words)
-**Hook:** The only thing scaling faster than your Kubernetes cluster is your AWS bill.
+**Hook:** The only thing scaling faster than your Kubernetes cluster is your Azure bill.
 **Problem/Context:** Developers often provision infrastructure with zero visibility into the cost impact. Finance teams find out about the overspend 30 days later when the invoice arrives. This "Feedback Gap" is the root cause of cloud waste.
 **Value Proposition:** This guide teaches you how to shift cost awareness left. By automating FinOps, you can show developers the price tag of their changes *before* they merge, and automate the cleanup of resources that no longer serve a purpose.
 **Preview:** We'll cover "Price Checks" in Pull Requests, automated tagging policies, and "Reaper" scripts that hunt down zombie infrastructure.
@@ -88,7 +88,7 @@ weight: 4
 
 **Performance & Security:**
 - **Tip:** Ensure your cost estimation tools have read-only access to your cloud plan/state, never write access.
-- **Tip:** Use "Budget Actions" in AWS/Azure to trigger webhooks (e.g., slack alert) when 80% of budget is reached.
+- **Tip:** Use "Budget Actions" in Azure to trigger webhooks (e.g., slack alert) when 80% of budget is reached.
 
 ### Troubleshooting Common Issues
 

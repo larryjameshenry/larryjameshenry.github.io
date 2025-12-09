@@ -1,42 +1,82 @@
-# Code Audit Report: Automating FinOps: Controlling Cloud Costs in Your Pipeline
+---
+title: "Code Audit: Automating FinOps (Azure Focus)"
+date: 2025-12-09T00:00:00
+target_draft: "plans/devops-automation/drafts/automating-finops-controlling-cloud-costs-in-your-pipeline.md"
+status: "Issues Found"
+---
 
-This report validates the code blocks found in the draft for "Automating FinOps: Controlling Cloud Costs in Your Pipeline" for syntax, logical consistency, adherence to best practices, and completeness within their described context.
+# Code Validation Report
 
-## Summary
+## 1. PowerShell Script (Reaper)
+**Status:** 🔴 **Critical Issue**
 
-The code snippets provided (OPA Rego policy and GitHub Actions workflow) are syntactically correct and logically sound. They effectively demonstrate the core concepts of "Budget Guardrails" and "Price Check" workflows using standard tools (OPA and Infracost). No critical errors were found.
+*   **Snippet:**
+    ```powershell
+    $vms = Get-AzVM -Status | Where-Object { 
+        $_.Tags['AutoShutdown'] -eq 'true' -and $_.PowerState -eq 'VM running' 
+    }
+    ```
+*   **Problem:** The `Get-AzVM -Status` object (`PSVirtualMachine`) does NOT have a top-level property called `PowerState`. The status is buried in the `Statuses` array.
+*   **Corrected Code:**
+    ```powershell
+    # Connect using Managed Identity
+    Connect-AzAccount -Identity
 
-## Detailed Audit
+    # Get all VMs with status
+    $vms = Get-AzVM -Status 
 
-### 1. OPA Rego Policy (Denying Large Instances)
+    foreach ($vm in $vms) {
+        # Check for Tag
+        if ($vm.Tags['AutoShutdown'] -eq 'true') {
+            # Parse Status correctly
+            $status = $vm.Statuses | Where-Object { $_.Code -like 'PowerState/*' }
+            
+            if ($status.DisplayStatus -eq 'VM running') {
+                Write-Output "Stopping VM: $($vm.Name)"
+                Stop-AzVM -Name $vm.Name -ResourceGroupName $vm.ResourceGroupName -Force
+            }
+        }
+    }
+    ```
 
-*   **Syntax:** The Rego syntax is valid.
-*   **Logic:**
-    *   The policy correctly iterates over `input.resource_changes` to find resources of type `aws_instance` that are being created (`"create"` action).
-    *   It extracts the `instance_type` and checks if it exists in the `denied_types` set.
-    *   If a match is found, it generates a clear denial message.
-*   **Best Practices:**
-    *   Using a set (`denied_types := {...}`) for lookup is efficient and readable.
-    *   The logic targets specific resource types and actions, avoiding broad or unintended denials.
-*   **Context:** This snippet perfectly illustrates the "Budget Guardrails" concept by enforcing a policy-as-code rule to prevent expensive provisioning.
+## 2. GitHub Actions Workflow (Infracost)
+**Status:** 🟡 **Warning**
 
-### 2. GitHub Actions Workflow (Infracost Cost Estimation)
+*   **Snippet:** `uses: infracost/actions/setup@v2`
+*   **Problem:** Using older `@v2` actions.
+*   **Recommendation:** Upgrade to `@v3`.
+    ```yaml
+    - name: Setup Infracost
+      uses: infracost/actions/setup@v3
+      with:
+        api-key: ${{ secrets.INFRACOST_API_KEY }}
 
-*   **Syntax:** Valid YAML syntax for a GitHub Actions workflow.
-*   **Logic:**
-    *   **Trigger:** `on: pull_request` is the correct trigger for a PR-based workflow.
-    *   **Permissions:** `pull-requests: write` is correctly specified, which is necessary for the `infracost/actions/comment` action to post comments on the PR. `contents: read` is also standard.
-    *   **Steps:**
-        *   `checkout`: Retrieves code.
-        *   `setup-terraform`: Installs Terraform.
-        *   `setup-infracost`: Installs Infracost and configures the API key from secrets.
-        *   `Generate cost estimate`: Runs `infracost breakdown` to generate a JSON report. The command structure is correct.
-        *   `Post comment`: Uses the official `infracost/actions/comment` action. The `behavior: update` and `diff-threshold: 50` options are correctly used to manage comment noise, aligning with the "Best Practices" section.
-*   **Best Practices:**
-    *   Using `secrets.INFRACOST_API_KEY` is secure.
-    *   Using official actions (`hashicorp/setup-terraform`, `infracost/setup-infracost`, `infracost/actions/comment`) ensures reliability.
-    *   Limiting permissions follows the principle of least privilege.
+    - name: Post Cost Comment
+      uses: infracost/actions/comment@v3
+      with:
+        path: /tmp/infracost.json
+        behavior: update
+    ```
 
-## Conclusion of Audit
+## 3. Azure Policy JSON
+**Status:** 🟡 **Warning**
 
-The code examples are high-quality, functional, and directly support the article's learning objectives. They can be used by readers as-is or with minimal modification for their own environments.
+*   **Snippet:** `"exists": "false"`
+*   **Problem:** While Azure Policy engine is lenient, `"false"` as a string is technically incorrect for boolean fields.
+*   **Recommendation:** Remove quotes.
+    ```json
+    {
+      "if": {
+        "field": "tags['CostCenter']",
+        "exists": false
+      },
+      "then": {
+        "effect": "deny"
+      }
+    }
+    ```
+
+## 4. Summary of Changes Required
+1.  **Rewrite PowerShell logic** to correctly iterate and filter VM statuses.
+2.  **Update GitHub Action versions** to `v3`.
+3.  **Fix JSON syntax** for boolean `exists` check.
