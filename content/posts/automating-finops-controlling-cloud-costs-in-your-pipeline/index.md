@@ -1,6 +1,7 @@
 ---
 title: "Automating FinOps: Controlling Cloud Costs in Your Pipeline"
 date: 2025-12-04T00:00:00
+draft: true
 description: "Stop cloud bill shock before it happens. Learn how to integrate cost estimation tools like Infracost and automated cleanup scripts into your DevOps workflow."
 series: ["DevOps Automation"]
 tags: ["finops automation", "cloud cost optimization", "infracost tutorial", "azure policy", "powershell"]

@@ -1,7 +1,7 @@
 ---
 title: "The Ultimate Guide to DevOps Automation in 2025: From CI/CD to Platform Engineering"
 date: 2025-12-04T00:00:00
-draft: false
+draft: true
 description: "A guide to modern DevOps automation, covering Platform Engineering, AIOps, and automated governance."
 series: ["DevOps Automation"]
 tags: ["DevOps automation", "automated devops pipelines", "future of devops", "platform engineering guide"]

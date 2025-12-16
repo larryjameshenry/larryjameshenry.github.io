@@ -1,7 +1,7 @@
 ---
 title: "The Rise of AIOps: Leveraging AI for Smarter DevOps Automation"
 date: 2025-12-04T00:00:00
-draft: false
+draft: true
 description: "Move beyond static alerts. Discover how AI and LLMs are transforming DevOps with predictive scaling, automated root cause analysis, and intelligent incident response."
 series: ["DevOps Automation"]
 tags: ["aiops use cases", "ai in devops", "predictive scaling", "chatgpt for devops"]

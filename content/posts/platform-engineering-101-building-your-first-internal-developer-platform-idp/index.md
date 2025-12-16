@@ -1,7 +1,7 @@
 ---
 title: "Platform Engineering 101: Building Your First Internal Developer Platform (IDP)"
 date: 2025-12-04T00:00:00
-draft: false
+draft: true
 description: "A comprehensive guide to shifting from ticket-based ops to self-service platforms. Learn how to build a 'Golden Path' for developers using tools like Backstage."
 series: ["DevOps Automation"]
 tags: ["platform engineering", "internal developer platform", "backstage tutorial", "idp tools"]
