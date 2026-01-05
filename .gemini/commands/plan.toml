@@ -1,5 +1,5 @@
 description = "Create a strategic content cluster plan based on research and specified article counts."
-prompt = """
+prompt = """Save the generated output to the file path: `plans/[topic-slug]/plan.md` using the 'write_file' tool.
 Based on the provided research document about "{{topic}}", act as an expert content strategist.
 
 Your task is to create a strategic content plan for a topic cluster. The plan should include one central "Pillar Post" and between {{min_articles}} and {{max_articles}} supporting "Cluster Posts".
@@ -16,7 +16,6 @@ ARTICLE_COUNT: [Total number of cluster articles, excluding the pillar post]
 - **Target Audience:** [Primary audience from research]
 - **Primary Keywords:** [3-5 primary keywords]
 - **Key Questions Answered:**
-    - [Question 1]
     - [Question 2]
     - ...
 
