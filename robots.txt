@@ -1,1 +1,28 @@
 User-agent: *
+Allow: /
+
+# AI Bots
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-bot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+# Machine-readable shortcut for AI
+Sitemap: https://larryjameshenry.com/index.json
+Sitemap: https://larryjameshenry.com/sitemap.xml
