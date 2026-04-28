@@ -1,0 +1,1 @@
+function readingTime(){const t=document.querySelector("article").innerText,n=225,s=t.trim().split(/\s+/).length,o=Math.ceil(s/n),e=document.querySelector("span#readingTime");e.innerHTML="<small> | </small>"+o+e.innerHTML}readingTime()

@@ -1,0 +1,1 @@
+function getScrollPercent(){const e=document.body.scrollHeight-window.innerHeight,t=window.scrollY;return t/e*100}const scrollProgressBar=document.getElementById("scroll-progress-bar");document.onscroll=function(){var e=Math.round(getScrollPercent());scrollProgressBar.style.width=e+"%",scrollProgressBar.ariaValueNow=e}
