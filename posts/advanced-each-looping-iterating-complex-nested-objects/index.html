@@ -1,0 +1,743 @@
+<!doctype html><html lang=en><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=X-UA-Compatible content="ie=edge"><meta http-equiv=Accept-CH content="DPR, Viewport-Width, Width"><link rel=icon href=/fav.webp type=image/gif alt="fav icon"><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Alata&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin=anonymous referrerpolicy=no-referrer><link rel=canonical href=https://larryjameshenry.com/posts/advanced-each-looping-iterating-complex-nested-objects/><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"Advanced each Looping: Iterating Complex Nested Objects","description":"Go beyond simple string arrays in Azure DevOps YAML. Master ${{ each }} over nested objects, key-value maps, and filtered iterations to generate dynamic stages.","image":"https:\/\/larryjameshenry.com\/images\/featured.webp","datePublished":"2026-04-29T00:00:00Z","dateModified":"2026-04-29T00:00:00Z","author":{"@type":"Person","name":"Larry James Henry"},"mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/larryjameshenry.com\/posts\/advanced-each-looping-iterating-complex-nested-objects\/"},"publisher":{"@type":"Organization","name":"Larry James Henry","logo":{"@type":"ImageObject","url":"https:\/\/larryjameshenry.com\/fav.webp"}}}</script><link rel=preload as=image href=/posts/advanced-each-looping-iterating-complex-nested-objects/images/featured_hu_10b82367fde20d6c.41f9220891b75f5e157bd22a3d72e0e57ad15cc8ccb4771a549cc39bf855357e.webp fetchpriority=high><meta property="og:url" content="https://larryjameshenry.com/posts/advanced-each-looping-iterating-complex-nested-objects/"><meta property="og:site_name" content="Larry James Henry"><meta property="og:title" content="Advanced each Looping: Iterating Complex Nested Objects"><meta property="og:description" content="Go beyond simple string arrays in Azure DevOps YAML. Master ${{ each }} over nested objects, key-value maps, and filtered iterations to generate dynamic stages."><meta property="og:locale" content="en_us"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2026-04-29T00:00:00+00:00"><meta property="article:modified_time" content="2026-04-29T00:00:00+00:00"><meta property="article:tag" content="Azure DevOps"><meta property="article:tag" content="YAML Each"><meta property="article:tag" content="Dynamic Stages"><meta property="article:tag" content="Looping Objects"><meta property="article:tag" content="Compile-Time Expressions"><meta property="article:tag" content="Pipeline Automation"><meta property="og:see_also" content="https://larryjameshenry.com/posts/ultimate-guide-yaml-expressions/"><meta property="og:see_also" content="https://larryjameshenry.com/posts/debugging-silent-pipeline-failures/"><meta property="og:see_also" content="https://larryjameshenry.com/posts/escaping-parameter-hell/"><meta property="og:see_also" content="https://larryjameshenry.com/posts/templatecontext-deep-dive/"><meta property="og:see_also" content="https://larryjameshenry.com/posts/dynamic-matrix-test-strategies/"><meta property="og:see_also" content="https://larryjameshenry.com/posts/cross-job-communication-mastering-dependencies-output-variables/"><meta name=twitter:card content="summary"><meta name=twitter:title content="Advanced each Looping: Iterating Complex Nested Objects"><meta name=twitter:description content="Go beyond simple string arrays in Azure DevOps YAML. Master ${{ each }} over nested objects, key-value maps, and filtered iterations to generate dynamic stages."><link rel=stylesheet href=/bootstrap-5/css/bootstrap.min.min.c653a89fa8ff9031447c0974acfe40dde40f71bcd595b0663b3f4c359f4a77cb.css integrity="sha256-xlOon6j/kDFEfAl0rP5A3eQPcbzVlbBmOz9MNZ9Kd8s=" media=print onload='this.media="all"'><noscript><link rel=stylesheet href=/bootstrap-5/css/bootstrap.min.min.c653a89fa8ff9031447c0974acfe40dde40f71bcd595b0663b3f4c359f4a77cb.css></noscript><link rel=stylesheet href=/css/critical.min.4e7dabc9833aa45c7bc7c06faccfc727a7e1b3200eb3cdc6502c6bd89f5c4dd3.css integrity="sha256-Tn2ryYM6pFx7x8BvrM/HJ6fhsyAOs83GUCxr2J9cTdM=" media=all><link rel=stylesheet href=/css/footer.min.722685472b0ea07058ff6200a07605e05feaad675f1c05b2291ce086996bbce0.css integrity="sha256-ciaFRysOoHBY/2IAoHYF4F/qrWdfHAWyKRzghplrvOA=" media=print onload='this.media="all"'><noscript><link rel=stylesheet href=/css/footer.min.722685472b0ea07058ff6200a07605e05feaad675f1c05b2291ce086996bbce0.css></noscript><style>:root{--text-color:#343a40;--text-secondary-color:#555e63;--text-link-color:#007bff;--background-color:#eaedf0;--secondary-background-color:#64ffda1a;--primary-color:#007bff;--secondary-color:#f8f9fa;--text-color-dark:#e4e6eb;--text-secondary-color-dark:#b0b3b8;--text-link-color-dark:#ffffff;--background-color-dark:#18191a;--secondary-background-color-dark:#212529;--primary-color-dark:#ffffff;--secondary-color-dark:#212529}body{font-size:1rem;font-weight:400;line-height:1.5;text-align:left}html{background-color:var(--background-color)!important}body::-webkit-scrollbar{height:0;width:8px;background-color:var(--background-color)}::-webkit-scrollbar-track{border-radius:1rem}::-webkit-scrollbar-thumb{border-radius:1rem;background:#b0b0b0;outline:1px solid var(--background-color)}#search-content::-webkit-scrollbar{width:.5em;height:.1em;background-color:var(--background-color)}</style><meta name=description content="Go beyond simple string arrays in Azure DevOps YAML. Master ${{ each }} over nested objects, key-value maps, and filtered iterations to generate dynamic stages."><link rel=stylesheet href=/css/single.min.94749e2d4caf4c21a2302bc66f19cbfc91e90f67e63fd3fe4f3071f9d0975c7d.css integrity="sha256-lHSeLUyvTCGiMCvGbxnL/JHpD2fmP9P+TzBx+dCXXH0="><title>Advanced each Looping: Iterating Complex Nested Objects | Larry James Henry</title></head><body class=light><a class=visually-hidden-focusable href=#content>Skip to main content</a>
+<script>let localStorageValue=localStorage.getItem("pref-theme"),mediaQuery=window.matchMedia("(prefers-color-scheme: dark)").matches;switch(localStorageValue){case"dark":document.body.classList.add("dark");break;case"light":document.body.classList.remove("dark");break;default:mediaQuery&&document.body.classList.add("dark");break}</script><script>var prevScrollPos=window.pageYOffset;window.addEventListener("scroll",function(){let s=document.getElementById("profileHeader"),t=window.pageYOffset,n=!1,o=!0,i=o?prevScrollPos>t:t>0;i?s.classList.add("showHeaderOnTop"):n=!0,t===0&&(n=!0),n&&s.classList.remove("showHeaderOnTop"),prevScrollPos=t})</script><header id=profileHeader role=banner><nav class="pt-3 navbar navbar-expand-lg animate"><div class="container-fluid mx-xs-2 mx-sm-5 mx-md-5 mx-lg-5"><a class="navbar-brand primary-font text-wrap" href=/><img src=/fav.webp width=30 height=30 class="d-inline-block align-top" alt="fav icon">
+Larry James Henry</a><div><input id=search autocomplete=off class="form-control mr-sm-2 d-none d-md-block" placeholder='Ctrl + k to Search...' aria-label=Search oninput=searchOnChange(event)></div><button class=navbar-toggler type=button data-bs-toggle=collapse data-bs-target=#navbarContent aria-controls=navbarContent aria-expanded=false aria-label="Toggle navigation">
+<svg aria-hidden="true" height="24" viewBox="0 0 16 16" width="24" data-view-component="true"><path fill-rule="evenodd" d="M1 2.75A.75.75.0 011.75 2h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 2.75zm0 5A.75.75.0 011.75 7h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 7.75zM1.75 12a.75.75.0 100 1.5h12.5a.75.75.0 100-1.5H1.75z"/></svg></button><div class="collapse navbar-collapse text-wrap primary-font" id=navbarContent><ul class="navbar-nav ms-auto text-center"><li class="nav-item navbar-text d-block d-md-none"><div class=nav-link><input id=search autocomplete=off class="form-control mr-sm-2" placeholder='Ctrl + k to Search...' aria-label=Search oninput=searchOnChange(event)></div></li><li class="nav-item navbar-text"><a class=nav-link href=/about title="About Me">About</a></li><li class="nav-item navbar-text"><a class=nav-link href=/posts title="Blog posts">Blog</a></li><li class="nav-item navbar-text"><a class=nav-link href=/series title=Series>Series</a></li><li class="nav-item navbar-text"><a class=nav-link href=/categories title=Categories>Categories</a></li><li class="nav-item navbar-text"><a class=nav-link href=/tags title=Tags>Tags</a></li><li class="nav-item navbar-text"><div class=text-center><button id=theme-toggle title=theme-toggle>
+<svg id="moon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+<svg id="sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></li></ul></div></div></nav></header><main id=content role=main><section id=single><div class=container><div class="row justify-content-center"><div class="col-sm-12 col-md-12 col-lg-9"><div class=pr-lg-4><div class="title mb-5"><h1 class="text-center mb-4">Advanced each Looping: Iterating Complex Nested Objects</h1><div class=text-center>Apr 29, 2026
+<span id=readingTime>min read</span></div></div><div class=featured-image><img class="img-fluid mx-auto d-block" src=/posts/advanced-each-looping-iterating-complex-nested-objects/images/featured_hu_10b82367fde20d6c.41f9220891b75f5e157bd22a3d72e0e57ad15cc8ccb4771a549cc39bf855357e.webp alt="Advanced each Looping: Iterating Complex Nested Objects" width=784 height=438 integrity="sha256-QfkiCJG3X14Ve9IqPXLg5XrRXMjMtHcaVJzDm/hVNX4=" fetchpriority=high loading=eager></div><article class="page-content p-2"><p>You loop through a string array to generate three deployment stages. Then the requirements change: each environment needs a region code, a service connection, and a flag for whether blue-green is enabled. You hit the wall — <code>${{ each }}</code> only gives you one value per iteration.</p><p>Most documentation on <code>${{ each }}</code> stops at string arrays. Real-world pipelines operate on structured data: environment objects with multiple properties, nested region-to-tier mappings, and key-value configuration maps. Knowing how to iterate simple lists is table stakes. Knowing how to destructure a nested object mid-loop, filter iterations with inline <code>${{ if }}</code>, and generate unique stage names from compound keys separates a 30-line template from a 300-line template.</p><p>This article covers:</p><ul><li>How <code>${{ each }}</code> behaves differently on arrays vs. mappings, and what <code>key</code> and <code>value</code> refer to in each case.</li><li>Patterns for iterating over arrays of objects with multiple properties.</li><li>Nested <code>${{ each }}</code> loops and the exact limits that make them dangerous.</li><li>Filtered iteration with inline <code>${{ if }}</code> to generate conditional stages without conditional logic at the caller.</li><li>Unique stage name generation from compound keys to avoid collision errors.</li><li>The template expansion limits that cap loop depth and total generated items.</li></ul><p>The article moves from a review of the basics through five progressively complex iteration patterns, then closes with a complete multi-region, multi-tier deployment generator.</p><hr><h2 id=how--each--actually-works>How <code>${{ each }}</code> Actually Works</h2><h3 id=the-two-forms--array-and-mapping>The Two Forms — Array and Mapping</h3><p><code>${{ each }}</code> operates on two fundamentally different YAML data structures, and the binding behavior differs between them.</p><p>When iterating a <strong>sequence</strong> (array), each iteration binds the loop variable to the element itself. For a string array, the variable is the string. For an array of mappings, the variable is the full mapping — all properties are accessible via dot notation.</p><p>When iterating a <strong>mapping</strong> (key-value object), each iteration binds the variable to a wrapper containing two sub-properties: <code>key</code> (the map key as a string) and <code>value</code> (the map value, which can be a string, number, or nested mapping). This is the only syntax for iterating mapping entries — there is no shorthand.</p><p>Both forms are compile-time. The loop unrolls during YAML expansion before the pipeline run starts. The result is a static Expanded YAML that the execution engine processes. You cannot add or remove stages at runtime — the structure is fixed at expansion time.</p><h3 id=diagram-the-yaml-expansion-lifecycle>Diagram: The YAML Expansion Lifecycle</h3><p>This diagram visualizes how compile-time expressions like <code>${{ each }}</code> and <code>${{ if }}</code> are evaluated to generate a static &ldquo;Expanded YAML&rdquo; before the pipeline execution phase begins.</p><pre class=mermaid>
+  flowchart TD
+    Start([Start Pipeline Run]) --&gt; Parse[Load YAML &amp; Parameters]
+    
+    subgraph CompileTime [Compile-Time Expansion]
+        direction TB
+        Evaluate[Evaluate Expressions]
+        Loop{{&#34;${{ each item in data }}&#34;}}
+        If{&#34;${{ if condition }}&#34;}
+        Sanitize[&#34;Sanitize IDs (replace)&#34;]
+        Unroll[Unroll into Static YAML]
+        
+        Evaluate --&gt; Loop
+        Loop --&gt; If
+        If -- True --&gt; Sanitize
+        If -- False --&gt; Skip[Skip Item]
+        Sanitize --&gt; Unroll
+        Unroll --&gt; Loop
+    end
+    
+    Parse --&gt; CompileTime
+    CompileTime --&gt; Expanded[Generated: Expanded YAML]
+    
+    subgraph Runtime [Execution Phase]
+        direction TB
+        Agent[Assign to Agents]
+        Vars[&#34;Evaluate $(vars) / $[vars]&#34;]
+        Steps[Execute Steps]
+        
+        Agent --&gt; Vars
+        Vars --&gt; Steps
+    end
+    
+    Expanded --&gt; Runtime
+    Runtime --&gt; End([Finish])
+
+    style CompileTime fill:#f9f,stroke:#333,stroke-width:2px
+    style Runtime fill:#bbf,stroke:#333,stroke-width:2px
+</pre><p><strong>Visual Notes:</strong></p><ul><li><strong>Compile-Time:</strong> This phase happens on the Azure DevOps server before any agent is assigned. It is where <code>${{ }}</code> syntax is resolved.</li><li><strong>Expanded YAML:</strong> This is the final, static structure of the pipeline. You can view this in the portal via &ldquo;Download full YAML&rdquo;.</li><li><strong>Runtime:</strong> This phase happens during execution. Expressions like <code>$(var)</code> or <code>$[var]</code> are resolved here, but they cannot change the pipeline&rsquo;s structure (stages/jobs).</li></ul><p>Here are the same three environments expressed as a string array, an array of mappings, and a mapping, with the corresponding <code>${{ each }}</code> syntax for each:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># Form 1: Array of strings</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># env binds to the string value (&#34;dev&#34;, &#34;staging&#34;, &#34;prod&#34;)</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>environments</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>object</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>default</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>dev</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>staging</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>prod</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#ae81ff>${{ each env in parameters.environments }}:</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>Deploy_${{ env }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>job</span>: <span style=color:#ae81ff>Deploy</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>script</span>: <span style=color:#ae81ff>echo &#34;Deploying to ${{ env }}&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Expands to three stages: Deploy_dev, Deploy_staging, Deploy_prod</span>
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># Form 2: Array of mappings</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># env binds to the full mapping; access properties via env.name, env.region</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>environments</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>object</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>default</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>dev</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>eastus</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-dev-eastus</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>staging</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>eastus</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-staging-eastus</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>prod</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>westeu</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-prod-westeu</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#ae81ff>${{ each env in parameters.environments }}:</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>Deploy_${{ env.name }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>job</span>: <span style=color:#ae81ff>Deploy</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>script</span>: <span style=color:#ae81ff>echo &#34;Deploying ${{ env.name }} to ${{ env.region }}&#34;</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>env</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>SERVICE_CONNECTION</span>: <span style=color:#ae81ff>${{ env.serviceConnection }}</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Expands to three stages: Deploy_dev, Deploy_staging, Deploy_prod</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Each stage carries its own region and service connection values</span>
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># Form 3: Mapping</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># sub binds to a wrapper; sub.key is the map key, sub.value is the map value</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>subscriptions</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>object</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>default</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>eastus</span>: <span style=color:#ae81ff>sub-001</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>westeu</span>: <span style=color:#ae81ff>sub-002</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>apsouth</span>: <span style=color:#ae81ff>sub-003</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#ae81ff>${{ each sub in parameters.subscriptions }}:</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>Deploy_${{ sub.key }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>deployment</span>: <span style=color:#ae81ff>Deploy</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>${{ sub.key }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>variables</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>subscriptionId</span>: <span style=color:#ae81ff>${{ sub.value }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>strategy</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>runOnce</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>deploy</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>            - <span style=color:#f92672>script</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                az account set --subscription $(subscriptionId)
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                echo &#34;Deploying to ${{ sub.key }}&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Expands to three stages: Deploy_apsouth, Deploy_eastus, Deploy_westeu</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Note: mapping keys iterate in alphabetical order</span>
+</span></span></code></pre></div><h3 id=variable-binding-names-and-scope>Variable Binding Names and Scope</h3><p>The binding name — <code>env</code>, <code>item</code>, <code>region</code>, or anything else — is arbitrary. Choose names that match the data semantics. A loop over environments requires <code>env</code>, not <code>item</code> or <code>x</code>. Readable binding names eliminate a full class of scope bugs when nesting.</p><p>The binding scopes to its <code>${{ each }}</code> block and is not accessible outside it. Inside a nested <code>${{ each }}</code>, the outer binding stays in scope — which is exactly how you build compound stage names across two loop levels:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># Outer binding (env) remains accessible inside the inner loop</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#ae81ff>${{ each env in parameters.environments }}:</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>${{ each region in env.regions }}:</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>${{ env.name }}_${{ region.code }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;${{ env.name }} — ${{ region.code }}&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>deployment</span>: <span style=color:#ae81ff>Deploy</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>${{ env.name }}-${{ region.code }}</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>strategy</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>runOnce</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>deploy</span>:
+</span></span><span style=display:flex><span>              <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>              - <span style=color:#f92672>script</span>: <span style=color:#ae81ff>echo &#34;Deploying ${{ env.name }} to ${{ region.code }}&#34;</span>
+</span></span></code></pre></div><p>Never reuse a binding name across nested levels. If the outer loop uses <code>env</code> and the inner loop also uses <code>env</code>, the inner binding shadows the outer, and <code>env.name</code> inside the inner loop resolves to the inner item&rsquo;s <code>name</code> property, not the outer environment&rsquo;s.</p><h3 id=what--each--can-generate>What <code>${{ each }}</code> Can Generate</h3><p><code>${{ each }}</code> works at three levels of pipeline structure:</p><p><strong>Stage level</strong> — each iteration produces one complete <code>stage:</code> block, including all its jobs and steps. This is the most common pattern for multi-environment deployment pipelines.</p><p><strong>Job level</strong> — each iteration produces one complete <code>job:</code> or <code>deployment:</code> block inside an existing stage. Use this when the stage structure is fixed but the jobs vary.</p><p><strong>Step level</strong> — each iteration produces one <code>- script:</code>, <code>- task:</code>, or other step entry inside a job. Use this for data-driven validation checklists or generated test commands.</p><p><code>${{ each }}</code> cannot generate individual YAML properties inside a single task block. If you need to conditionally set a task input (e.g., <code>azureSubscription:</code>), use an inline <code>${{ if }}</code> on the property value, not <code>${{ each }}</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># Stage-level: one complete stage per environment</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#ae81ff>${{ each env in parameters.environments }}:</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>Deploy_${{ env.name }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>job</span>: <span style=color:#ae81ff>Deploy</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>script</span>: <span style=color:#ae81ff>echo &#34;Stage-level generation for ${{ env.name }}&#34;</span>
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># Job-level: one deployment job per environment within a fixed stage</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>Deploy</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>${{ each env in parameters.environments }}:</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>deployment</span>: <span style=color:#ae81ff>Deploy_${{ env.name }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>${{ env.name }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>strategy</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>runOnce</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>deploy</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>            - <span style=color:#f92672>script</span>: <span style=color:#ae81ff>echo &#34;Job-level generation for ${{ env.name }}&#34;</span>
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># Step-level: one validation step per entry in the steps array</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>Validate</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>job</span>: <span style=color:#ae81ff>Validation</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>${{ each step in parameters.validationSteps }}:</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>script</span>: <span style=color:#ae81ff>${{ step.command }}</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>displayName</span>: <span style=color:#ae81ff>${{ step.name }}</span>
+</span></span></code></pre></div><hr><h2 id=iterating-arrays-of-objects>Iterating Arrays of Objects</h2><h3 id=single-level-object-arrays>Single-Level Object Arrays</h3><p>A parameter declared as <code>type: object</code> with a <code>default:</code> list of mappings gives each <code>${{ each }}</code> iteration access to all properties of the mapping via <code>${{ item.propertyName }}</code>. All properties resolve at compile time.</p><p>Properties present on every item work without guards. Properties that some items omit resolve to empty string. Use <code>${{ coalesce(item.optionalProp, 'default') }}</code> to provide a fallback.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># templates/deploy-stage.yml</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>environments</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>object</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>default</span>: []
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#ae81ff>${{ each env in parameters.environments }}:</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>Deploy_${{ env.name }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Deploy to ${{ env.name }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>deployment</span>: <span style=color:#ae81ff>Deploy</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>${{ env.name }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>strategy</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>runOnce</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>deploy</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>            - <span style=color:#f92672>script</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                echo &#34;Region: ${{ env.region }}&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                echo &#34;Service connection: ${{ env.serviceConnection }}&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                # coalesce() provides &#39;false&#39; when blueGreenEnabled is absent
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                echo &#34;Blue-green: ${{ coalesce(env.blueGreenEnabled, false) }}&#34;</span>
+</span></span><span style=display:flex><span>              <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Deploy ${{ env.name }} to ${{ env.region }}&#34;</span>
+</span></span></code></pre></div><p>The calling pipeline passes the <code>environments</code> array with all required properties per item:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># azure-pipelines.yml</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>template</span>: <span style=color:#ae81ff>templates/deploy-stage.yml</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>environments</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>dev</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>region</span>: <span style=color:#ae81ff>eastus</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-dev-eastus</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>blueGreenEnabled</span>: <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>staging</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>region</span>: <span style=color:#ae81ff>eastus</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-staging-eastus</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>blueGreenEnabled</span>: <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>prod</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>region</span>: <span style=color:#ae81ff>westeu</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-prod-westeu</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>blueGreenEnabled</span>: <span style=color:#66d9ef>true</span>
+</span></span></code></pre></div><p>This generates three deployment stages (<code>Deploy_dev</code>, <code>Deploy_staging</code>, <code>Deploy_prod</code>) with distinct service connections and regions. The <code>blueGreenEnabled</code> property is optional per item; <code>coalesce()</code> ensures a sensible default when omitted.</p><h3 id=generating-unique-identifiers-from-object-properties>Generating Unique Identifiers from Object Properties</h3><p>Stage and job names must be unique within their scope. Two items with the same rendered name produce a parse error before the pipeline runs:</p><pre tabindex=0><code>/azure-pipelines.yml (Line: 12, Col: 5): Duplicate identifier &#39;Deploy_eastus&#39;.
+</code></pre><p>The root cause is typically building the stage name from a single property that is not unique across the array. If two environments share the same region code and the stage name is <code>Deploy_${{ env.region }}</code>, you get a collision. Compose the name from two or more properties:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># Single property — fails when two items share the same region</span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>Deploy_${{ env.region }} </span> <span style=color:#75715e># Deploy_eastus appears twice: parse error</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Compound name — tier + region combination is unique per item</span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>${{ env.tier }}_${{ env.region }} </span> <span style=color:#75715e># dev_eastus, staging_eastus, prod_westeu</span>
+</span></span></code></pre></div><p>Azure DevOps stage and job names allow only alphanumeric characters and underscores — the character set <code>[A-Za-z0-9_]</code>. Additionally, Stage IDs cannot start with a number. Hyphens, dots, and spaces in property values cause a parse error.</p><p>Use the compile-time <code>replace()</code> function to sanitize identifier strings directly in the template. This allows callers to pass standard Azure resource names (which conventionally use hyphens) without breaking the pipeline parser:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>environments</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>object</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>default</span>:
+</span></span><span style=display:flex><span>  <span style=color:#75715e># Caller passes standard hyphenated names</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>dev</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>east-us</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-dev-eastus</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>prod</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>west-eu</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-prod-westeu</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#ae81ff>${{ each env in parameters.environments }}:</span>
+</span></span><span style=display:flex><span>  <span style=color:#75715e># Sanitize the tier and region names by replacing hyphens with underscores</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>${{ replace(env.tier, &#39;-&#39;, &#39;_&#39;) }}_${{ replace(env.region, &#39;-&#39;, &#39;_&#39;) }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;${{ env.tier }} (${{ env.region }})&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>deployment</span>: <span style=color:#ae81ff>Deploy</span>
+</span></span><span style=display:flex><span>      <span style=color:#75715e># Azure DevOps environment names use hyphen convention, so original value is fine here</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>${{ env.tier }}-${{ env.region }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>strategy</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>runOnce</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>deploy</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>            - <span style=color:#f92672>script</span>: <span style=color:#ae81ff>echo &#34;Deploying ${{ env.tier }} to ${{ env.region }}&#34;</span>
+</span></span></code></pre></div><h3 id=filtering-with-inline--if->Filtering with Inline <code>${{ if }}</code></h3><p>Place a <code>${{ if condition }}</code> block inside the <code>${{ each }}</code> body to skip items that do not match a filter criterion. No stage or job is generated for filtered-out items — they are absent from the Expanded YAML entirely.</p><p>This approach moves filter logic into the template. The caller provides the full set of environments; the template decides which ones produce stages based on built-in criteria. Callers do not need to pre-filter their arrays before passing them in.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># templates/deploy-stage.yml</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>environments</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>object</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>default</span>: []
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#ae81ff>${{ each env in parameters.environments }}:</span>
+</span></span><span style=display:flex><span>  <span style=color:#75715e># Only generate a stage when deployOnPR is explicitly true</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>${{ if eq(env.deployOnPR, true) }}:</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>Deploy_${{ env.name }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;PR deploy: ${{ env.name }}&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>deployment</span>: <span style=color:#ae81ff>Deploy</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>${{ env.name }}</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>strategy</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>runOnce</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>deploy</span>:
+</span></span><span style=display:flex><span>              <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>              - <span style=color:#f92672>script</span>: <span style=color:#ae81ff>echo &#34;PR deployment to ${{ env.name }}&#34;</span>
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># azure-pipelines.yml — caller provides all five environments unfiltered</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>template</span>: <span style=color:#ae81ff>templates/deploy-stage.yml</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>environments</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>dev_eastus</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>deployOnPR</span>: <span style=color:#66d9ef>true</span>    <span style=color:#75715e># Stage generated</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>dev_westeu</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>deployOnPR</span>: <span style=color:#66d9ef>false</span>   <span style=color:#75715e># Skipped — absent from Expanded YAML</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>staging</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>deployOnPR</span>: <span style=color:#66d9ef>true</span>    <span style=color:#75715e># Stage generated</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>prod_eastus</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>deployOnPR</span>: <span style=color:#66d9ef>false</span>   <span style=color:#75715e># Skipped</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>prod_westeu</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>deployOnPR</span>: <span style=color:#66d9ef>false</span>   <span style=color:#75715e># Skipped</span>
+</span></span></code></pre></div><p>The Expanded YAML contains exactly two deployment stages: <code>Deploy_dev_eastus</code> and <code>Deploy_staging</code>. The other three never reach the plan.</p><hr><h2 id=iterating-key-value-mappings>Iterating Key-Value Mappings</h2><h3 id=the-key--value-binding>The <code>key</code> / <code>value</code> Binding</h3><p>When the parameter is a YAML mapping rather than a sequence, <code>${{ each pair in parameters.regionMap }}</code> binds <code>pair.key</code> to the map key (always a string) and <code>pair.value</code> to the map value. The value can be a string, number, boolean, or a nested mapping.</p><p>This is the idiomatic pattern when the key is itself a meaningful identifier — a region code, a tenant ID, a service name — and the value carries supplementary configuration.</p><p>One constraint: mapping iteration order is alphabetical by key. If you need stages to run in a specific sequence, use a sequence of objects with explicit <code>dependsOn:</code> properties rather than a mapping.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>subscriptions</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>object</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>default</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>eastus</span>: <span style=color:#ae81ff>sub-001</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>westeu</span>: <span style=color:#ae81ff>sub-002</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>apsouth</span>: <span style=color:#ae81ff>sub-003</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span><span style=color:#75715e># Iterates alphabetically: apsouth → eastus → westeu</span>
+</span></span><span style=display:flex><span>- <span style=color:#ae81ff>${{ each sub in parameters.subscriptions }}:</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>Deploy_${{ sub.key }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Deploy to ${{ sub.key }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>deployment</span>: <span style=color:#ae81ff>Deploy</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>${{ sub.key }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>variables</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>subscriptionId</span>: <span style=color:#ae81ff>${{ sub.value }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>strategy</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>runOnce</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>deploy</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>            - <span style=color:#f92672>script</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                az account set --subscription $(subscriptionId)
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                echo &#34;Deploying to ${{ sub.key }}&#34;</span>
+</span></span><span style=display:flex><span>              <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Deploy to ${{ sub.key }}&#34;</span>
+</span></span></code></pre></div><h3 id=mapping-values-as-nested-objects>Mapping Values as Nested Objects</h3><p>A mapping&rsquo;s values can be mappings themselves. This is useful when the key is a natural, unique identifier and the value carries a structured configuration payload.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>regions</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>object</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>default</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>eastus</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>subscriptionId</span>: <span style=color:#ae81ff>sub-001</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>prod</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>blueGreen</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>westeu</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>subscriptionId</span>: <span style=color:#ae81ff>sub-002</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>prod</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>blueGreen</span>: <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dev_eastus</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>subscriptionId</span>: <span style=color:#ae81ff>sub-dev-001</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>dev</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>blueGreen</span>: <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#ae81ff>${{ each region in parameters.regions }}:</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>Deploy_${{ replace(region.key, &#39;-&#39;, &#39;_&#39;) }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Deploy to ${{ region.key }} (${{ region.value.tier }})&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>deployment</span>: <span style=color:#ae81ff>Deploy</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>${{ region.key }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>variables</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>subscriptionId</span>: <span style=color:#ae81ff>${{ region.value.subscriptionId }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>strategy</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>runOnce</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>deploy</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>            - <span style=color:#ae81ff>${{ if eq(region.value.blueGreen, true) }}:</span>
+</span></span><span style=display:flex><span>              - <span style=color:#f92672>script</span>: <span style=color:#ae81ff>echo &#34;Blue-green deploy to ${{ region.key }}&#34;</span>
+</span></span><span style=display:flex><span>                <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Blue-green deployment&#34;</span>
+</span></span><span style=display:flex><span>            - <span style=color:#ae81ff>${{ else }}:</span>
+</span></span><span style=display:flex><span>              - <span style=color:#f92672>script</span>: <span style=color:#ae81ff>echo &#34;Rolling deploy to ${{ region.key }}&#34;</span>
+</span></span><span style=display:flex><span>                <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Rolling deployment&#34;</span>
+</span></span></code></pre></div><p>Access nested properties via <code>region.value.subscriptionId</code>, <code>region.value.tier</code>, and <code>region.value.blueGreen</code> — the same dot-notation as object array iteration, just with the <code>value.</code> prefix between the loop variable and the nested property.</p><h3 id=when-to-use-mappings-vs-arrays-of-objects>When to Use Mappings vs. Arrays of Objects</h3><table><thead><tr><th>Criterion</th><th style=text-align:center>Use a mapping</th><th style=text-align:center>Use an array of objects</th></tr></thead><tbody><tr><td>Key is a natural unique identifier (region code, tenant ID)</td><td style=text-align:center>✓</td><td style=text-align:center></td></tr><tr><td>Key appears in stage names or resource references</td><td style=text-align:center>✓</td><td style=text-align:center></td></tr><tr><td>Iteration order is irrelevant</td><td style=text-align:center>✓</td><td style=text-align:center></td></tr><tr><td>Items have no natural unique key</td><td style=text-align:center></td><td style=text-align:center>✓</td></tr><tr><td>Insertion order must be preserved</td><td style=text-align:center></td><td style=text-align:center>✓</td></tr><tr><td>Items need explicit <code>dependsOn:</code> for sequencing</td><td style=text-align:center></td><td style=text-align:center>✓</td></tr><tr><td>Items will be passed as a <code>jobList</code> with <code>templateContext</code></td><td style=text-align:center></td><td style=text-align:center>✓</td></tr></tbody></table><p>The <code>templateContext</code> bridge works with array items passed as <code>jobList</code> — it does not apply to mapping values.</p><hr><h2 id=nested--each--loops>Nested <code>${{ each }}</code> Loops</h2><h3 id=the-valid-pattern--two-levels-deep>The Valid Pattern — Two Levels Deep</h3><p>Two levels of <code>${{ each }}</code> are reliable and cover most multi-dimensional deployment scenarios. An outer loop over environments, an inner loop over the regions within each environment, generates one stage per environment-region combination.</p><p>The outer binding stays in scope inside the inner loop. Use both bindings to build compound identifiers:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>environments</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>object</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>default</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>dev</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>regions</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>code</span>: <span style=color:#ae81ff>eastus</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-dev-eastus</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>code</span>: <span style=color:#ae81ff>westeu</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-dev-westeu</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>staging</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>regions</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>code</span>: <span style=color:#ae81ff>eastus</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-staging-eastus</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>code</span>: <span style=color:#ae81ff>westeu</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-staging-westeu</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>prod</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>regions</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>code</span>: <span style=color:#ae81ff>eastus</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-prod-eastus</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>code</span>: <span style=color:#ae81ff>westeu</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-prod-westeu</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>code</span>: <span style=color:#ae81ff>apsouth</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-prod-apsouth</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#ae81ff>${{ each env in parameters.environments }}:</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>${{ each region in env.regions }}:</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>${{ env.name }}_${{ region.code }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;${{ env.name }} — ${{ region.code }}&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>deployment</span>: <span style=color:#ae81ff>Deploy</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>${{ env.name }}-${{ region.code }}</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>strategy</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>runOnce</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>deploy</span>:
+</span></span><span style=display:flex><span>              <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>              - <span style=color:#f92672>script</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                  echo &#34;Environment: ${{ env.name }}&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                  echo &#34;Region: ${{ region.code }}&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                  echo &#34;Service connection: ${{ region.serviceConnection }}&#34;</span>
+</span></span><span style=display:flex><span>                <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Deploy ${{ env.name }} to ${{ region.code }}&#34;</span>
+</span></span></code></pre></div><p>This parameter definition — 2 dev regions, 2 staging regions, 3 prod regions — generates 7 stages. Adding a fourth environment with two regions produces 9 stages with no template changes.</p><h3 id=the-template-expansion-limit>The Template Expansion Limit</h3><p>Azure DevOps caps several dimensions of the expanded pipeline:</p><table><thead><tr><th>Limit</th><th>Value</th></tr></thead><tbody><tr><td>Jobs per stage</td><td>256</td></tr><tr><td>Total jobs in pipeline</td><td>1,000</td></tr><tr><td>Steps per job</td><td>1,000</td></tr><tr><td>Template files per pipeline</td><td>100</td></tr><tr><td>Expanded YAML size</td><td>10 MB</td></tr><tr><td>Max expression length</td><td>20,000 characters</td></tr></tbody></table><p>The 256-jobs-per-stage limit is the one nested loops most often hit. Each iteration of an inner loop that generates a job within a single stage counts toward this limit. A 3-environment × 10-region matrix at the job level generates 30 jobs per stage — well under the cap. A 20-environment × 15-region matrix generates 300 jobs per stage, and the pipeline parse fails:</p><pre tabindex=0><code>The pipeline has exceeded the maximum number of generated jobs (256).
+</code></pre><p>Calculate expected output before committing to nested loops: outer items × inner items = total generated stages or jobs. Leave headroom for the rest of the pipeline.</p><p>Three levels of nesting (<code>${{ each }}</code> inside <code>${{ each }}</code> inside <code>${{ each }}</code>) hits template expansion timeouts before the item count limit. Four levels is not a reliable pattern in production pipelines.</p><h3 id=flattening-deep-nesting>Flattening Deep Nesting</h3><p>When the data is naturally hierarchical (tier → region → service), the loop representation matches the data shape. The execution result is a flat list of independent stages. Pre-compute that flat list in the parameter definition and replace deep nesting with a single <code>${{ each }}</code> over the pre-computed combinations.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># Before: three-level nested loop — parse-time heavy, hits expansion limits</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#ae81ff>${{ each tier in parameters.tiers }}:</span>
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>${{ each region in parameters.regions }}:</span>
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>${{ each service in parameters.services }}:</span>
+</span></span><span style=display:flex><span>      - <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>${{ tier.name }}_${{ region.code }}_${{ service.name }}</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>deployment</span>: <span style=color:#ae81ff>Deploy</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>${{ tier.name }}-${{ region.code }}-${{ service.name }}</span>
+</span></span><span style=display:flex><span>          <span style=color:#75715e># ...</span>
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># After: single-level loop over a pre-computed flat array</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>deployMatrix</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>object</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>default</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>dev</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>eastus</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>service</span>: <span style=color:#ae81ff>api</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-dev-eastus-api</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>dev</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>eastus</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>service</span>: <span style=color:#ae81ff>worker</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-dev-eastus-worker</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>dev</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>westeu</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>service</span>: <span style=color:#ae81ff>api</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-dev-westeu-api</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>prod</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>eastus</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>service</span>: <span style=color:#ae81ff>api</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-prod-eastus-api</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>prod</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>eastus</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>service</span>: <span style=color:#ae81ff>worker</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-prod-eastus-worker</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#ae81ff>${{ each item in parameters.deployMatrix }}:</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>${{ item.tier }}_${{ item.region }}_${{ item.service }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;${{ item.tier }} / ${{ item.region }} / ${{ item.service }}&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>deployment</span>: <span style=color:#ae81ff>Deploy</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>${{ item.tier }}-${{ item.region }}-${{ item.service }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>strategy</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>runOnce</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>deploy</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>            - <span style=color:#f92672>script</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                echo &#34;Deploying ${{ item.service }} to ${{ item.region }} (${{ item.tier }})&#34;</span>
+</span></span><span style=display:flex><span>              <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Deploy ${{ item.service }}&#34;</span>
+</span></span></code></pre></div><p>The flat array approach is easier to read, easier to filter with inline <code>${{ if }}</code>, and immune to the three-level nesting timeout. When the combinations are dynamic — generated from infrastructure state at runtime — a script job can write the array to a pipeline variable and pass it to the next template (covered in the Dynamic Matrix Strategies article in this series).</p><hr><h2 id=advanced-iteration-patterns>Advanced Iteration Patterns</h2><h3 id=conditional-stage-dependencies-from-object-properties>Conditional Stage Dependencies from Object Properties</h3><p>Each generated stage can declare <code>dependsOn:</code> from the iterated object, making the deployment topology data-driven rather than hardcoded in the template.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>environments</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>object</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>default</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>dev_eastus</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-dev-eastus</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dependsOn</span>: []                     <span style=color:#75715e># Runs immediately after Build</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>dev_westeu</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-dev-westeu</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dependsOn</span>: []
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>staging_eastus</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-staging-eastus</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dependsOn</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>Deploy_dev_eastus              </span> <span style=color:#75715e># Waits for dev in the same region</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>staging_westeu</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-staging-westeu</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dependsOn</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>Deploy_dev_westeu</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>prod_eastus</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-prod-eastus</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dependsOn</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>Deploy_staging_eastus</span>
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>Deploy_staging_westeu          </span> <span style=color:#75715e># Requires both staging regions to succeed</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>prod_westeu</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-prod-westeu</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dependsOn</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>Deploy_staging_eastus</span>
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>Deploy_staging_westeu</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>Build</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>job</span>: <span style=color:#ae81ff>BuildApp</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>script</span>: <span style=color:#ae81ff>echo &#34;Build&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Build application&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#ae81ff>${{ each env in parameters.environments }}:</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>Deploy_${{ replace(env.name, &#39;-&#39;, &#39;_&#39;) }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dependsOn</span>: <span style=color:#ae81ff>${{ env.dependsOn }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>deployment</span>: <span style=color:#ae81ff>Deploy</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>${{ env.name }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>strategy</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>runOnce</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>deploy</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>            - <span style=color:#f92672>script</span>: <span style=color:#ae81ff>echo &#34;Deploying to ${{ env.name }}&#34;</span>
+</span></span><span style=display:flex><span>              <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Deploy&#34;</span>
+</span></span></code></pre></div><p>Adding a new environment requires adding one object to the array with the correct <code>dependsOn</code> references. The template does not change.</p><h3 id=generating-steps-from-object-properties>Generating Steps from Object Properties</h3><p><code>${{ each }}</code> at the step level generates validation or command steps from a data-driven list. Adding a check requires a new array entry, not a template edit. Combine with inline <code>${{ if step.enabled }}</code> to make individual steps opt-in per caller.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>validationSteps</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>object</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>default</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Lint</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>command</span>: <span style=color:#ae81ff>npm run lint</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>enabled</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>UnitTests</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>command</span>: <span style=color:#ae81ff>npm test</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>enabled</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>IntegrationTests</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>command</span>: <span style=color:#ae81ff>npm run test:integration</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>enabled</span>: <span style=color:#66d9ef>false</span>          <span style=color:#75715e># Disabled by default; callers can override</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>SecurityScan</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>command</span>: <span style=color:#ae81ff>npm audit --audit-level=high</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>enabled</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>Validate</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>job</span>: <span style=color:#ae81ff>Validation</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>checkout</span>: <span style=color:#ae81ff>self</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>script</span>: <span style=color:#ae81ff>npm ci</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Install dependencies&#34;</span>
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>${{ each step in parameters.validationSteps }}:</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>${{ if eq(step.enabled, true) }}:</span>
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>script</span>: <span style=color:#ae81ff>${{ step.command }}</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>displayName</span>: <span style=color:#ae81ff>${{ step.name }}</span>
+</span></span></code></pre></div><p>A caller that needs integration tests passes the same array with <code>enabled: true</code> on that entry. The template does not change.</p><h3 id=using--each--with-templatecontext>Using <code>${{ each }}</code> with <code>templateContext</code></h3><p>When iterating a <code>jobList</code> parameter, each job carries both its standard properties and an optional <code>templateContext</code> object. The loop body can read both dimensions in the same expression — the caller co-locates job structure and deployment metadata; the template reads both to generate fully configured stages.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># templates/deploy-with-context.yml</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>jobs</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>jobList</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>default</span>: []
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>Deploy</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#ae81ff>${{ each job in parameters.jobs }}:</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>deployment</span>: <span style=color:#ae81ff>${{ job.job }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>${{ job.environment }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>strategy</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>runOnce</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>deploy</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>            - <span style=color:#ae81ff>${{ if eq(job.templateContext.approvalRequired, true) }}:</span>
+</span></span><span style=display:flex><span>              - <span style=color:#f92672>task</span>: <span style=color:#ae81ff>ManualValidation@0</span>
+</span></span><span style=display:flex><span>                <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Manual approval for ${{ job.job }}&#34;</span>
+</span></span><span style=display:flex><span>                <span style=color:#f92672>inputs</span>:
+</span></span><span style=display:flex><span>                  <span style=color:#f92672>notifyUsers</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                    ops-team@example.com</span>
+</span></span><span style=display:flex><span>                  <span style=color:#f92672>instructions</span>: <span style=color:#e6db74>&#34;Approve deployment to ${{ job.templateContext.region }}&#34;</span>
+</span></span><span style=display:flex><span>            - <span style=color:#f92672>script</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                echo &#34;Region: ${{ job.templateContext.region }}&#34;</span>
+</span></span><span style=display:flex><span>              <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Deploy to ${{ job.templateContext.region }}&#34;</span>
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># azure-pipelines.yml — caller co-locates job definition and deployment metadata</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>template</span>: <span style=color:#ae81ff>templates/deploy-with-context.yml</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>job</span>: <span style=color:#ae81ff>DeployEastUS</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>prod-eastus</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>templateContext</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>region</span>: <span style=color:#ae81ff>eastus</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>approvalRequired</span>: <span style=color:#66d9ef>true</span>    <span style=color:#75715e># Generates a ManualValidation step</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>job</span>: <span style=color:#ae81ff>DeployWestEU</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>prod-westeu</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>templateContext</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>region</span>: <span style=color:#ae81ff>westeu</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>approvalRequired</span>: <span style=color:#66d9ef>false</span>   <span style=color:#75715e># No approval step generated</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>job</span>: <span style=color:#ae81ff>DeployApSouth</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>prod-apsouth</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>templateContext</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>region</span>: <span style=color:#ae81ff>apsouth</span>
+</span></span><span style=display:flex><span>        <span style=color:#f92672>approvalRequired</span>: <span style=color:#66d9ef>true</span>
+</span></span></code></pre></div><p><code>templateContext</code> properties (<code>job.templateContext.region</code>, <code>job.templateContext.approvalRequired</code>) and standard job properties (<code>job.job</code>, <code>job.environment</code>) are all accessible in the same loop body via the same dot-notation. This is the pattern that makes templates genuinely generic: the caller owns the data, the template owns the logic.</p><hr><h2 id=hands-on-example-multi-region-multi-tier-deployment-matrix>Hands-On Example: Multi-Region, Multi-Tier Deployment Matrix</h2><p><strong>Scenario:</strong> An automation engineer needs a pipeline that deploys a microservice to three tiers (dev, staging, prod) across two regions (eastus, westeu) — six deployment stages total. Each tier-region combination has a unique service connection and Azure environment. Prod stages require blue-green deployment; dev and staging use rolling. The pipeline must support adding a third region (apsouth) by editing only the parameter definition — zero template changes.</p><p><strong>Prerequisites:</strong></p><ul><li>Six Azure DevOps environments named by convention: <code>dev-eastus</code>, <code>dev-westeu</code>, <code>staging-eastus</code>, <code>staging-westeu</code>, <code>prod-eastus</code>, <code>prod-westeu</code></li><li>Six service connections named by convention: <code>sc-dev-eastus</code>, <code>sc-dev-westeu</code>, etc.</li><li>A build stage that produces a deployable artifact</li></ul><h3 id=step-1-create-the-deployment-matrix-template>Step 1: Create the deployment matrix template</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># templates/deploy-matrix.yml</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>environments</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>object</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>default</span>: []
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#ae81ff>${{ each env in parameters.environments }}:</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>${{ replace(env.tier, &#39;-&#39;, &#39;_&#39;) }}_${{ replace(env.region, &#39;-&#39;, &#39;_&#39;) }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;${{ env.tier }} (${{ env.region }})&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dependsOn</span>: <span style=color:#ae81ff>${{ env.dependsOn }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>deployment</span>: <span style=color:#ae81ff>Deploy</span>
+</span></span><span style=display:flex><span>      <span style=color:#75715e># Azure DevOps environment uses hyphen convention; stage name uses underscore</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>environment</span>: <span style=color:#ae81ff>${{ env.tier }}-${{ env.region }}</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>strategy</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>runOnce</span>:
+</span></span><span style=display:flex><span>          <span style=color:#f92672>deploy</span>:
+</span></span><span style=display:flex><span>            <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>            - <span style=color:#f92672>download</span>: <span style=color:#ae81ff>current</span>
+</span></span><span style=display:flex><span>              <span style=color:#f92672>artifact</span>: <span style=color:#ae81ff>app</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            <span style=color:#75715e># Prod uses blue-green; dev and staging use rolling</span>
+</span></span><span style=display:flex><span>            - <span style=color:#ae81ff>${{ if eq(env.blueGreen, true) }}:</span>
+</span></span><span style=display:flex><span>              - <span style=color:#f92672>script</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                  echo &#34;Blue-green deployment: ${{ env.tier }}-${{ env.region }}&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                  echo &#34;Service connection: ${{ env.serviceConnection }}&#34;</span>
+</span></span><span style=display:flex><span>                <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Blue-green deploy&#34;</span>
+</span></span><span style=display:flex><span>              - <span style=color:#f92672>script</span>: <span style=color:#ae81ff>echo &#34;Swap complete: ${{ env.tier }}-${{ env.region }}&#34;</span>
+</span></span><span style=display:flex><span>                <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Verify slot swap&#34;</span>
+</span></span><span style=display:flex><span>            - <span style=color:#ae81ff>${{ else }}:</span>
+</span></span><span style=display:flex><span>              - <span style=color:#f92672>script</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                  echo &#34;Rolling deployment: ${{ env.tier }}-${{ env.region }}&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>                  echo &#34;Service connection: ${{ env.serviceConnection }}&#34;</span>
+</span></span><span style=display:flex><span>                <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Rolling deploy&#34;</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            - <span style=color:#f92672>script</span>: <span style=color:#ae81ff>echo &#34;Deployment complete: ${{ env.tier }}-${{ env.region }}&#34;</span>
+</span></span><span style=display:flex><span>              <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Post-deploy verification&#34;</span>
+</span></span></code></pre></div><h3 id=step-2-create-the-calling-pipeline>Step 2: Create the calling pipeline</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># azure-pipelines.yml</span>
+</span></span><span style=display:flex><span><span style=color:#f92672>trigger</span>:
+</span></span><span style=display:flex><span>- <span style=color:#ae81ff>main</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>environments</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>object</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>default</span>:
+</span></span><span style=display:flex><span>  <span style=color:#75715e># dev — runs after Build, no environment gate</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>dev</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>eastus</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-dev-eastus</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>blueGreen</span>: <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dependsOn</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>Build</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>dev</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>westeu</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-dev-westeu</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>blueGreen</span>: <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dependsOn</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>Build</span>
+</span></span><span style=display:flex><span>  <span style=color:#75715e># staging — depends on the matching dev region</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>staging</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>eastus</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-staging-eastus</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>blueGreen</span>: <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dependsOn</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>dev_eastus</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>staging</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>westeu</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-staging-westeu</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>blueGreen</span>: <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dependsOn</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>dev_westeu</span>
+</span></span><span style=display:flex><span>  <span style=color:#75715e># prod — requires both staging regions to succeed before deploying</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>prod</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>eastus</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-prod-eastus</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>blueGreen</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dependsOn</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>staging_eastus</span>
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>staging_westeu</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>prod</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>westeu</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-prod-westeu</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>blueGreen</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dependsOn</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>staging_eastus</span>
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>staging_westeu</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>stages</span>:
+</span></span><span style=display:flex><span>- <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>Build</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>job</span>: <span style=color:#ae81ff>BuildApp</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>      <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>script</span>: <span style=color:#ae81ff>echo &#34;Building application&#34;</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Build&#34;</span>
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>publish</span>: <span style=color:#ae81ff>$(Build.ArtifactStagingDirectory)</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>artifact</span>: <span style=color:#ae81ff>app</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>- <span style=color:#f92672>template</span>: <span style=color:#ae81ff>templates/deploy-matrix.yml</span>
+</span></span><span style=display:flex><span>  <span style=color:#f92672>parameters</span>:
+</span></span><span style=display:flex><span>    <span style=color:#f92672>environments</span>: <span style=color:#ae81ff>${{ parameters.environments }}</span>
+</span></span></code></pre></div><h3 id=step-3-verify-the-expanded-yaml>Step 3: Verify the Expanded YAML</h3><p>Open the pipeline in Azure DevOps, select <strong>Run pipeline</strong>, then choose <strong>Download full YAML</strong> (or use the CLI: <code>az pipelines run --dry-run</code>). The Expanded YAML should show six deployment stages named with the tier-region underscore pattern.</p><p>Confirm:</p><ul><li>Each stage&rsquo;s <code>environment:</code> uses hyphen notation (<code>prod-eastus</code>)</li><li>Each stage&rsquo;s <code>stage:</code> key uses underscore notation (<code>prod_eastus</code>)</li><li>Prod stages include the blue-green deploy step; dev and staging stages include rolling only</li><li>Prod stages list both staging regions in <code>dependsOn:</code></li></ul><h3 id=step-4-add-a-third-region>Step 4: Add a third region</h3><p>Add three entries to the <code>environments</code> array — one per tier for <code>apsouth</code>:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span>  - <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>dev</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>apsouth</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-dev-apsouth</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>blueGreen</span>: <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dependsOn</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>Build</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>staging</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>apsouth</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-staging-apsouth</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>blueGreen</span>: <span style=color:#66d9ef>false</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dependsOn</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>dev_apsouth</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>tier</span>: <span style=color:#ae81ff>prod</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>region</span>: <span style=color:#ae81ff>apsouth</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>serviceConnection</span>: <span style=color:#ae81ff>sc-prod-apsouth</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>blueGreen</span>: <span style=color:#66d9ef>true</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>dependsOn</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>staging_apsouth</span>
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>staging_eastus</span>
+</span></span><span style=display:flex><span>    - <span style=color:#ae81ff>staging_westeu</span>
+</span></span></code></pre></div><p>Re-run the pipeline. The Expanded YAML now shows nine deployment stages. The template file has not changed.</p><hr><h2 id=best-practices-and-optimization>Best Practices and Optimization</h2><p><strong>Use compound identifiers for generated names.</strong> Single-property stage names (<code>Deploy_${{ env.region }}</code>) collide when two items share the same property value. Compose names from at least two properties (<code>${{ env.tier }}_${{ env.region }}</code>) to guarantee uniqueness as the array grows.</p><p><strong>Replace three-level nesting with a pre-computed flat array.</strong> A nested loop over 5 × 5 × 5 items generates 125 stages — within the 10 MB expanded YAML limit, but prone to parse timeouts. A single loop over a 125-item flat array is faster to expand and easier to filter.</p><p><strong>Leverage <code>${{ replace() }}</code> for sanitization.</strong> Stage IDs only accept <code>[A-Za-z0-9_]</code>. Use <code>${{ replace(item.name, '-', '_') }}</code> inside your template to prevent parse errors when callers pass names with hyphens.</p><p><strong>Place inline <code>${{ if }}</code> filters in the template, not the caller.</strong> The caller provides the full set of environments; the template decides which ones generate stages. This keeps filter logic centralized and prevents callers from submitting incorrect pre-filtered arrays.</p><p><strong>Document the expected object shape in the <code>default:</code> block.</strong> YAML parameters have no schema enforcement. A missing property resolves to empty string silently. The <code>default:</code> block is the authoritative example of the required object shape; callers should copy and modify it.</p><p><strong>Minimize template file calls inside loops.</strong> Each <code>template:</code> reference inside a loop body triggers one repository fetch per iteration. A loop over 50 environments that calls a three-file template chain triggers 150 repository fetches during parse. Consolidate logic into the loop body to reduce parse-time overhead.</p><p><strong>Never use <code>$(var)</code> or <code>$[var]</code> inside <code>${{ each }}</code>.</strong> Runtime variables do not exist during template expansion. Referencing them inside a loop body produces empty string, not an error — the pipeline runs but generates stages with missing values.</p><hr><h2 id=troubleshooting-common-issues>Troubleshooting Common Issues</h2><p><strong>Duplicate identifier parse error on generated stages</strong></p><p>Two items in the array produce the same rendered stage name after property substitution. Add a second property to the stage name: <code>${{ item.tier }}_${{ item.region }}</code>. Add a comment in the <code>default:</code> block warning callers that tier-region combinations must be unique across the array.</p><p><strong>The pipeline has exceeded the maximum number of jobs</strong></p><p>The loop generates more than 256 jobs per stage or more than 1,000 total jobs. Count the expected output: outer items × inner items = generated stages or jobs. If the count approaches 256, flatten nested loops into a pre-computed flat array and use an inline <code>${{ if }}</code> to filter out combinations not needed for the current run.</p><p><strong>A property accessed via <code>${{ item.prop }}</code> resolves to empty string for some iterations</strong></p><p>The property is absent from those items — YAML object arrays do not enforce a schema. Use <code>${{ coalesce(item.prop, 'defaultValue') }}</code> for optional properties. For required properties, add a validation step that fails the pipeline when the property is missing:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span>- <span style=color:#ae81ff>${{ each env in parameters.environments }}:</span>
+</span></span><span style=display:flex><span>  - <span style=color:#f92672>stage</span>: <span style=color:#ae81ff>${{ replace(env.tier, &#39;-&#39;, &#39;_&#39;) }}_${{ replace(env.region, &#39;-&#39;, &#39;_&#39;) }}</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>jobs</span>:
+</span></span><span style=display:flex><span>    - <span style=color:#f92672>job</span>: <span style=color:#ae81ff>Validate</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>pool</span>:
+</span></span><span style=display:flex><span>        <span style=color:#f92672>vmImage</span>: <span style=color:#ae81ff>ubuntu-latest</span>
+</span></span><span style=display:flex><span>      <span style=color:#f92672>steps</span>:
+</span></span><span style=display:flex><span>      <span style=color:#75715e># Evaluated at compile-time; if env.serviceConnection is missing, the script is inserted</span>
+</span></span><span style=display:flex><span>      - <span style=color:#ae81ff>${{ if eq(env.serviceConnection, &#39;&#39;) }}:</span>
+</span></span><span style=display:flex><span>        - <span style=color:#f92672>script</span>: |<span style=color:#e6db74>
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            echo &#34;##vso[task.logissue type=error]Missing required property: serviceConnection on ${{ env.tier }}_${{ env.region }}&#34;
+</span></span></span><span style=display:flex><span><span style=color:#e6db74>            exit 1</span>
+</span></span><span style=display:flex><span>          <span style=color:#f92672>displayName</span>: <span style=color:#e6db74>&#34;Validate required properties&#34;</span>
+</span></span></code></pre></div><p><strong>Stage name contains invalid characters — parse error</strong></p><p>A property value used in the stage name contains a hyphen, dot, space, or other character outside <code>[A-Za-z0-9_]</code>. Stage IDs also cannot start with a number. Use <code>${{ replace(env.name, '-', '_') }}</code> to sanitize the string.</p><p><strong>Inner loop binding name returns empty string — outer binding name was reused</strong></p><p>The inner loop binding name shadows the outer loop binding name. Use distinct, semantically meaningful names: <code>${{ each tier in parameters.tiers }}</code> for the outer, <code>${{ each region in tier.regions }}</code> for the inner. Never reuse a binding name across nested levels.</p><p><strong>Mapping iteration order is inconsistent between runs</strong></p><p>YAML mapping key order is implementation-defined; Azure DevOps sorts mapping keys alphabetically. If iteration order matters (e.g., for a stage dependency chain), switch from a mapping to a sequence of objects with an explicit <code>dependsOn:</code> property on each item.</p><hr><h2 id=key-takeaways>Key Takeaways</h2><ol><li><code>${{ each }}</code> has two forms: array iteration binds to the element; mapping iteration binds to <code>pair.key</code> and <code>pair.value</code>. Using the wrong form produces silent empty bindings, not an error.</li><li>Object array iteration is the most flexible pattern — each item carries multiple properties accessible via <code>item.propertyName</code>, enabling multi-dimensional stage generation from a single compact parameter.</li><li>You can sanitize Stage IDs using the <code>${{ replace() }}</code> function at compile-time.</li><li>Nested <code>${{ each }}</code> is valid to two levels. At three levels, calculate expected output counts against the 256-job and 1,000-job limits before committing.</li><li>Inline <code>${{ if }}</code> filtering inside a loop body moves filter logic into the template and away from the caller — the caller defines the full set of environments; the template decides which ones generate stages.</li><li>Pre-computed flat arrays beat deep nesting in every dimension: easier to read, easier to filter, faster to parse, and immune to the expansion limit.</li></ol><p><strong>Next Steps:</strong></p><ul><li>Read the Dynamic Matrix Strategies article in this series to combine <code>${{ each }}</code> with pattern that pairs <code>${{ each job in parameters.jobs }}</code> with per-item metadata to drive environment routing and conditional step injection</li><li>Audit existing <code>${{ each }}</code> loops in your templates and verify that generated stage names cannot collide when new items are added to the parameter array</li></ul><hr><h2 id=sources>Sources</h2><ul><li><a href="https://learn.microsoft.com/en-us/azure/devops/pipelines/process/expressions?view=azure-devops#template-expressions">Microsoft Learn: Template expressions reference — ${{ each }}</a></li><li><a href="https://learn.microsoft.com/en-us/azure/devops/pipelines/process/template-parameters?view=azure-devops#object-parameter-type">Microsoft Learn: Template parameters — object type</a></li><li><a href="https://learn.microsoft.com/en-us/azure/devops/pipelines/process/limits?view=azure-devops">Microsoft Learn: Pipeline limits and constraints</a></li><li><a href="https://learn.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops#passing-metadata-to-templates">Microsoft Learn: Passing metadata to templates (templateContext)</a></li><li><a href=https://github.com/microsoft/azure-pipelines-yaml>Azure DevOps YAML schema reference</a></li></ul></article></div></div><div class="col-sm-12 col-md-12 col-lg-3"><div id=stickySideBar class=sticky-sidebar><aside class=tags><h2 class=h5>Series</h2><ul class="tags-ul list-unstyled list-inline"><li class=list-inline-item><a href=https://larryjameshenry.com/series/azure-devops-yaml-expression-masterclass target=_blank>Azure DevOps YAML Expression Masterclass</a></li></ul></aside><aside class=tags><h2 class=h5>Categories</h2><ul class="tags-ul list-unstyled list-inline"><li class=list-inline-item><a href=https://larryjameshenry.com/categories/devops target=_blank>DevOps</a></li></ul></aside><aside class=tags><h2 class=h5>Tags</h2><ul class="tags-ul list-unstyled list-inline"><li class=list-inline-item><a href=https://larryjameshenry.com/tags/azure-devops target=_blank>Azure DevOps</a></li><li class=list-inline-item><a href=https://larryjameshenry.com/tags/yaml-each target=_blank>YAML each</a></li><li class=list-inline-item><a href=https://larryjameshenry.com/tags/dynamic-stages target=_blank>dynamic stages</a></li><li class=list-inline-item><a href=https://larryjameshenry.com/tags/looping-objects target=_blank>looping objects</a></li><li class=list-inline-item><a href=https://larryjameshenry.com/tags/compile-time-expressions target=_blank>compile-time expressions</a></li><li class=list-inline-item><a href=https://larryjameshenry.com/tags/pipeline-automation target=_blank>pipeline automation</a></li></ul></aside><aside class=social><h2 class=h5>Social</h2><div class=social-content><ul class=list-inline><li class="list-inline-item text-center"><a target=_blank href="https://www.linkedin.com/shareArticle?mini=true&url=https%3a%2f%2flarryjameshenry.com%2fposts%2fadvanced-each-looping-iterating-complex-nested-objects%2f" aria-label="Share on LinkedIn"><i class="fab fa-linkedin"></i></a></li><li class="list-inline-item text-center"><a target=_blank href="https://twitter.com/share?text=Advanced%20each%20Looping%3a%20Iterating%20Complex%20Nested%20Objects&url=https%3a%2f%2flarryjameshenry.com%2fposts%2fadvanced-each-looping-iterating-complex-nested-objects%2f" aria-label="Share on Twitter"><i class="fab fa-twitter"></i></a></li><li class="list-inline-item text-center"><a target=_blank href="https://api.whatsapp.com/send?text=Advanced%20each%20Looping%3a%20Iterating%20Complex%20Nested%20Objects: https%3a%2f%2flarryjameshenry.com%2fposts%2fadvanced-each-looping-iterating-complex-nested-objects%2f" aria-label="Share on WhatsApp"><i class="fab fa-whatsapp"></i></a></li><li class="list-inline-item text-center"><a target=_blank href='mailto:?subject=Advanced%20each%20Looping%3a%20Iterating%20Complex%20Nested%20Objects&amp;body=Check%20out%20this%20site https%3a%2f%2flarryjameshenry.com%2fposts%2fadvanced-each-looping-iterating-complex-nested-objects%2f' aria-label="Share via Email"><i class="fa fa-envelope"></i></a></li></ul></div></aside></div></div></div><div class=row><div class="col-sm-12 col-md-12 col-lg-9 p-4"></div></div></div><button class="p-2 px-3" onclick=topFunction() id=topScroll>
+<i class="fas fa-angle-up"></i></button></section><div class=progress><div id=scroll-progress-bar class=progress-bar role=progressbar aria-label="Scroll progress" aria-valuenow=0 aria-valuemin=0 aria-valuemax=100></div></div><script src=/js/scrollProgressBar.min.6f611391703cce73ce949127f8ae624cdea7ec73ea45e8563b8489811cb035e8.js integrity="sha256-b2ETkXA8znPOlJEn+K5iTN6n7HPqRehWO4SJgRywNeg="></script><script>var topScroll=document.getElementById("topScroll");window.onscroll=function(){scrollFunction()};function scrollFunction(){document.body.scrollTop>20||document.documentElement.scrollTop>20?topScroll.style.display="block":topScroll.style.display="none"}function topFunction(){document.body.scrollTop=0,document.documentElement.scrollTop=0}let stickySideBarElem=document.getElementById("stickySideBar"),stickyNavBar=!0;if(stickyNavBar){let e=document.getElementById("profileHeader"),t=e.offsetHeight+15;stickySideBarElem.style.top=t+"px"}else stickySideBarElem.style.top="50px"</script><script src=/js/readingTime.min.ba4f8275197e2b9d901b602f3f24245a0e1e0e8a6727f5115cd03245f1eb83d7.js integrity="sha256-uk+CdRl+K52QG2AvPyQkWg4eDopnJ/URXNAyRfHrg9c="></script></main><footer role=contentinfo><div class="container py-3" id=recent-posts><h2 class="h3 text-center text-secondary py-3">Recent Posts</h2><div class="row justify-content-center"><div class="col-lg-4 col-md-6 pt-2"><div class="card h-100"><div class=card-header><a href=/posts/ultimate-guide-yaml-expressions/><img src=/posts/ultimate-guide-yaml-expressions/images/featured_hu_91359d00462113c5.1e59c38462868d9beb5445e67bc616e23bd9e049c8adf5fafc836da2ddf0b06e.webp class=card-img-top alt="The Ultimate Guide to Azure DevOps YAML Expressions" width=784 height=438 fetchpriority=high loading=eager></a></div><div class="card-body bg-transparent p-3 shadow-sm"><a href=/posts/ultimate-guide-yaml-expressions/ class="primary-font card-title"><h3 class="card-title h5 bg-transparent" title="The Ultimate Guide to Azure DevOps YAML Expressions">The Ultimate Guide to Azure DevOps YAML Expressions</h3></a><div class="card-text secondary-font"><p><p>Your pipeline condition evaluates to <code>false</code>. You know the variable is set. The logs show it. Yet the step is skipped. No error. No warning. Just silence.</p><p>This failure pattern is the most common source of confusion in Azure DevOps pipelines. The root cause is almost always the same: you used the wrong …</p></p></div></div><div class="mt-auto card-footer"><span class=float-start>Apr 29, 2026</span>
+<a href=/posts/ultimate-guide-yaml-expressions/ class="float-end btn btn-outline-info btn-sm">Read</a></div></div></div><div class="col-lg-4 col-md-6 pt-2"><div class="card h-100"><div class=card-header><a href=/posts/azure-landing-zone-guide/><img src=/posts/azure-landing-zone-guide/images/featured_hu_7abdf12a57b9e611.9dc7235dcb9ac633e4551274ad7fd29e6358aa73afbcc60dc770087bd4ba877b.webp class=card-img-top alt="Enterprise Azure Landing Zone: The Complete Guide" width=784 height=438></a></div><div class="card-body bg-transparent p-3 shadow-sm"><a href=/posts/azure-landing-zone-guide/ class="primary-font card-title"><h3 class="card-title h5 bg-transparent" title="Enterprise Azure Landing Zone: The Complete Guide">Enterprise Azure Landing Zone: The Complete Guide</h3></a><div class="card-text secondary-font"><p><p>Most Azure environments fail because nobody built a foundation first. One team creates a resource group called <code>test-rg</code> that becomes production 18 months later. Another ships without tags and cannot attribute 40% of the monthly bill. These aren&rsquo;t isolated mistakes — they are the predictable …</p></p></div></div><div class="mt-auto card-footer"><span class=float-start>Apr 2, 2026</span>
+<a href=/posts/azure-landing-zone-guide/ class="float-end btn btn-outline-info btn-sm">Read</a></div></div></div><div class="col-lg-4 col-md-6 pt-2"><div class="card h-100"><div class=card-header><a href=/posts/debugging-silent-pipeline-failures/><img src=/posts/debugging-silent-pipeline-failures/images/featured_hu_33fa623d38c36133.6fc2f20f06268d467a8332dfaa25da3384e20b58f96e046e077f1126cf9f4370.webp class=card-img-top alt="Debugging Silent Azure DevOps YAML if Statement Failures" width=784 height=438></a></div><div class="card-body bg-transparent p-3 shadow-sm"><a href=/posts/debugging-silent-pipeline-failures/ class="primary-font card-title"><h3 class="card-title h5 bg-transparent" title="Debugging Silent Azure DevOps YAML if Statement Failures">Debugging Silent Azure DevOps YAML if Statement Failures</h3></a><div class="card-text secondary-font"><p><p>The step is in the YAML. The variable is set. The log shows the pipeline ran without errors. But the step never executed — no skip message, no failure, just nothing. You have just met the silent failure.</p><p><code>${{ if }}</code> is the most-used expression in Azure DevOps YAML and also the most misunderstood. …</p></p></div></div><div class="mt-auto card-footer"><span class=float-start>Apr 29, 2026</span>
+<a href=/posts/debugging-silent-pipeline-failures/ class="float-end btn btn-outline-info btn-sm">Read</a></div></div></div></div></div><div class="text-center pt-2"><span class=px-1><a href=https://github.com/larryjameshenry aria-label=github><svg width="2.7em" height="2.7em" viewBox="0 0 1792 1792"><path id="footer-socialNetworks-github-svg-path" d="M522 1352q-8 9-20-3-13-11-4-19 8-9 20 3 12 11 4 19zm-42-61q9 12 0 19-8 6-17-7t0-18q9-7 17 6zm-61-60q-5 7-13 2-10-5-7-12 3-5 13-2 10 5 7 12zm31 34q-6 7-16-3-9-11-2-16 6-6 16 3 9 11 2 16zm129 112q-4 12-19 6-17-4-13-15t19-7q16 5 13 16zm63 5q0 11-16 11-17 2-17-11 0-11 16-11 17-2 17 11zm58-10q2 10-14 14t-18-8 14-15q16-2 18 9zm964-956v960q0 119-84.5 203.5T1376 1664h-224q-16 0-24.5-1t-19.5-5-16-14.5-5-27.5v-239q0-97-52-142 57-6 102.5-18t94-39 81-66.5 53-105T1386 856q0-121-79-206 37-91-8-204-28-9-81 11t-92 44l-38 24q-93-26-192-26t-192 26q-16-11-42.5-27T578 459.5 492 446q-44 113-7 204-79 85-79 206 0 85 20.5 150t52.5 105 80.5 67 94 39 102.5 18q-40 36-49 103-21 10-45 15t-57 5-65.5-21.5T484 1274q-19-32-48.5-52t-49.5-24l-20-3q-21 0-29 4.5t-5 11.5 9 14 13 12l7 5q22 10 43.5 38t31.5 51l10 23q13 38 44 61.5t67 30 69.5 7 55.5-3.5l23-4q0 38 .5 103t.5 68q0 22-11 33.5t-22 13-33 1.5H416q-119 0-203.5-84.5T128 1376V416q0-119 84.5-203.5T416 128h960q119 0 203.5 84.5T1664 416z"/></svg>
+</a></span><span class=px-1><a href=https://www.linkedin.com/in/larryjameshenry aria-label=linkedin><svg width="2.4em" height="2.4em" fill="#fff" aria-label="LinkedIn" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0077b5" rx="15%"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 Larry James Henry. All rights reserved.</div></div></div></footer><script defer src=/bootstrap-5/js/bootstrap.bundle.min.js></script><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script defer src=/js/search.min.c590d9a08e125edb257cb869250fd256afcfd19b0fe36691c74648d868735c21.js integrity="sha256-xZDZoI4SXtslfLhpJQ/SVq/P0ZsP42aRx0ZI2GhzXCE="></script><section id=search-content class=py-2 aria-label="Search results"><div class=container id=search-results></div></section><script type=module>
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+      
+      const initMermaid = () => {
+        mermaid.run({
+          querySelector: '.mermaid',
+        });
+      };
+
+      if (window.requestIdleCallback) {
+        window.requestIdleCallback(() => setTimeout(initMermaid, 500));
+      } else {
+        window.addEventListener('load', () => setTimeout(initMermaid, 500));
+      }
+    </script></body></html>
