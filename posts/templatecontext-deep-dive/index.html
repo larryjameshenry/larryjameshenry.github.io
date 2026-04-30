@@ -113,11 +113,6 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
     RootYAML --&gt; Phase2
     Phase2 --&gt; ExpandedYAML
     ExpandedYAML --&gt; Runtime
-
-    style RootYAML fill:#f3e5f5,stroke:#7b1fa2
-    style Phase2 fill:#e1f5fe,stroke:#03a9f4
-    style ExpandedYAML fill:#e8f5e9,stroke:#4caf50
-    style Runtime fill:#fff3e0,stroke:#ff9800
 </pre><p><strong>Visual Notes:</strong></p><ul><li><strong>The Bridge:</strong> Because <code>templateContext</code> is stripped during compilation, the template must &ldquo;bridge&rdquo; the value into a standard variable or environment variable for the agent to see it.</li><li><strong>Scope Restriction:</strong> The blue zone is the only place where direct <code>${{ deploy.templateContext }}</code> access is valid. In the orange zone (Runtime), only the bridged variables exist.</li></ul><h3 id=schema-validation-behavior>Schema Validation Behavior</h3><p>Azure DevOps recognizes <code>templateContext</code> as a reserved keyword. Adding it to a job definition inside a <code>deploymentList</code> parameter does not trigger the standard &ldquo;Unexpected value&rdquo; schema error:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># INVALID: custom property added directly to a job definition — schema error</span>
 </span></span><span style=display:flex><span>- <span style=color:#f92672>deployment</span>: <span style=color:#ae81ff>DeployDev</span>
 </span></span><span style=display:flex><span>  <span style=color:#f92672>targetEnvironment</span>: <span style=color:#ae81ff>dev  </span> <span style=color:#75715e># &#34;Unexpected value &#39;targetEnvironment&#39;&#34;</span>
