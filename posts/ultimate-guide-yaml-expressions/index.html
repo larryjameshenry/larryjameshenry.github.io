@@ -68,7 +68,7 @@ Phase 5: Execute       → Tasks run → $( ) macros expanded per-task
     subgraph CompilePhase [Compile-Time (Phase 1-2)]
         direction TB
         P1[Phase 1: Parse&lt;br/&gt;Load YAML &amp; Templates]
-        P2[Phase 2: Compile&lt;br/&gt;Evaluate ${{ expression }}]
+        P2[Phase 2: Compile&lt;br/&gt;Evaluate &#39;${{ expression }}&#39;]
         P1 --&gt; P2
         
         note1[&#34;Input: Parameters, Static Vars&lt;br/&gt;Output: Expanded YAML&#34;]
@@ -81,8 +81,8 @@ Phase 5: Execute       → Tasks run → $( ) macros expanded per-task
 
     subgraph RuntimePhase [Runtime (Phase 4-5)]
         direction TB
-        P4[Phase 4: Initialize&lt;br/&gt;Hydrate $[ expression ]]
-        P5[Phase 5: Execute&lt;br/&gt;Expand $(macro) per-task]
+        P4[Phase 4: Initialize&lt;br/&gt;Hydrate &#39;$[ expression ]&#39;]
+        P5[Phase 5: Execute&lt;br/&gt;Expand &#39;$(macro)&#39; per-task]
         P4 --&gt; P5
         
         note2[&#34;Input: Build.Reason, Groups, Secrets&lt;br/&gt;Output: Task Commands&#34;]
@@ -94,6 +94,7 @@ Phase 5: Execute       → Tasks run → $( ) macros expanded per-task
 
     %% Annotations
     P2 -- &#34;The Structural Boundary&#34; --&gt; P4
+    
 </pre><p><strong>Visual Notes:</strong></p><ul><li><strong>The Structural Boundary:</strong> Decisions made in the orange zone (Phase 2) change the <em>structure</em> of the pipeline (stages/jobs). Decisions made in the blue zone (Phases 4-5) change the <em>behavior</em> or <em>values</em> within that fixed structure.</li><li><strong>The Availability Gap:</strong> Variables like <code>Build.SourceBranch</code> do not exist in the orange zone. If you use <code>${{ if }}</code> to test them, the result is always false because the data hasn&rsquo;t arrived yet.</li></ul><p>The &ldquo;Golden Rule&rdquo; follows directly from this sequence: you cannot use data from a later phase in an earlier phase. <code>${{ }}</code> cannot read a value that only exists in Phase 4. <code>$[ ]</code> cannot alter the structure of the pipeline that was fixed in Phase 2.</p><h3 id=what-variables-exist-at-compile-time>What Variables Exist at Compile Time</h3><p>The compile-time variable store is small and static. Only two sources contribute to it:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none><code class=language-yaml data-lang=yaml><span style=display:flex><span><span style=color:#75715e># AVAILABLE at compile time (${{ }})</span>
 </span></span><span style=display:flex><span><span style=color:#f92672>parameters</span>:
 </span></span><span style=display:flex><span>  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>environment       </span> <span style=color:#75715e># parameters are always available at compile time</span>

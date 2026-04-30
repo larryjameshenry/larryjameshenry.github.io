@@ -88,9 +88,9 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 
     subgraph Phase2 [Phase 2: Template Expansion (Compile-Time)]
         direction TB
-        Iterate[&#34;Iterate List: ${{ each deploy in parameters.deployments }}&#34;]
-        Read[&#34;Read Metadata:&lt;br/&gt;${{ deploy.templateContext.env }}&#34;]
-        Bridge[&#34;Variable Bridge Pattern:&lt;br/&gt;variables:&lt;br/&gt;- name: TARGET_ENV&lt;br/&gt;  value: ${{ deploy.templateContext.env }}&#34;]
+        Iterate[&#34;Iterate List: &#39;${{ each deploy in parameters.deployments }}&#39;&#34;]
+        Read[&#34;Read Metadata:&lt;br/&gt;&#39;${{ deploy.templateContext.env }}&#39;&#34;]
+        Bridge[&#34;Variable Bridge Pattern:&lt;br/&gt;variables:&lt;br/&gt;- name: TARGET_ENV&lt;br/&gt;  value: &#39;${{ deploy.templateContext.env }}&#39;&#34;]
         
         Iterate --&gt; Read
         Read --&gt; Bridge
@@ -103,8 +103,8 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
     subgraph Runtime [Phase 4: Initialization &amp; Execution (Runtime)]
         direction TB
         Agent[&#34;Agent Loads Variables&#34;]
-        Consume[&#34;Script Consumes Variable:&lt;br/&gt;echo $(TARGET_ENV)&#34;]
-        Fail[&#34;Direct access fails:&lt;br/&gt;echo ${{ deploy.templateContext.env }} == &#39;&#39;&#34;]
+        Consume[&#34;Script Consumes Variable:&lt;br/&gt;echo &#39;$(TARGET_ENV)&#39;&#34;]
+        Fail[&#34;Direct access fails:&lt;br/&gt;echo &#39;${{ deploy.templateContext.env }}&#39; == &#39;&#39;&#34;]
         
         Agent --&gt; Consume
         Agent -.-&gt; Fail
