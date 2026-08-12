@@ -34,16 +34,14 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 </span></span><span class=line><span class=cl><span class=n>  virtual_network_id</span>  <span class=o>=</span> <span class=k>module</span><span class=p>.</span><span class=k>hub_vnet</span><span class=p>.</span><span class=k>resource_id</span><span class=c1>
 </span></span></span><span class=line><span class=cl><span class=c1>  # AVM Firewall accepts public_ip_count and virtual_network_id or ip_configurations
 </span></span></span><span class=line><span class=cl>}
-</span></span></code></pre></div><h2 id=3-private-dns-resolution-flow>3. Private DNS Resolution Flow</h2><p>DNS is the most frequent source of post-deployment support tickets. In a hub-and-spoke model, centralize <strong>Private DNS Zones</strong> in the hub and use the <strong>Azure DNS Private Resolver</strong> to handle queries from both cloud and on-premises clients.</p><h3 id=private-dns-resolution-flow-resolver-pattern>Private DNS Resolution Flow (Resolver Pattern)</h3><pre tabindex=0><code class=language-mermaid data-lang=mermaid>sequenceDiagram
-    participant VM as Spoke VM (App)
-    participant Res as DNS Private Resolver
-    participant Zone as Private DNS Zone
-
-    VM-&gt;&gt;Res: 1. nslookup app.db.local
-    Res-&gt;&gt;Zone: 2. Check Linked Zones
-    Zone--&gt;&gt;Res: 3. Return 10.0.5.4
-    Res--&gt;&gt;VM: 4. Resolve to 10.0.5.4
-</code></pre><p>Link your hub VNet to the Private DNS Zones, and configure your spokes to use the Hub&rsquo;s Firewall or Resolver as their DNS server. That&rsquo;s what makes <code>resource.privatelink.blob.core.windows.net</code> resolve to a private IP across your entire organization—not just in the subscription where the Private Endpoint lives.</p><h2 id=4-vnet-peering-and-gateway-transit>4. VNet Peering and Gateway Transit</h2><p>To connect a spoke to the hub, create a two-way peering. In an enterprise landing zone, enable <strong>Gateway Transit</strong>. This lets spoke VNets use the VPN or ExpressRoute gateway in the hub, so you don&rsquo;t pay for an expensive gateway in every application subscription.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-hcl data-lang=hcl><span class=line><span class=cl><span class=k>resource</span> <span class=s2>&#34;azurerm_virtual_network_peering&#34; &#34;hub_to_spoke&#34;</span> {
+</span></span></code></pre></div><h2 id=3-private-dns-resolution-flow>3. Private DNS Resolution Flow</h2><p>DNS is the most frequent source of post-deployment support tickets. In a hub-and-spoke model, centralize <strong>Private DNS Zones</strong> in the hub and use the <strong>Azure DNS Private Resolver</strong> to handle queries from both cloud and on-premises clients.</p><h3 id=private-dns-resolution-flow-resolver-pattern>Private DNS Resolution Flow (Resolver Pattern)</h3><div class=mermaid>sequenceDiagram
+participant VM as Spoke VM (App)
+participant Res as DNS Private Resolver
+participant Zone as Private DNS Zone
+VM->>Res: 1. nslookup app.db.local
+Res->>Zone: 2. Check Linked Zones
+Zone-->>Res: 3. Return 10.0.5.4
+Res-->>VM: 4. Resolve to 10.0.5.4</div><p>Link your hub VNet to the Private DNS Zones, and configure your spokes to use the Hub&rsquo;s Firewall or Resolver as their DNS server. That&rsquo;s what makes <code>resource.privatelink.blob.core.windows.net</code> resolve to a private IP across your entire organization—not just in the subscription where the Private Endpoint lives.</p><h2 id=4-vnet-peering-and-gateway-transit>4. VNet Peering and Gateway Transit</h2><p>To connect a spoke to the hub, create a two-way peering. In an enterprise landing zone, enable <strong>Gateway Transit</strong>. This lets spoke VNets use the VPN or ExpressRoute gateway in the hub, so you don&rsquo;t pay for an expensive gateway in every application subscription.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-hcl data-lang=hcl><span class=line><span class=cl><span class=k>resource</span> <span class=s2>&#34;azurerm_virtual_network_peering&#34; &#34;hub_to_spoke&#34;</span> {
 </span></span><span class=line><span class=cl><span class=n>  name</span>                      <span class=o>=</span> <span class=s2>&#34;peer-hub-to-app01&#34;</span>
 </span></span><span class=line><span class=cl><span class=n>  resource_group_name</span>       <span class=o>=</span> <span class=k>module</span><span class=p>.</span><span class=k>hub_vnet</span><span class=p>.</span><span class=k>resource_group_name</span>
 </span></span><span class=line><span class=cl><span class=n>  virtual_network_name</span>      <span class=o>=</span> <span class=k>module</span><span class=p>.</span><span class=k>hub_vnet</span><span class=p>.</span><span class=k>name</span>

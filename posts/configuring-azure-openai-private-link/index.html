@@ -13,17 +13,14 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nv>privateEndpointNetworkPolicies</span><span class=p>:</span><span class=w> </span><span class=s>&#39;Disabled&#39;</span><span class=w> </span><span class=c1>// Mandatory for Private Link</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
-</span></span></span></code></pre></div><p>In a hub-and-spoke topology, place the Private Endpoint in the hub&rsquo;s shared-services VNet. This allows all peered spoke VNets to reach the AI service through a single entry point, centralizing DNS and security monitoring.</p><h3 id=hub-and-spoke-networking-topology>Hub-and-Spoke Networking Topology</h3><pre tabindex=0><code class=language-mermaid data-lang=mermaid>flowchart TD
-    subgraph Hub[&#34;[ HUB VNET ]&#34;]
-        Snet[&#34;[ Snet-Private-Endpoints ]&lt;br/&gt;- OpenAI Private Endpoint (10.0.1.5)&lt;br/&gt;- Private DNS Zone&#34;]
-    end
-
-    subgraph Spoke[&#34;[ SPOKE VNET A ]&#34;]
-        Runner[&#34;- Self-hosted GH Runner&lt;br/&gt;- (DNS links to Hub Zone)&#34;]
-    end
-
-    Hub --&gt;|VNet Peering - Transit| Spoke
-</code></pre><h2 id=3-provisioning-the-private-endpoint>3. Provisioning the Private Endpoint</h2><p>The most reliable way to deploy Private Link is via Bicep. You must target the <code>account</code> group ID for Azure Cognitive Services.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bicep data-lang=bicep><span class=line><span class=cl><span class=kd>resource</span><span class=w> </span><span class=nv>privateEndpoint</span><span class=w> </span><span class=s>&#39;Microsoft.Network/privateEndpoints@2023-04-01&#39;</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span></code></pre></div><p>In a hub-and-spoke topology, place the Private Endpoint in the hub&rsquo;s shared-services VNet. This allows all peered spoke VNets to reach the AI service through a single entry point, centralizing DNS and security monitoring.</p><h3 id=hub-and-spoke-networking-topology>Hub-and-Spoke Networking Topology</h3><div class=mermaid>flowchart TD
+subgraph Hub["[ HUB VNET ]"]
+Snet["[ Snet-Private-Endpoints ]<br>- OpenAI Private Endpoint (10.0.1.5)<br>- Private DNS Zone"]
+end
+subgraph Spoke["[ SPOKE VNET A ]"]
+Runner["- Self-hosted GH Runner<br>- (DNS links to Hub Zone)"]
+end
+Hub -->|VNet Peering - Transit| Spoke</div><h2 id=3-provisioning-the-private-endpoint>3. Provisioning the Private Endpoint</h2><p>The most reliable way to deploy Private Link is via Bicep. You must target the <code>account</code> group ID for Azure Cognitive Services.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bicep data-lang=bicep><span class=line><span class=cl><span class=kd>resource</span><span class=w> </span><span class=nv>privateEndpoint</span><span class=w> </span><span class=s>&#39;Microsoft.Network/privateEndpoints@2023-04-01&#39;</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=p>{</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nv>name</span><span class=p>:</span><span class=w> </span><span class=s>&#39;pe-openai-prod&#39;</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nv>location</span><span class=p>:</span><span class=w> </span><span class=nv>location</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nv>properties</span><span class=p>:</span><span class=w> </span><span class=p>{</span><span class=w>
@@ -39,16 +36,14 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>]</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
-</span></span></span></code></pre></div><p>If your OpenAI resource is in a different subscription than the VNet, the connection enters a &ldquo;Pending&rdquo; state and requires manual approval in the Networking blade of the OpenAI resource.</p><h2 id=4-dns-configuration-the-split-brain-pattern>4. DNS Configuration: The Split-Brain Pattern</h2><p>Private Link creates the private IP, but your applications still use the FQDN <code>your-resource.openai.azure.com</code>. Without a DNS override, that FQDN still resolves to the public IP — and your traffic fails the moment you disable public access. The Private DNS step is where most implementations fail silently.</p><h3 id=split-brain-dns-resolution>Split-Brain DNS Resolution</h3><pre tabindex=0><code class=language-mermaid data-lang=mermaid>sequenceDiagram
-    participant Client as Internal Client (VNet)&lt;br/&gt;(nslookup resource.openai.com)
-    participant Resolver as Azure DNS Resolver&lt;br/&gt;(168.63.129.16)
-    participant Zone as Private DNS Zone&lt;br/&gt;(privatelink.openai.com)
-
-    Client-&gt;&gt;Resolver: 1. Query FQDN
-    Resolver-&gt;&gt;Zone: 2. Query Private Zone
-    Zone--&gt;&gt;Resolver: 3. Return Private IP (10.0.1.5)
-    Resolver--&gt;&gt;Client: 4. Resolve to 10.0.1.5
-</code></pre><h3 id=private-dns-zones>Private DNS Zones</h3><p>Azure provides a specialized Private DNS Zone: <code>privatelink.openai.azure.com</code>. When you link your VNet to this zone, any query for an OpenAI resource returns the private IP. The <code>privateDnsZoneGroups</code> resource in Bicep automates the A-record registration.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bicep data-lang=bicep><span class=line><span class=cl><span class=kd>resource</span><span class=w> </span><span class=nv>dnsGroup</span><span class=w> </span><span class=s>&#39;Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01&#39;</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span></code></pre></div><p>If your OpenAI resource is in a different subscription than the VNet, the connection enters a &ldquo;Pending&rdquo; state and requires manual approval in the Networking blade of the OpenAI resource.</p><h2 id=4-dns-configuration-the-split-brain-pattern>4. DNS Configuration: The Split-Brain Pattern</h2><p>Private Link creates the private IP, but your applications still use the FQDN <code>your-resource.openai.azure.com</code>. Without a DNS override, that FQDN still resolves to the public IP — and your traffic fails the moment you disable public access. The Private DNS step is where most implementations fail silently.</p><h3 id=split-brain-dns-resolution>Split-Brain DNS Resolution</h3><div class=mermaid>sequenceDiagram
+participant Client as Internal Client (VNet)<br>(nslookup resource.openai.com)
+participant Resolver as Azure DNS Resolver<br>(168.63.129.16)
+participant Zone as Private DNS Zone<br>(privatelink.openai.com)
+Client->>Resolver: 1. Query FQDN
+Resolver->>Zone: 2. Query Private Zone
+Zone-->>Resolver: 3. Return Private IP (10.0.1.5)
+Resolver-->>Client: 4. Resolve to 10.0.1.5</div><h3 id=private-dns-zones>Private DNS Zones</h3><p>Azure provides a specialized Private DNS Zone: <code>privatelink.openai.azure.com</code>. When you link your VNet to this zone, any query for an OpenAI resource returns the private IP. The <code>privateDnsZoneGroups</code> resource in Bicep automates the A-record registration.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bicep data-lang=bicep><span class=line><span class=cl><span class=kd>resource</span><span class=w> </span><span class=nv>dnsGroup</span><span class=w> </span><span class=s>&#39;Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01&#39;</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=p>{</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nv>name</span><span class=p>:</span><span class=w> </span><span class=s>&#39;default&#39;</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nv>parent</span><span class=p>:</span><span class=w> </span><span class=nv>privateEndpoint</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nv>properties</span><span class=p>:</span><span class=w> </span><span class=p>{</span><span class=w>

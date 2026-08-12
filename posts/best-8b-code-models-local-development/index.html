@@ -22,24 +22,22 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 </span></span></span></code></pre></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ollama pull gemma4:e4b
 </span></span></code></pre></div><h3 id=deepseek-r1-distill-qwen-7b-the-reasoning-specialist>DeepSeek-R1-Distill-Qwen-7B: The Reasoning Specialist</h3><p>DeepSeek-R1-Distill-Qwen-7B shines when tasks require deep chain-of-thought reasoning and complex math/logic. When a task requires intricate algorithmic generation or complex refactoring, its distilled reasoning capabilities allow it to perform well beyond its 7B size class.</p><p>Use it when the task involves heavy logic, math, or complex chain-of-thought generation. Switch to Qwen3.5 or Gemma 4 for standard boilerplate or large-context tasks.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ollama pull deepseek-r1:7b
 </span></span></code></pre></div><h3 id=ibm-granite-41-8b-the-compliance-option>IBM Granite 4.1 8B: The Compliance Option</h3><p>IBM Granite 4.1 8B&rsquo;s distinguishing feature is open data. The IBM team released the full training dataset composition and training logs, meaning you can audit exactly what data the model was trained on.</p><p>While it lacks the massive context window of Qwen3.5 (Granite is limited to 8,192 tokens) and the multimodal capabilities of Gemma 4, it generates predictable, structurally sound code. For compliance-sensitive environments where auditable training data is a requirement, it remains a solid choice.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ollama pull granite-code:8b
-</span></span></code></pre></div><h3 id=the-decision-matrix>The Decision Matrix</h3><p>Once you finish the initial setup, role-based model assignment is the correct mental model:</p><table><thead><tr><th>Use Case</th><th>Model</th><th>Reason</th></tr></thead><tbody><tr><td>Large file context (>8k tokens)</td><td>Qwen3.5 9B</td><td>128K native context window (often run at 32K)</td></tr><tr><td>UI generation from mockups</td><td>Qwen3.5 9B</td><td>Exceptional vision capabilities for precise UI code</td></tr><tr><td>Edge devices / Multimodal AI</td><td>Gemma 4 E4B</td><td>High efficiency (PLE architecture) and native text/image/audio support</td></tr><tr><td>Complex algorithms (Python, C++)</td><td>DeepSeek-R1-Distill-Qwen-7B</td><td>Superior chain-of-thought reasoning and logic capability</td></tr><tr><td>Compliance-audited environments</td><td>IBM Granite 4.1 8B</td><td>Open training data, fully auditable</td></tr></tbody></table><h2 id=hands-on-example-hot-swapping-models-session>Hands-On Example: Hot-Swapping Models Session</h2><p><strong>Scenario:</strong> You&rsquo;re building a web application. Qwen3.5 9B writes the core data processing logic; Gemma 4 E4B generates the UI components.</p><h3 id=diagram>Diagram</h3><p>Visualizes the hot-swapping workflow between specialized local models during development, demonstrating context persistence and role-based execution across VRAM constraints.</p><pre tabindex=0><code class=language-mermaid data-lang=mermaid>flowchart TD
-    IDE[&#34;OpenCode IDE Session&lt;br/&gt;(Persistent Context)&#34;]
-    Qwen[&#34;Load Qwen3.5 9B&lt;br/&gt;(VRAM: ~4.7 - 5.0GB)&#34;]
-    Proc[&#34;src/api/processor.ts&#34;]
-    Gemma[&#34;Load Gemma 4 E4B&lt;br/&gt;(VRAM: ~3.8 - 4.2GB)&#34;]
-    UI[&#34;src/components/ui.tsx&#34;]
-    Build[&#34;npm run build&#34;]
-    Verify[&#34;Verification&#34;]
-
-    IDE --&gt; Qwen
-    Qwen --&gt;|(1) Generate Logic| Proc
-    Qwen --&gt;|(2) Unload Qwen3.5| Gemma
-    Proc --&gt; UI
-    Gemma --&gt;|(3) Generate UI| UI
-    Gemma --&gt;|(4) Run Build/Test| Build
-    UI --&gt; Verify
-    Verify --&gt; Build
-</code></pre><p><strong>Visual Notes:</strong></p><ul><li>VRAM allocation emphasizes why models are unloaded sequentially on 8GB-12GB GPUs.</li><li>The OpenCode IDE Session acts as the persistent context bridge between independent model inferences.</li></ul><p><strong>Step 1: Pull both models</strong></p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ollama pull qwen3.5:9b
+</span></span></code></pre></div><h3 id=the-decision-matrix>The Decision Matrix</h3><p>Once you finish the initial setup, role-based model assignment is the correct mental model:</p><table><thead><tr><th>Use Case</th><th>Model</th><th>Reason</th></tr></thead><tbody><tr><td>Large file context (>8k tokens)</td><td>Qwen3.5 9B</td><td>128K native context window (often run at 32K)</td></tr><tr><td>UI generation from mockups</td><td>Qwen3.5 9B</td><td>Exceptional vision capabilities for precise UI code</td></tr><tr><td>Edge devices / Multimodal AI</td><td>Gemma 4 E4B</td><td>High efficiency (PLE architecture) and native text/image/audio support</td></tr><tr><td>Complex algorithms (Python, C++)</td><td>DeepSeek-R1-Distill-Qwen-7B</td><td>Superior chain-of-thought reasoning and logic capability</td></tr><tr><td>Compliance-audited environments</td><td>IBM Granite 4.1 8B</td><td>Open training data, fully auditable</td></tr></tbody></table><h2 id=hands-on-example-hot-swapping-models-session>Hands-On Example: Hot-Swapping Models Session</h2><p><strong>Scenario:</strong> You&rsquo;re building a web application. Qwen3.5 9B writes the core data processing logic; Gemma 4 E4B generates the UI components.</p><h3 id=diagram>Diagram</h3><p>Visualizes the hot-swapping workflow between specialized local models during development, demonstrating context persistence and role-based execution across VRAM constraints.</p><div class=mermaid>flowchart TD
+IDE["OpenCode IDE Session<br>(Persistent Context)"]
+Qwen["Load Qwen3.5 9B<br>(VRAM: ~4.7 - 5.0GB)"]
+Proc["src/api/processor.ts"]
+Gemma["Load Gemma 4 E4B<br>(VRAM: ~3.8 - 4.2GB)"]
+UI["src/components/ui.tsx"]
+Build["npm run build"]
+Verify["Verification"]
+IDE --> Qwen
+Qwen -->|(1) Generate Logic| Proc
+Qwen -->|(2) Unload Qwen3.5| Gemma
+Proc --> UI
+Gemma -->|(3) Generate UI| UI
+Gemma -->|(4) Run Build/Test| Build
+UI --> Verify
+Verify --> Build</div><p><strong>Visual Notes:</strong></p><ul><li>VRAM allocation emphasizes why models are unloaded sequentially on 8GB-12GB GPUs.</li><li>The OpenCode IDE Session acts as the persistent context bridge between independent model inferences.</li></ul><p><strong>Step 1: Pull both models</strong></p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ollama pull qwen3.5:9b
 </span></span><span class=line><span class=cl>ollama pull gemma4:e4b
 </span></span></code></pre></div><p><strong>Step 2: Use Qwen3.5 9B for the complex logic</strong></p><p>In OpenCode:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>/model qwen3.5:9b
 </span></span><span class=line><span class=cl>/add src/api/processor.ts

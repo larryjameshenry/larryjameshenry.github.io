@@ -18,20 +18,17 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 </span></span></span><span class=line><span class=cl>Do not wrap code in conversational filler or markdown explanations unless explicitly asked.<span class=s2>&#34;&#34;&#34;</span><span class=err>
 </span></span></span></code></pre></div><p>Build and register the custom model:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ollama create my-coder -f Modelfile
 </span></span></code></pre></div><p>Test it:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ollama run my-coder <span class=s2>&#34;def parse_csv(filepath: str) -&gt; list[dict]:&#34;</span>
-</span></span></code></pre></div><p>The model should complete the function without preamble.</p><h2 id=integrating-opencode>Integrating OpenCode</h2><h3 id=installing-and-connecting-opencode>Installing and Connecting OpenCode</h3><p>OpenCode is a terminal-native AI coding agent. It sits in your project directory, reads your files, sends prompts to Ollama&rsquo;s local API, and applies generated code diffs directly to your filesystem. No copy-paste, no context switching to a browser.</p><h3 id=diagram>Diagram</h3><p>This diagram visualizes the fully local workflow between the filesystem, the OpenCode terminal interface, and the Ollama API serving the quantized model from GPU VRAM.</p><pre tabindex=0><code class=language-mermaid data-lang=mermaid>flowchart TD
-    PF[&#34;Project Files&#34;]
-    TUI[&#34;OpenCode TUI&#34;]
-    User((&#34;User Prompt&#34;))
-
-    subgraph API[&#34;Ollama Local API&#34;]
-        Model[&#34;Qwen3.5 Model&lt;br/&gt;(Loaded in GPU VRAM)&#34;]
-    end
-
-    PF &lt;--&#34;Reads/Writes&#34;--&gt; TUI
-    User --&gt; TUI
-    TUI --&#34;Prompt&lt;br/&gt;+ Context&#34;--&gt; Model
-    Model --&#34;Generated&lt;br/&gt;Code Diff&#34;--&gt; TUI
-</code></pre><p><strong>Visual Notes:</strong></p><ul><li>The entire process executes on the local machine without external network calls.</li><li>The KV cache and model weights reside strictly within the isolated GPU VRAM block.</li></ul><p>Install via npm:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>npm install -g opencode-ai
+</span></span></code></pre></div><p>The model should complete the function without preamble.</p><h2 id=integrating-opencode>Integrating OpenCode</h2><h3 id=installing-and-connecting-opencode>Installing and Connecting OpenCode</h3><p>OpenCode is a terminal-native AI coding agent. It sits in your project directory, reads your files, sends prompts to Ollama&rsquo;s local API, and applies generated code diffs directly to your filesystem. No copy-paste, no context switching to a browser.</p><h3 id=diagram>Diagram</h3><p>This diagram visualizes the fully local workflow between the filesystem, the OpenCode terminal interface, and the Ollama API serving the quantized model from GPU VRAM.</p><div class=mermaid>flowchart TD
+PF["Project Files"]
+TUI["OpenCode TUI"]
+User(("User Prompt"))
+subgraph API["Ollama Local API"]
+Model["Qwen3.5 Model<br>(Loaded in GPU VRAM)"]
+end
+PF <--"Reads/Writes"--> TUI
+User --> TUI
+TUI --"Prompt<br>+ Context"--> Model
+Model --"Generated<br>Code Diff"--> TUI</div><p><strong>Visual Notes:</strong></p><ul><li>The entire process executes on the local machine without external network calls.</li><li>The KV cache and model weights reside strictly within the isolated GPU VRAM block.</li></ul><p>Install via npm:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>npm install -g opencode-ai
 </span></span></code></pre></div><p>Configure OpenCode to point to your local Ollama instance. Create or edit <code>~/.config/opencode/opencode.json</code>:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
 </span></span><span class=line><span class=cl>  <span class=nt>&#34;$schema&#34;</span><span class=p>:</span> <span class=s2>&#34;https://opencode.ai/config.json&#34;</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>  <span class=nt>&#34;provider&#34;</span><span class=p>:</span> <span class=p>{</span>

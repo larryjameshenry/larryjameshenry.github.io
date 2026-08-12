@@ -14,23 +14,20 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nv>requestMessage</span><span class=p>:</span><span class=w> </span><span class=s>&#39;Enable secure vectorization for DevOps indexer.&#39;</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
-</span></span></span></code></pre></div><p><strong>Note:</strong> Once deployed, this connection enters a &ldquo;Pending&rdquo; status and MUST be approved in the target Azure OpenAI resource&rsquo;s <strong>Networking</strong> blade before the indexer can communicate.</p><h3 id=ingestion-path-via-shared-private-link>Ingestion Path via Shared Private Link</h3><pre tabindex=0><code class=language-mermaid data-lang=mermaid>flowchart LR
-    subgraph Hub[&#34;[ HUB VNET ]&#34;]
-        Search[&#34;Azure AI Search&lt;br/&gt;(Indexer)&#34;]
-        Link[&#34;[ Shared Private Link ]&#34;]
-        Blob[&#34;Azure Blob Storage&lt;br/&gt;(Raw Runbooks)&#34;]
-        Search --- Link
-        Link --&gt;|VNet Internal Transit| Blob
-    end
-
-    subgraph Backbone[&#34;[ MICROSOFT BACKBONE ]&#34;]
-        OpenAI[&#34;Azure OpenAI&lt;br/&gt;(Embedding Model)&#34;]
-        PE[&#34;[ Private Endpoint ]&#34;]
-        OpenAI --- PE
-    end
-
-    Link --&gt;|APPROVED| PE
-</code></pre><h2 id=3-document-level-security-trimming>3. Document-Level Security Trimming</h2><p>A shared RAG index containing documents from multiple teams creates a real data boundary risk. Without security trimming, a user could craft a query to retrieve documents they aren&rsquo;t authorized to read. The LLM won&rsquo;t refuse—it will happily summarize whatever context you hand it.</p><h3 id=the-identity-filter-pattern>The Identity Filter Pattern</h3><p>The correct solution is the <strong>Identity Filter Pattern</strong>. During ingestion, map source document permissions (e.g., Confluence Space permissions) to Entra ID Group Object IDs. Store these IDs in a <code>Collection(Edm.String)</code> field named <code>allowedGroups</code> in your AI Search index.</p><p>At query time, your orchestrator retrieves the user&rsquo;s active group memberships via the Microsoft Graph API and applies them as a hard OData filter.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># Query-time security trimming using the search.in function</span>
+</span></span></span></code></pre></div><p><strong>Note:</strong> Once deployed, this connection enters a &ldquo;Pending&rdquo; status and MUST be approved in the target Azure OpenAI resource&rsquo;s <strong>Networking</strong> blade before the indexer can communicate.</p><h3 id=ingestion-path-via-shared-private-link>Ingestion Path via Shared Private Link</h3><div class=mermaid>flowchart LR
+subgraph Hub["[ HUB VNET ]"]
+Search["Azure AI Search<br>(Indexer)"]
+Link["[ Shared Private Link ]"]
+Blob["Azure Blob Storage<br>(Raw Runbooks)"]
+Search --- Link
+Link -->|VNet Internal Transit| Blob
+end
+subgraph Backbone["[ MICROSOFT BACKBONE ]"]
+OpenAI["Azure OpenAI<br>(Embedding Model)"]
+PE["[ Private Endpoint ]"]
+OpenAI --- PE
+end
+Link -->|APPROVED| PE</div><h2 id=3-document-level-security-trimming>3. Document-Level Security Trimming</h2><p>A shared RAG index containing documents from multiple teams creates a real data boundary risk. Without security trimming, a user could craft a query to retrieve documents they aren&rsquo;t authorized to read. The LLM won&rsquo;t refuse—it will happily summarize whatever context you hand it.</p><h3 id=the-identity-filter-pattern>The Identity Filter Pattern</h3><p>The correct solution is the <strong>Identity Filter Pattern</strong>. During ingestion, map source document permissions (e.g., Confluence Space permissions) to Entra ID Group Object IDs. Store these IDs in a <code>Collection(Edm.String)</code> field named <code>allowedGroups</code> in your AI Search index.</p><p>At query time, your orchestrator retrieves the user&rsquo;s active group memberships via the Microsoft Graph API and applies them as a hard OData filter.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># Query-time security trimming using the search.in function</span>
 </span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>get_security_filter</span><span class=p>(</span><span class=n>user_groups</span><span class=p>:</span> <span class=nb>list</span><span class=p>[</span><span class=nb>str</span><span class=p>]):</span>
 </span></span><span class=line><span class=cl>    <span class=c1># &#39;search.in&#39; is optimized for large lists of Group Object IDs</span>
 </span></span><span class=line><span class=cl>    <span class=n>group_string</span> <span class=o>=</span> <span class=s2>&#34;,&#34;</span><span class=o>.</span><span class=n>join</span><span class=p>(</span><span class=n>user_groups</span><span class=p>)</span>
@@ -42,18 +39,16 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 </span></span><span class=line><span class=cl>    <span class=nb>filter</span><span class=o>=</span><span class=n>get_security_filter</span><span class=p>(</span><span class=n>active_groups</span><span class=p>),</span>
 </span></span><span class=line><span class=cl>    <span class=n>vector_queries</span><span class=o>=</span><span class=p>[</span><span class=n>vector_query</span><span class=p>]</span>
 </span></span><span class=line><span class=cl><span class=p>)</span>
-</span></span></code></pre></div><h3 id=identity-filter-pattern-security-trimming>Identity Filter Pattern (Security Trimming)</h3><pre tabindex=0><code class=language-mermaid data-lang=mermaid>sequenceDiagram
-    participant Eng as Engineer (Query)
-    participant Orch as Orchestrator (Function)
-    participant Search as Azure AI Search
-
-    Eng-&gt;&gt;Orch: 1. Ask &#34;Node Drain?&#34;
-    note over Orch: 2. Get User Group IDs&lt;br/&gt;(svc-platform, on-call)&lt;br/&gt;3. Construct OData Filter&lt;br/&gt;allowedGroups/any(g: search.in(g, &#39;...&#39;))
-    Orch-&gt;&gt;Search: 4. Hybrid Search + Filter
-    note over Search: 5. Match chunks&lt;br/&gt;where groups match
-    Search--&gt;&gt;Orch: Search Results
-    Orch--&gt;&gt;Eng: 6. Return Filtered Context
-</code></pre><p>By filtering at the retrieval layer, the LLM never receives context blocks that the user isn&rsquo;t permitted to see. Security is enforced at the data source, not the model prompt.</p><h2 id=4-ingestion-pipeline-and-deletion-detection>4. Ingestion Pipeline and Deletion Detection</h2><p>For DevOps content, <strong>Markdown-aware chunking</strong> is superior to arbitrary character counts. Runbooks are structured by headings. Splitting on <code>##</code> ensures that a &ldquo;Node Drain Procedure&rdquo; stays as a single, coherent context block.</p><h3 id=deletion-policy-no-ghost-runbooks>Deletion Policy: No Ghost Runbooks</h3><p>A RAG system that retains deleted runbooks is dangerous. If an incident playbook is archived because it contains a flaw, the AI must stop suggesting it immediately—not at the next scheduled sync, immediately. Use the <strong>Native Blob Soft Delete</strong> pattern. When a file is removed from Blob Storage, the AI Search indexer detects the soft-deleted state and automatically purges the corresponding chunks from the index during the next run.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=c1>// AI Search Indexer Deletion Policy
+</span></span></code></pre></div><h3 id=identity-filter-pattern-security-trimming>Identity Filter Pattern (Security Trimming)</h3><div class=mermaid>sequenceDiagram
+participant Eng as Engineer (Query)
+participant Orch as Orchestrator (Function)
+participant Search as Azure AI Search
+Eng->>Orch: 1. Ask "Node Drain?"
+note over Orch: 2. Get User Group IDs<br>(svc-platform, on-call)<br>3. Construct OData Filter<br>allowedGroups/any(g: search.in(g, '...'))
+Orch->>Search: 4. Hybrid Search + Filter
+note over Search: 5. Match chunks<br>where groups match
+Search-->>Orch: Search Results
+Orch-->>Eng: 6. Return Filtered Context</div><p>By filtering at the retrieval layer, the LLM never receives context blocks that the user isn&rsquo;t permitted to see. Security is enforced at the data source, not the model prompt.</p><h2 id=4-ingestion-pipeline-and-deletion-detection>4. Ingestion Pipeline and Deletion Detection</h2><p>For DevOps content, <strong>Markdown-aware chunking</strong> is superior to arbitrary character counts. Runbooks are structured by headings. Splitting on <code>##</code> ensures that a &ldquo;Node Drain Procedure&rdquo; stays as a single, coherent context block.</p><h3 id=deletion-policy-no-ghost-runbooks>Deletion Policy: No Ghost Runbooks</h3><p>A RAG system that retains deleted runbooks is dangerous. If an incident playbook is archived because it contains a flaw, the AI must stop suggesting it immediately—not at the next scheduled sync, immediately. Use the <strong>Native Blob Soft Delete</strong> pattern. When a file is removed from Blob Storage, the AI Search indexer detects the soft-deleted state and automatically purges the corresponding chunks from the index during the next run.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=c1>// AI Search Indexer Deletion Policy
 </span></span></span><span class=line><span class=cl><span class=s2>&#34;dataDeletionDetectionPolicy&#34;</span><span class=err>:</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=nt>&#34;@odata.type&#34;</span><span class=p>:</span> <span class=s2>&#34;#Microsoft.Azure.Search.NativeBlobSoftDeleteDeletionDetectionPolicy&#34;</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>

@@ -26,28 +26,24 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 </span></span><span class=line><span class=cl><span class=p>}</span>
 </span></span></code></pre></div><p>Two details matter here. The <code>baseURL</code> uses the <code>/v1</code> suffix — Ollama exposes an OpenAI-compatible endpoint at that path, and OpenCode expects the OpenAI API format. The <code>"tools": true</code> flag enables function calling, which is how OpenCode applies file diffs as actual filesystem operations rather than just printing text.</p><p>After saving, restart OpenCode and select the model with <code>/model my-coder</code> at the chat input.</p><h2 id=essential-opencode-commands>Essential OpenCode Commands</h2><h3 id=managing-code-context--and-new>Managing Code Context: <code>@</code> and <code>/new</code></h3><p>The quality of AI-generated code correlates directly with the quality of context you provide. Too little context and the model invents function signatures. Too much context and the KV cache overflows VRAM, slowing generation to a crawl.</p><p>To attach a file to the model&rsquo;s active context window, type <code>@</code> followed by the filename for fuzzy searching:</p><pre tabindex=0><code>@parser.py
 </code></pre><p>This reads <code>parser.py</code> and adds its full contents to the KV cache. The model can now reference the functions, imports, and type definitions in that file when generating changes.</p><p>To free KV cache memory and focus the model on what you&rsquo;re currently working on, clear the session context by starting a new one:</p><pre tabindex=0><code>/new
-</code></pre><p>On an 8GB VRAM setup (like an RTX 4060 running Llama-3 8B), active context management is the difference between generating at 45 tokens/sec and degrading to 3 tokens/sec. Clear your context the moment you switch tasks.</p><p>The core workflow pattern — Attach-Prompt-Apply-Clear — keeps your sessions fast and your context focused:</p><ol><li>Use <code>@</code> to attach the file you&rsquo;re editing (and any interfaces it references)</li><li>Prompt the model for the specific change</li><li>Review and apply the generated diff</li><li>Use <code>/new</code> to clear the context when moving to an unrelated task</li></ol><h3 id=diagram>Diagram</h3><p>This diagram visualizes the OpenCode TUI architecture and core workflow, illustrating how the terminal interface manages context, communicates with the local Ollama API, and applies code diffs directly to the filesystem.</p><pre tabindex=0><code class=language-mermaid data-lang=mermaid>flowchart TD
-    TUI[&#34;OpenCode TUI&lt;br/&gt;(User Terminal)&#34;]
-    CTX[&#34;Context Manager&lt;br/&gt;(@ file, /new)&#34;]
-    Chat[&#34;Chat / Prompt&lt;br/&gt;(Request Diff)&#34;]
-    Cmd[&#34;Command Executor&lt;br/&gt;(! shell cmds)&#34;]
-    API[&#34;Ollama API (/v1)&lt;br/&gt;(Localhost)&#34;]
-    FS[&#34;Local Filesystem&lt;br/&gt;(Project Code)&#34;]
-    LLM[&#34;LLM Engine&lt;br/&gt;(Generates Diff)&#34;]
-    Diff[&#34;Diff Applier&lt;br/&gt;(Writes to disk)&#34;]
-
-    TUI --&gt; CTX
-    TUI --&gt; Chat
-    TUI --&gt; Cmd
-
-    CTX --&gt; API
-    Chat --&gt; API
-    Cmd --&gt; FS
-
-    API --&gt; LLM
-    LLM --&gt; Diff
-    Diff --&gt; FS
-</code></pre><p><strong>Visual Notes:</strong></p><ul><li>The Context Manager and Prompt feed directly into the Ollama API, utilizing the KV cache.</li><li>The LLM Engine generates a diff, which the Diff Applier writes directly to the Local Filesystem.</li><li>The Command Executor interacts directly with the filesystem, independent of the LLM generation loop.</li></ul><h3 id=applying-diffs-and-running-commands>Applying Diffs and Running Commands</h3><p>When the model generates a code change, OpenCode presents it as a unified diff in the TUI — additions in green, removals in red. Press Enter to apply or Esc to reject. The change writes directly to your file on disk. No clipboard involved.</p><p>You can also run shell commands from inside OpenCode by prefixing them with <code>!</code>:</p><pre tabindex=0><code>!pytest tests/test_parser.py -v
+</code></pre><p>On an 8GB VRAM setup (like an RTX 4060 running Llama-3 8B), active context management is the difference between generating at 45 tokens/sec and degrading to 3 tokens/sec. Clear your context the moment you switch tasks.</p><p>The core workflow pattern — Attach-Prompt-Apply-Clear — keeps your sessions fast and your context focused:</p><ol><li>Use <code>@</code> to attach the file you&rsquo;re editing (and any interfaces it references)</li><li>Prompt the model for the specific change</li><li>Review and apply the generated diff</li><li>Use <code>/new</code> to clear the context when moving to an unrelated task</li></ol><h3 id=diagram>Diagram</h3><p>This diagram visualizes the OpenCode TUI architecture and core workflow, illustrating how the terminal interface manages context, communicates with the local Ollama API, and applies code diffs directly to the filesystem.</p><div class=mermaid>flowchart TD
+TUI["OpenCode TUI<br>(User Terminal)"]
+CTX["Context Manager<br>(@ file, /new)"]
+Chat["Chat / Prompt<br>(Request Diff)"]
+Cmd["Command Executor<br>(! shell cmds)"]
+API["Ollama API (/v1)<br>(Localhost)"]
+FS["Local Filesystem<br>(Project Code)"]
+LLM["LLM Engine<br>(Generates Diff)"]
+Diff["Diff Applier<br>(Writes to disk)"]
+TUI --> CTX
+TUI --> Chat
+TUI --> Cmd
+CTX --> API
+Chat --> API
+Cmd --> FS
+API --> LLM
+LLM --> Diff
+Diff --> FS</div><p><strong>Visual Notes:</strong></p><ul><li>The Context Manager and Prompt feed directly into the Ollama API, utilizing the KV cache.</li><li>The LLM Engine generates a diff, which the Diff Applier writes directly to the Local Filesystem.</li><li>The Command Executor interacts directly with the filesystem, independent of the LLM generation loop.</li></ul><h3 id=applying-diffs-and-running-commands>Applying Diffs and Running Commands</h3><p>When the model generates a code change, OpenCode presents it as a unified diff in the TUI — additions in green, removals in red. Press Enter to apply or Esc to reject. The change writes directly to your file on disk. No clipboard involved.</p><p>You can also run shell commands from inside OpenCode by prefixing them with <code>!</code>:</p><pre tabindex=0><code>!pytest tests/test_parser.py -v
 </code></pre><p>OpenCode executes the command and pipes the output back into the conversation. The model reads the test results and can suggest fixes based on the actual error messages — without you copying error text from one window to another.</p><h2 id=hands-on-example-refactoring-a-function>Hands-On Example: Refactoring a Function</h2><p><strong>The task:</strong> Refactor a CSV parser and verify the tests still pass, entirely within the terminal.</p><p>Starting file, <code>parser.py</code>:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>parse_csv</span><span class=p>(</span><span class=n>filepath</span><span class=p>):</span>
 </span></span><span class=line><span class=cl>    <span class=kn>import</span> <span class=nn>csv</span>
 </span></span><span class=line><span class=cl>    <span class=n>data</span> <span class=o>=</span> <span class=p>[]</span>
