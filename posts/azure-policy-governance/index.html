@@ -4,12 +4,17 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 <svg aria-hidden="true" height="24" viewBox="0 0 16 16" width="24" data-view-component="true"><path fill-rule="evenodd" d="M1 2.75A.75.75.0 011.75 2h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 2.75zm0 5A.75.75.0 011.75 7h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 7.75zM1.75 12a.75.75.0 100 1.5h12.5a.75.75.0 100-1.5H1.75z"/></svg></button><div class="collapse navbar-collapse text-wrap primary-font" id=navbarContent><ul class="navbar-nav ms-auto text-center"><li class="nav-item navbar-text d-block d-md-none"><div class=nav-link><input id=search autocomplete=off class="form-control mr-sm-2" placeholder='Ctrl + k to Search...' aria-label=Search oninput=searchOnChange(event)></div></li><li class="nav-item navbar-text"><a class=nav-link href=/about title="About Me">About</a></li><li class="nav-item navbar-text"><a class=nav-link href=/posts title="Blog posts">Blog</a></li><li class="nav-item navbar-text"><a class=nav-link href=/series title=Series>Series</a></li><li class="nav-item navbar-text"><a class=nav-link href=/categories title=Categories>Categories</a></li><li class="nav-item navbar-text"><a class=nav-link href=/tags title=Tags>Tags</a></li><li class="nav-item navbar-text"><div class=text-center><button id=theme-toggle title=theme-toggle>
 <svg id="moon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
 <svg id="sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></li></ul></div></div></nav></header><main id=content role=main><section id=single><div class=container><div class="row justify-content-center"><div class="col-sm-12 col-md-12 col-lg-9"><div class=pr-lg-4><div class="title mb-5"><h1 class="text-center mb-4">Governance at Scale: Writing and Deploying Azure Policies with Terraform and Bicep</h1><div class=text-center>Apr 5, 2026
-<span id=readingTime>min read</span></div></div><div class=featured-image><img class="img-fluid mx-auto d-block" src=/posts/azure-policy-governance/images/featured_hu_ab687e71cec2c3e5.2875d535cf3cd64d480e9efded29fa48aa1d96f825212fc62746a3c1d93c48f3.webp alt="Governance at Scale: Writing and Deploying Azure Policies with Terraform and Bicep" width=784 height=438 integrity="sha256-KHXVNc881k1IDp797Sn6SKodlvglIS/GJ0ajwdk8SPM=" fetchpriority=high loading=eager></div><article class="page-content p-2"><p>The compliance report arrives on a Friday afternoon. You scan through it and stop on a finding: a Storage Account with public network access enabled, sitting in your production subscription, deployed three weeks ago. Someone bypassed the documented standard, the ARM deployment succeeded, and nobody noticed until now.</p><p>You had the standard documented. You didn&rsquo;t have it enforced.</p><p>That gap—between what your security baseline says and what actually exists in Azure—is configuration drift. It accumulates quietly, one manual deployment at a time, until an audit surfaces it. <strong>Azure Policy</strong> closes that gap by turning your standards from documentation into enforcement logic that ARM evaluates on every resource creation and modification.</p><p>Azure Policy scales flat: assign policies at the Management Group scope and they cover every subscription underneath, today and three years from now. This article covers how to author and deploy policies using <strong>Policy as Code</strong> patterns in Terraform and Bicep, moving from audit mode into proactive enforcement and automated remediation.</p><h2 id=1-the-policy-assignment-hierarchy>1. The Policy Assignment Hierarchy</h2><p>Group related controls into <strong>Initiatives</strong> (also called Policy Sets) rather than managing individual policies. A single &ldquo;Security Baseline&rdquo; initiative can bundle 20 policies into one assignment—much easier to manage across a hierarchy than 20 separate assignments you have to keep synchronized.</p><h3 id=policy-assignment-hierarchy>Policy Assignment Hierarchy</h3><div class=mermaid>flowchart TD
+<span id=readingTime>min read</span></div></div><div class=featured-image><img class="img-fluid mx-auto d-block" src=/posts/azure-policy-governance/images/featured_hu_ab687e71cec2c3e5.2875d535cf3cd64d480e9efded29fa48aa1d96f825212fc62746a3c1d93c48f3.webp alt="Governance at Scale: Writing and Deploying Azure Policies with Terraform and Bicep" width=784 height=438 integrity="sha256-KHXVNc881k1IDp797Sn6SKodlvglIS/GJ0ajwdk8SPM=" fetchpriority=high loading=eager></div><article class="page-content p-2"><p>The compliance report arrives on a Friday afternoon. You scan through it and stop on a finding: a Storage Account with public network access enabled, sitting in your production subscription, deployed three weeks ago. Someone bypassed the documented standard, the ARM deployment succeeded, and nobody noticed until now.</p><p>You had the standard documented. You didn&rsquo;t have it enforced.</p><p>That gap—between what your security baseline says and what actually exists in Azure—is configuration drift. It accumulates quietly, one manual deployment at a time, until an audit surfaces it. <strong>Azure Policy</strong> closes that gap by turning your standards from documentation into enforcement logic that ARM evaluates on every resource creation and modification.</p><p>Azure Policy scales flat: assign policies at the Management Group scope and they cover every subscription underneath, today and three years from now. This article covers how to author and deploy policies using <strong>Policy as Code</strong> patterns in Terraform and Bicep, moving from audit mode into proactive enforcement and automated remediation.</p><h2 id=1-the-policy-assignment-hierarchy>1. The Policy Assignment Hierarchy</h2><p>Group related controls into <strong>Initiatives</strong> (also called Policy Sets) rather than managing individual policies. A single &ldquo;Security Baseline&rdquo; initiative can bundle 20 policies into one assignment—much easier to manage across a hierarchy than 20 separate assignments you have to keep synchronized.</p><h3 id=policy-assignment-hierarchy>Policy Assignment Hierarchy</h3><div class=mermaid-wrapper><template class=mermaid-src>flowchart TD
 Init["[ INITIATIVE ] (e.g., Private AI Infra)<br>- Policy A: Deny Public Access<br>- Policy B: Require Private Link<br>- Policy C: Deploy Diag Settings"]
 Assign["[ ASSIGNMENT ] (Scoped to mg-intermediate)<br>- Target: All child subscriptions<br>- Identity: System-Assigned Managed ID"]
 Exemp["[ EXEMPTION ] (Optional - Scoped to Sub/RG)<br>- Reason: Legacy Migration<br>- Type: Waiver"]
 Init --> Assign
-Assign --> Exemp</div><h2 id=2-proactive-enforcement-with-the-deny-effect>2. Proactive Enforcement with the Deny Effect</h2><p>The most powerful tool in your governance arsenal is the <code>Deny</code> effect. It evaluates a resource request <em>before</em> it is created. If the resource doesn&rsquo;t meet the requirement (e.g., it lacks a mandatory tag), ARM rejects the request with a <code>403 Forbidden</code>.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
+Assign --> Exemp</template><div class=mermaid>flowchart TD
+Init["[ INITIATIVE ] (e.g., Private AI Infra)<br>- Policy A: Deny Public Access<br>- Policy B: Require Private Link<br>- Policy C: Deploy Diag Settings"]
+Assign["[ ASSIGNMENT ] (Scoped to mg-intermediate)<br>- Target: All child subscriptions<br>- Identity: System-Assigned Managed ID"]
+Exemp["[ EXEMPTION ] (Optional - Scoped to Sub/RG)<br>- Reason: Legacy Migration<br>- Type: Waiver"]
+Init --> Assign
+Assign --> Exemp</div></div><h2 id=2-proactive-enforcement-with-the-deny-effect>2. Proactive Enforcement with the Deny Effect</h2><p>The most powerful tool in your governance arsenal is the <code>Deny</code> effect. It evaluates a resource request <em>before</em> it is created. If the resource doesn&rsquo;t meet the requirement (e.g., it lacks a mandatory tag), ARM rejects the request with a <code>403 Forbidden</code>.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
 </span></span><span class=line><span class=cl>  <span class=nt>&#34;if&#34;</span><span class=p>:</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=nt>&#34;field&#34;</span><span class=p>:</span> <span class=s2>&#34;Microsoft.Storage/storageAccounts/publicNetworkAccess&#34;</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>    <span class=nt>&#34;notEquals&#34;</span><span class=p>:</span> <span class=s2>&#34;Disabled&#34;</span>
@@ -18,7 +23,7 @@ Assign --> Exemp</div><h2 id=2-proactive-enforcement-with-the-deny-effect>2. Pro
 </span></span><span class=line><span class=cl>    <span class=nt>&#34;effect&#34;</span><span class=p>:</span> <span class=s2>&#34;Deny&#34;</span>
 </span></span><span class=line><span class=cl>  <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
-</span></span></code></pre></div><p><strong>Pro Tip:</strong> Always set the <code>mode</code> property in your policy definition. Use <code>Indexed</code> for policies that evaluate tags and locations. Use <code>All</code> for resource-specific properties like network rules or subnets.</p><h2 id=3-self-healing-with-deployifnotexists-dine>3. Self-Healing with DeployIfNotExists (DINE)</h2><p>Auditing tells you what&rsquo;s broken; <strong>DeployIfNotExists (DINE)</strong> fixes it automatically. This effect is used for auxiliary resources like diagnostic settings or private DNS zones. If the primary resource (e.g., a VNet) exists but the dependent resource (e.g., diagnostic settings) is missing, Azure Policy triggers a remediation task to deploy it.</p><h3 id=dine-policy-remediation-workflow>DINE Policy Remediation Workflow</h3><div class=mermaid>sequenceDiagram
+</span></span></code></pre></div><p><strong>Pro Tip:</strong> Always set the <code>mode</code> property in your policy definition. Use <code>Indexed</code> for policies that evaluate tags and locations. Use <code>All</code> for resource-specific properties like network rules or subnets.</p><h2 id=3-self-healing-with-deployifnotexists-dine>3. Self-Healing with DeployIfNotExists (DINE)</h2><p>Auditing tells you what&rsquo;s broken; <strong>DeployIfNotExists (DINE)</strong> fixes it automatically. This effect is used for auxiliary resources like diagnostic settings or private DNS zones. If the primary resource (e.g., a VNet) exists but the dependent resource (e.g., diagnostic settings) is missing, Azure Policy triggers a remediation task to deploy it.</p><h3 id=dine-policy-remediation-workflow>DINE Policy Remediation Workflow</h3><div class=mermaid-wrapper><template class=mermaid-src>sequenceDiagram
 participant Res as Non-Compliant Resource
 participant Engine as Azure Policy Engine
 participant MI as Managed ID
@@ -27,7 +32,16 @@ Res->>Engine: Creation Request
 note over Engine: 2. Evaluate Compliance<br>3. [ Non-Compliant ]
 Engine->>MI: 4. Trigger Remediation Task
 MI-->>Res: 5. Deploy Missing Resource
-note over Res: 6. Resource is COMPLIANT</div><p><strong>Terraform Implementation:</strong>
+note over Res: 6. Resource is COMPLIANT</template><div class=mermaid>sequenceDiagram
+participant Res as Non-Compliant Resource
+participant Engine as Azure Policy Engine
+participant MI as Managed ID
+note over Res: 1. Resource Created<br>(Missing Diag Settings)
+Res->>Engine: Creation Request
+note over Engine: 2. Evaluate Compliance<br>3. [ Non-Compliant ]
+Engine->>MI: 4. Trigger Remediation Task
+MI-->>Res: 5. Deploy Missing Resource
+note over Res: 6. Resource is COMPLIANT</div></div><p><strong>Terraform Implementation:</strong>
 To support DINE, the policy assignment requires a <strong>Managed Identity</strong> and an RBAC role assignment allowing that identity to deploy resources.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-hcl data-lang=hcl><span class=line><span class=cl><span class=k>resource</span> <span class=s2>&#34;azurerm_management_group_policy_assignment&#34; &#34;logging&#34;</span> {
 </span></span><span class=line><span class=cl><span class=n>  name</span>                 <span class=o>=</span> <span class=s2>&#34;deploy-diag-settings&#34;</span>
 </span></span><span class=line><span class=cl><span class=n>  management_group_id</span>  <span class=o>=</span> <span class=k>var</span><span class=p>.</span><span class=k>platform_mg_id</span>
@@ -58,20 +72,54 @@ To support DINE, the policy assignment requires a <strong>Managed Identity</stro
 </a></span><span class=px-1><a href=https://www.linkedin.com/in/larryjameshenry aria-label=linkedin><svg width="2.4em" height="2.4em" fill="#fff" aria-label="LinkedIn" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0077b5" rx="15%"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 Larry James Henry. All rights reserved.</div></div></div></footer><script defer src=/bootstrap-5/js/bootstrap.bundle.min.js></script><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script defer src=/js/search.min.c590d9a08e125edb257cb869250fd256afcfd19b0fe36691c74648d868735c21.js integrity="sha256-xZDZoI4SXtslfLhpJQ/SVq/P0ZsP42aRx0ZI2GhzXCE="></script><script type=module>
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
   
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'base',
-    themeVariables: {
+  function getThemeVariables() {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
       primaryColor: isDarkMode ? '#1c2530' : '#ffffff',
       primaryTextColor: isDarkMode ? '#e6edf3' : '#1a2332',
       primaryBorderColor: isDarkMode ? '#5eead4' : '#0f766e',
       lineColor: isDarkMode ? '#9aa7b3' : '#5b6b7c',
-      secondaryColor: isDarkMode ? '#0f766e1a' : '#0f766e1a',
+      secondaryColor: isDarkMode ? '#5eead41a' : '#0f766e1a',
       tertiaryColor: isDarkMode ? '#0f1720' : '#f4f7f9',
-      fontFamily: 'inherit',
+      fontFamily: 'inherit'
+    };
+  }
+
+  async function renderMermaid() {
+    const wrappers = document.querySelectorAll('.mermaid-wrapper');
+    for (const wrapper of wrappers) {
+      const template = wrapper.querySelector('.mermaid-src');
+      const display = wrapper.querySelector('.mermaid');
+      if (template && display) {
+        display.removeAttribute('data-processed');
+        display.innerHTML = template.innerHTML;
+      }
     }
+    
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: getThemeVariables()
+    });
+    
+    await mermaid.run({
+      querySelector: '.mermaid'
+    });
+  }
+
+  renderMermaid();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-theme') {
+        renderMermaid();
+      }
+    });
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    renderMermaid();
   });
 </script><section id=search-content class=py-2 aria-label="Search results"><div class=container id=search-results></div></section></body></html>

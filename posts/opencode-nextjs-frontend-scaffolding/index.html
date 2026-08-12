@@ -11,7 +11,7 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 </span></span><span class=line><span class=cl><span class=k>-</span> Components are Server Components by default. Add <span class=sb>`&#34;use client&#34;`</span> as the first line only when the component uses state, effects, or browser APIs.
 </span></span><span class=line><span class=cl><span class=k>-</span> Styling is Tailwind CSS utility classes only. No inline <span class=sb>`style`</span> props, no separate <span class=sb>`.css`</span> files.
 </span></span><span class=line><span class=cl><span class=k>-</span> Save all components under <span class=sb>`src/components/`</span>.
-</span></span></code></pre></div><p>That last rule matters more than it looks like it should — Tailwind&rsquo;s default config only scans paths defined in <code>tailwind.config.ts</code> (which defaults to everything under <code>src/</code>). A component saved completely outside <code>src/</code> can render with zero styling applied even though the JSX is correct. You&rsquo;ll spend twenty minutes assuming your Tailwind install is broken before you notice the file landed in the wrong folder.</p><h2 id=generating-complex-components>Generating Complex Components</h2><h3 id=break-the-dashboard-into-pieces-the-model-can-hold>Break the Dashboard Into Pieces the Model Can Hold</h3><p>A dashboard isn&rsquo;t one component, it&rsquo;s three or four: a <code>Sidebar</code>, a <code>Header</code>, and whatever main content does the actual work — say, a <code>DataTable</code>. Prompting for all of it at once is the single most common way to burn a session. Local 9B models start losing instruction adherence and syntax integrity somewhere past 150-200 lines of generated React in a single response. Split the dashboard into files and generate each one in its own turn:</p><ol><li><code>Sidebar.tsx</code> — Client Component only if it needs state (a mobile collapse toggle); Server Component if it&rsquo;s static navigation.</li><li><code>Header.tsx</code> — almost always a Server Component.</li><li><code>DataTable.tsx</code> — Client Component, since sorting and pagination need interactivity.</li></ol><p>Each of these is a separate prompt, not a separate section of one giant prompt. The context window resets your advantage every time — a focused 40-line ask gets you working code; a 300-line ask gets you a component that imports <code>lucide-react</code> icons you never installed.</p><h3 id=component-generation-pattern-diagram>Component Generation Pattern Diagram</h3><p>Visualizes the atomic component generation pattern. The Next.js shell is built by standard CLI tooling, while OpenCode handles individual components via tightly scoped, sequential prompts.</p><div class=mermaid>flowchart TD
+</span></span></code></pre></div><p>That last rule matters more than it looks like it should — Tailwind&rsquo;s default config only scans paths defined in <code>tailwind.config.ts</code> (which defaults to everything under <code>src/</code>). A component saved completely outside <code>src/</code> can render with zero styling applied even though the JSX is correct. You&rsquo;ll spend twenty minutes assuming your Tailwind install is broken before you notice the file landed in the wrong folder.</p><h2 id=generating-complex-components>Generating Complex Components</h2><h3 id=break-the-dashboard-into-pieces-the-model-can-hold>Break the Dashboard Into Pieces the Model Can Hold</h3><p>A dashboard isn&rsquo;t one component, it&rsquo;s three or four: a <code>Sidebar</code>, a <code>Header</code>, and whatever main content does the actual work — say, a <code>DataTable</code>. Prompting for all of it at once is the single most common way to burn a session. Local 9B models start losing instruction adherence and syntax integrity somewhere past 150-200 lines of generated React in a single response. Split the dashboard into files and generate each one in its own turn:</p><ol><li><code>Sidebar.tsx</code> — Client Component only if it needs state (a mobile collapse toggle); Server Component if it&rsquo;s static navigation.</li><li><code>Header.tsx</code> — almost always a Server Component.</li><li><code>DataTable.tsx</code> — Client Component, since sorting and pagination need interactivity.</li></ol><p>Each of these is a separate prompt, not a separate section of one giant prompt. The context window resets your advantage every time — a focused 40-line ask gets you working code; a 300-line ask gets you a component that imports <code>lucide-react</code> icons you never installed.</p><h3 id=component-generation-pattern-diagram>Component Generation Pattern Diagram</h3><p>Visualizes the atomic component generation pattern. The Next.js shell is built by standard CLI tooling, while OpenCode handles individual components via tightly scoped, sequential prompts.</p><div class=mermaid-wrapper><template class=mermaid-src>flowchart TD
 CLI["Next.js CLI Tools\n(Initial Canvas)"]
 OpenCode["OpenCode\n(Atomic Prompt Cycles)"]
 Shell["Dashboard Shell"]
@@ -24,7 +24,20 @@ OpenCode -->|Cycle 2| Header
 OpenCode -->|Cycle 3| DataTable
 Sidebar -->|Feeds back| Shell
 Header -->|Feeds back| Shell
-DataTable -->|Feeds back| Shell</div><p><strong>Visual Notes:</strong></p><ul><li>The CLI generates the initial canvas to avoid wasting context window tokens.</li><li>Each component represents an isolated, atomic prompt cycle to maintain context integrity.</li><li>Component responses feed back into the Dashboard Shell sequentially.</li></ul><h3 id=say-the-tailwind-classes-out-loud>Say the Tailwind Classes Out Loud</h3><p>&ldquo;Make it look modern&rdquo; is not a specification, it&rsquo;s a Rorschach test, and the model will fail it. Give it literal class names:</p><blockquote><p>Use <code>bg-slate-900</code>, <code>text-slate-100</code>, and <code>border-slate-800</code> for the container. Rows get <code>hover:bg-slate-800</code> on hover.</p></blockquote><p>That single sentence removes an entire category of back-and-forth where you&rsquo;re describing a color scheme in adjectives and the model is guessing at hex values.</p><h2 id=practical-example-building-a-dynamic-data-table>Practical Example: Building a Dynamic Data Table</h2><p>Here&rsquo;s the actual sequence for the <code>DataTable</code> component, run as three separate prompts against OpenCode.</p><p><strong>Step 1 — the interface.</strong> Prompt:</p><blockquote><p>Create a React functional component <code>DataTable</code> in <code>src/components/DataTable.tsx</code>. It must use Tailwind CSS for styling. Include a <code>"use client"</code> directive at the very top. The component accepts a <code>data</code> prop (an array of objects). Implement basic ascending/descending sorting logic on column headers.</p></blockquote><p><strong>Step 2 — styling pass.</strong> Once the logic comes back clean, ask specifically for the visual layer using the explicit class names from the section above, rather than trusting the first pass to have nailed hover states and borders.</p><p><strong>Step 3 — refine the sort.</strong> The first sorting implementation from a 9B model is usually functional but naive — often string-comparing numeric columns. Call that out directly and ask for a numeric-aware comparator.</p><p>The component that comes out the other side:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=line><span class=cl><span class=s2>&#34;use client&#34;</span><span class=p>;</span>
+DataTable -->|Feeds back| Shell</template><div class=mermaid>flowchart TD
+CLI["Next.js CLI Tools\n(Initial Canvas)"]
+OpenCode["OpenCode\n(Atomic Prompt Cycles)"]
+Shell["Dashboard Shell"]
+Sidebar["Sidebar.tsx\n(Client/Server)"]
+Header["Header.tsx\n(Server Component)"]
+DataTable["DataTable.tsx\n(Client Component)"]
+CLI -->|Generates| Shell
+OpenCode -->|Cycle 1| Sidebar
+OpenCode -->|Cycle 2| Header
+OpenCode -->|Cycle 3| DataTable
+Sidebar -->|Feeds back| Shell
+Header -->|Feeds back| Shell
+DataTable -->|Feeds back| Shell</div></div><p><strong>Visual Notes:</strong></p><ul><li>The CLI generates the initial canvas to avoid wasting context window tokens.</li><li>Each component represents an isolated, atomic prompt cycle to maintain context integrity.</li><li>Component responses feed back into the Dashboard Shell sequentially.</li></ul><h3 id=say-the-tailwind-classes-out-loud>Say the Tailwind Classes Out Loud</h3><p>&ldquo;Make it look modern&rdquo; is not a specification, it&rsquo;s a Rorschach test, and the model will fail it. Give it literal class names:</p><blockquote><p>Use <code>bg-slate-900</code>, <code>text-slate-100</code>, and <code>border-slate-800</code> for the container. Rows get <code>hover:bg-slate-800</code> on hover.</p></blockquote><p>That single sentence removes an entire category of back-and-forth where you&rsquo;re describing a color scheme in adjectives and the model is guessing at hex values.</p><h2 id=practical-example-building-a-dynamic-data-table>Practical Example: Building a Dynamic Data Table</h2><p>Here&rsquo;s the actual sequence for the <code>DataTable</code> component, run as three separate prompts against OpenCode.</p><p><strong>Step 1 — the interface.</strong> Prompt:</p><blockquote><p>Create a React functional component <code>DataTable</code> in <code>src/components/DataTable.tsx</code>. It must use Tailwind CSS for styling. Include a <code>"use client"</code> directive at the very top. The component accepts a <code>data</code> prop (an array of objects). Implement basic ascending/descending sorting logic on column headers.</p></blockquote><p><strong>Step 2 — styling pass.</strong> Once the logic comes back clean, ask specifically for the visual layer using the explicit class names from the section above, rather than trusting the first pass to have nailed hover states and borders.</p><p><strong>Step 3 — refine the sort.</strong> The first sorting implementation from a 9B model is usually functional but naive — often string-comparing numeric columns. Call that out directly and ask for a numeric-aware comparator.</p><p>The component that comes out the other side:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-tsx data-lang=tsx><span class=line><span class=cl><span class=s2>&#34;use client&#34;</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=kr>import</span> <span class=p>{</span> <span class=nx>useState</span><span class=p>,</span> <span class=nx>useMemo</span> <span class=p>}</span> <span class=kr>from</span> <span class=s2>&#34;react&#34;</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>
@@ -109,20 +122,54 @@ You&rsquo;re passing too much. Trim the prompt down to the one file being genera
 </a></span><span class=px-1><a href=https://www.linkedin.com/in/larryjameshenry aria-label=linkedin><svg width="2.4em" height="2.4em" fill="#fff" aria-label="LinkedIn" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0077b5" rx="15%"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 Larry James Henry. All rights reserved.</div></div></div></footer><script defer src=/bootstrap-5/js/bootstrap.bundle.min.js></script><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script defer src=/js/search.min.c590d9a08e125edb257cb869250fd256afcfd19b0fe36691c74648d868735c21.js integrity="sha256-xZDZoI4SXtslfLhpJQ/SVq/P0ZsP42aRx0ZI2GhzXCE="></script><script type=module>
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
   
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'base',
-    themeVariables: {
+  function getThemeVariables() {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
       primaryColor: isDarkMode ? '#1c2530' : '#ffffff',
       primaryTextColor: isDarkMode ? '#e6edf3' : '#1a2332',
       primaryBorderColor: isDarkMode ? '#5eead4' : '#0f766e',
       lineColor: isDarkMode ? '#9aa7b3' : '#5b6b7c',
-      secondaryColor: isDarkMode ? '#0f766e1a' : '#0f766e1a',
+      secondaryColor: isDarkMode ? '#5eead41a' : '#0f766e1a',
       tertiaryColor: isDarkMode ? '#0f1720' : '#f4f7f9',
-      fontFamily: 'inherit',
+      fontFamily: 'inherit'
+    };
+  }
+
+  async function renderMermaid() {
+    const wrappers = document.querySelectorAll('.mermaid-wrapper');
+    for (const wrapper of wrappers) {
+      const template = wrapper.querySelector('.mermaid-src');
+      const display = wrapper.querySelector('.mermaid');
+      if (template && display) {
+        display.removeAttribute('data-processed');
+        display.innerHTML = template.innerHTML;
+      }
     }
+    
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: getThemeVariables()
+    });
+    
+    await mermaid.run({
+      querySelector: '.mermaid'
+    });
+  }
+
+  renderMermaid();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-theme') {
+        renderMermaid();
+      }
+    });
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    renderMermaid();
   });
 </script><section id=search-content class=py-2 aria-label="Search results"><div class=container id=search-results></div></section></body></html>

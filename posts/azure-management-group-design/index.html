@@ -4,7 +4,7 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 <svg aria-hidden="true" height="24" viewBox="0 0 16 16" width="24" data-view-component="true"><path fill-rule="evenodd" d="M1 2.75A.75.75.0 011.75 2h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 2.75zm0 5A.75.75.0 011.75 7h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 7.75zM1.75 12a.75.75.0 100 1.5h12.5a.75.75.0 100-1.5H1.75z"/></svg></button><div class="collapse navbar-collapse text-wrap primary-font" id=navbarContent><ul class="navbar-nav ms-auto text-center"><li class="nav-item navbar-text d-block d-md-none"><div class=nav-link><input id=search autocomplete=off class="form-control mr-sm-2" placeholder='Ctrl + k to Search...' aria-label=Search oninput=searchOnChange(event)></div></li><li class="nav-item navbar-text"><a class=nav-link href=/about title="About Me">About</a></li><li class="nav-item navbar-text"><a class=nav-link href=/posts title="Blog posts">Blog</a></li><li class="nav-item navbar-text"><a class=nav-link href=/series title=Series>Series</a></li><li class="nav-item navbar-text"><a class=nav-link href=/categories title=Categories>Categories</a></li><li class="nav-item navbar-text"><a class=nav-link href=/tags title=Tags>Tags</a></li><li class="nav-item navbar-text"><div class=text-center><button id=theme-toggle title=theme-toggle>
 <svg id="moon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
 <svg id="sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></li></ul></div></div></nav></header><main id=content role=main><section id=single><div class=container><div class="row justify-content-center"><div class="col-sm-12 col-md-12 col-lg-9"><div class=pr-lg-4><div class="title mb-5"><h1 class="text-center mb-4">Design Your Azure Management Group and Subscription Hierarchy</h1><div class=text-center>Apr 2, 2026
-<span id=readingTime>min read</span></div></div><div class=featured-image><img class="img-fluid mx-auto d-block" src=/posts/azure-management-group-design/images/featured_hu_a4db3817161bab08.f610dbe166ee38210a4c5bb491689d7a86976bdfa60931bbc5d25500f5ceb2a0.webp alt="Design Your Azure Management Group and Subscription Hierarchy" width=784 height=438 integrity="sha256-9hDb4WbuOCEKTFu0kWideoaXa9+mCTG7xdJVAPXOsqA=" fetchpriority=high loading=eager></div><article class="page-content p-2"><p>Six months after the initial landing zone deployment, a new VP reorganizes the business units. Your management group tree — which you built to mirror the org chart — is now wrong. Every policy assignment, every RBAC scope, every cost report that referenced &ldquo;BU-Finance&rdquo; and &ldquo;BU-Operations&rdquo; needs to move. You spend two sprints refactoring infrastructure that was working fine. The reorganization didn&rsquo;t break the business; your hierarchy design broke your platform.</p><p>This is the Management Group trap. The hierarchy is the first thing you build in a landing zone, and it is the hardest thing to change later. Management Groups (MGs) sit above the subscription level, letting you apply Azure Policies and RBAC roles that cascade down to every child resource. A well-designed tree governs 1,000 subscriptions with the same effort as one. A poorly designed tree — typically one that mirrors a fluctuating org chart — means two sprints of refactoring every time the business restructures.</p><p>Design for <strong>Functional Longevity</strong> instead. Your hierarchy should represent the &ldquo;Job to be Done&rdquo; — Connectivity, Production Workloads, Sandboxes — not which department is currently paying the bill. Here&rsquo;s how to deploy the standard Cloud Adoption Framework (CAF) hierarchy using <strong>Azure Verified Modules (AVM)</strong> and wire up the governance scaffold for your entire Azure estate.</p><h2 id=1-the-enterprise-scale-hierarchy>1. The Enterprise-Scale Hierarchy</h2><p>The standard blueprint starts with a single &ldquo;Intermediate&rdquo; Management Group below the Tenant Root. This group represents your organization and serves as the boundary for all shared enterprise policies.</p><h3 id=enterprise-scale-management-group-hierarchy>Enterprise-Scale Management Group Hierarchy</h3><div class=mermaid>flowchart TD
+<span id=readingTime>min read</span></div></div><div class=featured-image><img class="img-fluid mx-auto d-block" src=/posts/azure-management-group-design/images/featured_hu_a4db3817161bab08.f610dbe166ee38210a4c5bb491689d7a86976bdfa60931bbc5d25500f5ceb2a0.webp alt="Design Your Azure Management Group and Subscription Hierarchy" width=784 height=438 integrity="sha256-9hDb4WbuOCEKTFu0kWideoaXa9+mCTG7xdJVAPXOsqA=" fetchpriority=high loading=eager></div><article class="page-content p-2"><p>Six months after the initial landing zone deployment, a new VP reorganizes the business units. Your management group tree — which you built to mirror the org chart — is now wrong. Every policy assignment, every RBAC scope, every cost report that referenced &ldquo;BU-Finance&rdquo; and &ldquo;BU-Operations&rdquo; needs to move. You spend two sprints refactoring infrastructure that was working fine. The reorganization didn&rsquo;t break the business; your hierarchy design broke your platform.</p><p>This is the Management Group trap. The hierarchy is the first thing you build in a landing zone, and it is the hardest thing to change later. Management Groups (MGs) sit above the subscription level, letting you apply Azure Policies and RBAC roles that cascade down to every child resource. A well-designed tree governs 1,000 subscriptions with the same effort as one. A poorly designed tree — typically one that mirrors a fluctuating org chart — means two sprints of refactoring every time the business restructures.</p><p>Design for <strong>Functional Longevity</strong> instead. Your hierarchy should represent the &ldquo;Job to be Done&rdquo; — Connectivity, Production Workloads, Sandboxes — not which department is currently paying the bill. Here&rsquo;s how to deploy the standard Cloud Adoption Framework (CAF) hierarchy using <strong>Azure Verified Modules (AVM)</strong> and wire up the governance scaffold for your entire Azure estate.</p><h2 id=1-the-enterprise-scale-hierarchy>1. The Enterprise-Scale Hierarchy</h2><p>The standard blueprint starts with a single &ldquo;Intermediate&rdquo; Management Group below the Tenant Root. This group represents your organization and serves as the boundary for all shared enterprise policies.</p><h3 id=enterprise-scale-management-group-hierarchy>Enterprise-Scale Management Group Hierarchy</h3><div class=mermaid-wrapper><template class=mermaid-src>flowchart TD
 subgraph Root["Tenant Root Group"]
 subgraph Inter["[ Intermediate MG ] (Contoso)"]
 subgraph Platform["[ Platform ]"]
@@ -20,14 +20,37 @@ subgraph Decomm["[ Decommissioned ]"]
 D_Sub["(Cleanup Path)"]
 end
 end
-end</div><h3 id=11-functional-segments>1.1: Functional Segments</h3><ul><li><strong>Platform:</strong> Home to the shared service subscriptions. No application code runs here.</li><li><strong>Landing Zones:</strong> The production and non-production environments for applications.<ul><li><strong>Corp:</strong> Workloads requiring internal connectivity (VPN/ER).</li><li><strong>Online:</strong> Public-facing workloads with direct internet ingress.</li></ul></li><li><strong>Sandbox:</strong> A &ldquo;Free Fire&rdquo; zone for experimentation. Policies here are loose (Audit-only) and resources are often auto-deleted after 30 days.</li><li><strong>Decommissioned:</strong> The &ldquo;Parking Lot&rdquo; for subscriptions slated for deletion. A single <code>Deny All</code> policy here ensures no new costs are incurred while waiting for the purge cycle.</li></ul><h2 id=2-policy-and-rbac-cascading>2. Policy and RBAC Cascading</h2><p>The value of the hierarchy is that you define a control once and it applies everywhere below it — no per-subscription busywork.</p><h3 id=policy-and-rbac-cascading>Policy and RBAC Cascading</h3><div class=mermaid>flowchart TD
+end</template><div class=mermaid>flowchart TD
+subgraph Root["Tenant Root Group"]
+subgraph Inter["[ Intermediate MG ] (Contoso)"]
+subgraph Platform["[ Platform ]"]
+P_Sub["- Connectivity<br>- Identity<br>- Management"]
+end
+subgraph LZ["[ Landing Zones ]"]
+LZ_Sub["- Corp<br>- Online"]
+end
+subgraph Sandbox["[ Sandbox ]"]
+S_Sub["(Temp Work)"]
+end
+subgraph Decomm["[ Decommissioned ]"]
+D_Sub["(Cleanup Path)"]
+end
+end
+end</div></div><h3 id=11-functional-segments>1.1: Functional Segments</h3><ul><li><strong>Platform:</strong> Home to the shared service subscriptions. No application code runs here.</li><li><strong>Landing Zones:</strong> The production and non-production environments for applications.<ul><li><strong>Corp:</strong> Workloads requiring internal connectivity (VPN/ER).</li><li><strong>Online:</strong> Public-facing workloads with direct internet ingress.</li></ul></li><li><strong>Sandbox:</strong> A &ldquo;Free Fire&rdquo; zone for experimentation. Policies here are loose (Audit-only) and resources are often auto-deleted after 30 days.</li><li><strong>Decommissioned:</strong> The &ldquo;Parking Lot&rdquo; for subscriptions slated for deletion. A single <code>Deny All</code> policy here ensures no new costs are incurred while waiting for the purge cycle.</li></ul><h2 id=2-policy-and-rbac-cascading>2. Policy and RBAC Cascading</h2><p>The value of the hierarchy is that you define a control once and it applies everywhere below it — no per-subscription busywork.</p><h3 id=policy-and-rbac-cascading>Policy and RBAC Cascading</h3><div class=mermaid-wrapper><template class=mermaid-src>flowchart TD
 MG["[ MANAGEMENT GROUP ]<br>- Policy: Deny Public IP<br>- RBAC: Platform Admins (Owner)"]
 Sub["[ CHILD SUBSCRIPTION ]<br>- Inherits Deny Policy<br>- Inherits Admin RBAC"]
 RG["[ RESOURCE GROUP ]<br>- (Local Contributor RBAC)"]
 Res["[ RESOURCE ]<br>- Blocked from having Public IP<br>- Managed by Platform Admins"]
 MG --> Sub
 Sub --> RG
-RG --> Res</div><h2 id=3-deploying-with-terraform-avm>3. Deploying with Terraform AVM</h2><p>The <code>avm-ptn-alz</code> module is the 2026 standard for deploying the CAF hierarchy. It replaces the legacy <code>caf-enterprise-scale</code> module with a flatter, more maintainable structure — fewer nested modules, fewer surprises when you run <code>terraform plan</code>.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-hcl data-lang=hcl><span class=line><span class=cl><span class=c1># Deploy the MG Hierarchy
+RG --> Res</template><div class=mermaid>flowchart TD
+MG["[ MANAGEMENT GROUP ]<br>- Policy: Deny Public IP<br>- RBAC: Platform Admins (Owner)"]
+Sub["[ CHILD SUBSCRIPTION ]<br>- Inherits Deny Policy<br>- Inherits Admin RBAC"]
+RG["[ RESOURCE GROUP ]<br>- (Local Contributor RBAC)"]
+Res["[ RESOURCE ]<br>- Blocked from having Public IP<br>- Managed by Platform Admins"]
+MG --> Sub
+Sub --> RG
+RG --> Res</div></div><h2 id=3-deploying-with-terraform-avm>3. Deploying with Terraform AVM</h2><p>The <code>avm-ptn-alz</code> module is the 2026 standard for deploying the CAF hierarchy. It replaces the legacy <code>caf-enterprise-scale</code> module with a flatter, more maintainable structure — fewer nested modules, fewer surprises when you run <code>terraform plan</code>.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-hcl data-lang=hcl><span class=line><span class=cl><span class=c1># Deploy the MG Hierarchy
 </span></span></span><span class=line><span class=cl><span class=k>module</span> <span class=s2>&#34;alz&#34;</span> {
 </span></span><span class=line><span class=cl><span class=n>  source</span>  <span class=o>=</span> <span class=s2>&#34;Azure/avm-ptn-alz/azurerm&#34;</span>
 </span></span><span class=line><span class=cl><span class=n>  version</span> <span class=o>=</span> <span class=s2>&#34;~&gt; 0.10&#34;</span>
@@ -73,20 +96,54 @@ RG --> Res</div><h2 id=3-deploying-with-terraform-avm>3. Deploying with Terrafor
 </a></span><span class=px-1><a href=https://www.linkedin.com/in/larryjameshenry aria-label=linkedin><svg width="2.4em" height="2.4em" fill="#fff" aria-label="LinkedIn" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0077b5" rx="15%"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 Larry James Henry. All rights reserved.</div></div></div></footer><script defer src=/bootstrap-5/js/bootstrap.bundle.min.js></script><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script defer src=/js/search.min.c590d9a08e125edb257cb869250fd256afcfd19b0fe36691c74648d868735c21.js integrity="sha256-xZDZoI4SXtslfLhpJQ/SVq/P0ZsP42aRx0ZI2GhzXCE="></script><script type=module>
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
   
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'base',
-    themeVariables: {
+  function getThemeVariables() {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
       primaryColor: isDarkMode ? '#1c2530' : '#ffffff',
       primaryTextColor: isDarkMode ? '#e6edf3' : '#1a2332',
       primaryBorderColor: isDarkMode ? '#5eead4' : '#0f766e',
       lineColor: isDarkMode ? '#9aa7b3' : '#5b6b7c',
-      secondaryColor: isDarkMode ? '#0f766e1a' : '#0f766e1a',
+      secondaryColor: isDarkMode ? '#5eead41a' : '#0f766e1a',
       tertiaryColor: isDarkMode ? '#0f1720' : '#f4f7f9',
-      fontFamily: 'inherit',
+      fontFamily: 'inherit'
+    };
+  }
+
+  async function renderMermaid() {
+    const wrappers = document.querySelectorAll('.mermaid-wrapper');
+    for (const wrapper of wrappers) {
+      const template = wrapper.querySelector('.mermaid-src');
+      const display = wrapper.querySelector('.mermaid');
+      if (template && display) {
+        display.removeAttribute('data-processed');
+        display.innerHTML = template.innerHTML;
+      }
     }
+    
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: getThemeVariables()
+    });
+    
+    await mermaid.run({
+      querySelector: '.mermaid'
+    });
+  }
+
+  renderMermaid();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-theme') {
+        renderMermaid();
+      }
+    });
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    renderMermaid();
   });
 </script><section id=search-content class=py-2 aria-label="Search results"><div class=container id=search-results></div></section></body></html>

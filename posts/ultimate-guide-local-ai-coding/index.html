@@ -18,7 +18,7 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 </span></span></span><span class=line><span class=cl>Do not wrap code in conversational filler or markdown explanations unless explicitly asked.<span class=s2>&#34;&#34;&#34;</span><span class=err>
 </span></span></span></code></pre></div><p>Build and register the custom model:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ollama create my-coder -f Modelfile
 </span></span></code></pre></div><p>Test it:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ollama run my-coder <span class=s2>&#34;def parse_csv(filepath: str) -&gt; list[dict]:&#34;</span>
-</span></span></code></pre></div><p>The model should complete the function without preamble.</p><h2 id=integrating-opencode>Integrating OpenCode</h2><h3 id=installing-and-connecting-opencode>Installing and Connecting OpenCode</h3><p>OpenCode is a terminal-native AI coding agent. It sits in your project directory, reads your files, sends prompts to Ollama&rsquo;s local API, and applies generated code diffs directly to your filesystem. No copy-paste, no context switching to a browser.</p><h3 id=diagram>Diagram</h3><p>This diagram visualizes the fully local workflow between the filesystem, the OpenCode terminal interface, and the Ollama API serving the quantized model from GPU VRAM.</p><div class=mermaid>flowchart TD
+</span></span></code></pre></div><p>The model should complete the function without preamble.</p><h2 id=integrating-opencode>Integrating OpenCode</h2><h3 id=installing-and-connecting-opencode>Installing and Connecting OpenCode</h3><p>OpenCode is a terminal-native AI coding agent. It sits in your project directory, reads your files, sends prompts to Ollama&rsquo;s local API, and applies generated code diffs directly to your filesystem. No copy-paste, no context switching to a browser.</p><h3 id=diagram>Diagram</h3><p>This diagram visualizes the fully local workflow between the filesystem, the OpenCode terminal interface, and the Ollama API serving the quantized model from GPU VRAM.</p><div class=mermaid-wrapper><template class=mermaid-src>flowchart TD
 PF["Project Files"]
 TUI["OpenCode TUI"]
 User(("User Prompt"))
@@ -28,7 +28,17 @@ end
 PF <--"Reads/Writes"--> TUI
 User --> TUI
 TUI --"Prompt<br>+ Context"--> Model
-Model --"Generated<br>Code Diff"--> TUI</div><p><strong>Visual Notes:</strong></p><ul><li>The entire process executes on the local machine without external network calls.</li><li>The KV cache and model weights reside strictly within the isolated GPU VRAM block.</li></ul><p>Install via npm:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>npm install -g opencode-ai
+Model --"Generated<br>Code Diff"--> TUI</template><div class=mermaid>flowchart TD
+PF["Project Files"]
+TUI["OpenCode TUI"]
+User(("User Prompt"))
+subgraph API["Ollama Local API"]
+Model["Qwen3.5 Model<br>(Loaded in GPU VRAM)"]
+end
+PF <--"Reads/Writes"--> TUI
+User --> TUI
+TUI --"Prompt<br>+ Context"--> Model
+Model --"Generated<br>Code Diff"--> TUI</div></div><p><strong>Visual Notes:</strong></p><ul><li>The entire process executes on the local machine without external network calls.</li><li>The KV cache and model weights reside strictly within the isolated GPU VRAM block.</li></ul><p>Install via npm:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>npm install -g opencode-ai
 </span></span></code></pre></div><p>Configure OpenCode to point to your local Ollama instance. Create or edit <code>~/.config/opencode/opencode.json</code>:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span>
 </span></span><span class=line><span class=cl>  <span class=nt>&#34;$schema&#34;</span><span class=p>:</span> <span class=s2>&#34;https://opencode.ai/config.json&#34;</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>  <span class=nt>&#34;provider&#34;</span><span class=p>:</span> <span class=p>{</span>
@@ -88,20 +98,54 @@ Refactor process_records to use a list comprehension and remove the redundant bo
 </a></span><span class=px-1><a href=https://www.linkedin.com/in/larryjameshenry aria-label=linkedin><svg width="2.4em" height="2.4em" fill="#fff" aria-label="LinkedIn" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0077b5" rx="15%"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 Larry James Henry. All rights reserved.</div></div></div></footer><script defer src=/bootstrap-5/js/bootstrap.bundle.min.js></script><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script defer src=/js/search.min.c590d9a08e125edb257cb869250fd256afcfd19b0fe36691c74648d868735c21.js integrity="sha256-xZDZoI4SXtslfLhpJQ/SVq/P0ZsP42aRx0ZI2GhzXCE="></script><script type=module>
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
   
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'base',
-    themeVariables: {
+  function getThemeVariables() {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
       primaryColor: isDarkMode ? '#1c2530' : '#ffffff',
       primaryTextColor: isDarkMode ? '#e6edf3' : '#1a2332',
       primaryBorderColor: isDarkMode ? '#5eead4' : '#0f766e',
       lineColor: isDarkMode ? '#9aa7b3' : '#5b6b7c',
-      secondaryColor: isDarkMode ? '#0f766e1a' : '#0f766e1a',
+      secondaryColor: isDarkMode ? '#5eead41a' : '#0f766e1a',
       tertiaryColor: isDarkMode ? '#0f1720' : '#f4f7f9',
-      fontFamily: 'inherit',
+      fontFamily: 'inherit'
+    };
+  }
+
+  async function renderMermaid() {
+    const wrappers = document.querySelectorAll('.mermaid-wrapper');
+    for (const wrapper of wrappers) {
+      const template = wrapper.querySelector('.mermaid-src');
+      const display = wrapper.querySelector('.mermaid');
+      if (template && display) {
+        display.removeAttribute('data-processed');
+        display.innerHTML = template.innerHTML;
+      }
     }
+    
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: getThemeVariables()
+    });
+    
+    await mermaid.run({
+      querySelector: '.mermaid'
+    });
+  }
+
+  renderMermaid();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-theme') {
+        renderMermaid();
+      }
+    });
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    renderMermaid();
   });
 </script><section id=search-content class=py-2 aria-label="Search results"><div class=container id=search-results></div></section></body></html>

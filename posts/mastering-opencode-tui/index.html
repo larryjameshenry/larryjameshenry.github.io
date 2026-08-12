@@ -26,7 +26,7 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 </span></span><span class=line><span class=cl><span class=p>}</span>
 </span></span></code></pre></div><p>Two details matter here. The <code>baseURL</code> uses the <code>/v1</code> suffix — Ollama exposes an OpenAI-compatible endpoint at that path, and OpenCode expects the OpenAI API format. The <code>"tools": true</code> flag enables function calling, which is how OpenCode applies file diffs as actual filesystem operations rather than just printing text.</p><p>After saving, restart OpenCode and select the model with <code>/model my-coder</code> at the chat input.</p><h2 id=essential-opencode-commands>Essential OpenCode Commands</h2><h3 id=managing-code-context--and-new>Managing Code Context: <code>@</code> and <code>/new</code></h3><p>The quality of AI-generated code correlates directly with the quality of context you provide. Too little context and the model invents function signatures. Too much context and the KV cache overflows VRAM, slowing generation to a crawl.</p><p>To attach a file to the model&rsquo;s active context window, type <code>@</code> followed by the filename for fuzzy searching:</p><pre tabindex=0><code>@parser.py
 </code></pre><p>This reads <code>parser.py</code> and adds its full contents to the KV cache. The model can now reference the functions, imports, and type definitions in that file when generating changes.</p><p>To free KV cache memory and focus the model on what you&rsquo;re currently working on, clear the session context by starting a new one:</p><pre tabindex=0><code>/new
-</code></pre><p>On an 8GB VRAM setup (like an RTX 4060 running Llama-3 8B), active context management is the difference between generating at 45 tokens/sec and degrading to 3 tokens/sec. Clear your context the moment you switch tasks.</p><p>The core workflow pattern — Attach-Prompt-Apply-Clear — keeps your sessions fast and your context focused:</p><ol><li>Use <code>@</code> to attach the file you&rsquo;re editing (and any interfaces it references)</li><li>Prompt the model for the specific change</li><li>Review and apply the generated diff</li><li>Use <code>/new</code> to clear the context when moving to an unrelated task</li></ol><h3 id=diagram>Diagram</h3><p>This diagram visualizes the OpenCode TUI architecture and core workflow, illustrating how the terminal interface manages context, communicates with the local Ollama API, and applies code diffs directly to the filesystem.</p><div class=mermaid>flowchart TD
+</code></pre><p>On an 8GB VRAM setup (like an RTX 4060 running Llama-3 8B), active context management is the difference between generating at 45 tokens/sec and degrading to 3 tokens/sec. Clear your context the moment you switch tasks.</p><p>The core workflow pattern — Attach-Prompt-Apply-Clear — keeps your sessions fast and your context focused:</p><ol><li>Use <code>@</code> to attach the file you&rsquo;re editing (and any interfaces it references)</li><li>Prompt the model for the specific change</li><li>Review and apply the generated diff</li><li>Use <code>/new</code> to clear the context when moving to an unrelated task</li></ol><h3 id=diagram>Diagram</h3><p>This diagram visualizes the OpenCode TUI architecture and core workflow, illustrating how the terminal interface manages context, communicates with the local Ollama API, and applies code diffs directly to the filesystem.</p><div class=mermaid-wrapper><template class=mermaid-src>flowchart TD
 TUI["OpenCode TUI<br>(User Terminal)"]
 CTX["Context Manager<br>(@ file, /new)"]
 Chat["Chat / Prompt<br>(Request Diff)"]
@@ -43,7 +43,24 @@ Chat --> API
 Cmd --> FS
 API --> LLM
 LLM --> Diff
-Diff --> FS</div><p><strong>Visual Notes:</strong></p><ul><li>The Context Manager and Prompt feed directly into the Ollama API, utilizing the KV cache.</li><li>The LLM Engine generates a diff, which the Diff Applier writes directly to the Local Filesystem.</li><li>The Command Executor interacts directly with the filesystem, independent of the LLM generation loop.</li></ul><h3 id=applying-diffs-and-running-commands>Applying Diffs and Running Commands</h3><p>When the model generates a code change, OpenCode presents it as a unified diff in the TUI — additions in green, removals in red. Press Enter to apply or Esc to reject. The change writes directly to your file on disk. No clipboard involved.</p><p>You can also run shell commands from inside OpenCode by prefixing them with <code>!</code>:</p><pre tabindex=0><code>!pytest tests/test_parser.py -v
+Diff --> FS</template><div class=mermaid>flowchart TD
+TUI["OpenCode TUI<br>(User Terminal)"]
+CTX["Context Manager<br>(@ file, /new)"]
+Chat["Chat / Prompt<br>(Request Diff)"]
+Cmd["Command Executor<br>(! shell cmds)"]
+API["Ollama API (/v1)<br>(Localhost)"]
+FS["Local Filesystem<br>(Project Code)"]
+LLM["LLM Engine<br>(Generates Diff)"]
+Diff["Diff Applier<br>(Writes to disk)"]
+TUI --> CTX
+TUI --> Chat
+TUI --> Cmd
+CTX --> API
+Chat --> API
+Cmd --> FS
+API --> LLM
+LLM --> Diff
+Diff --> FS</div></div><p><strong>Visual Notes:</strong></p><ul><li>The Context Manager and Prompt feed directly into the Ollama API, utilizing the KV cache.</li><li>The LLM Engine generates a diff, which the Diff Applier writes directly to the Local Filesystem.</li><li>The Command Executor interacts directly with the filesystem, independent of the LLM generation loop.</li></ul><h3 id=applying-diffs-and-running-commands>Applying Diffs and Running Commands</h3><p>When the model generates a code change, OpenCode presents it as a unified diff in the TUI — additions in green, removals in red. Press Enter to apply or Esc to reject. The change writes directly to your file on disk. No clipboard involved.</p><p>You can also run shell commands from inside OpenCode by prefixing them with <code>!</code>:</p><pre tabindex=0><code>!pytest tests/test_parser.py -v
 </code></pre><p>OpenCode executes the command and pipes the output back into the conversation. The model reads the test results and can suggest fixes based on the actual error messages — without you copying error text from one window to another.</p><h2 id=hands-on-example-refactoring-a-function>Hands-On Example: Refactoring a Function</h2><p><strong>The task:</strong> Refactor a CSV parser and verify the tests still pass, entirely within the terminal.</p><p>Starting file, <code>parser.py</code>:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=k>def</span> <span class=nf>parse_csv</span><span class=p>(</span><span class=n>filepath</span><span class=p>):</span>
 </span></span><span class=line><span class=cl>    <span class=kn>import</span> <span class=nn>csv</span>
 </span></span><span class=line><span class=cl>    <span class=n>data</span> <span class=o>=</span> <span class=p>[]</span>
@@ -76,20 +93,54 @@ Diff --> FS</div><p><strong>Visual Notes:</strong></p><ul><li>The Context Manage
 </a></span><span class=px-1><a href=https://www.linkedin.com/in/larryjameshenry aria-label=linkedin><svg width="2.4em" height="2.4em" fill="#fff" aria-label="LinkedIn" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0077b5" rx="15%"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 Larry James Henry. All rights reserved.</div></div></div></footer><script defer src=/bootstrap-5/js/bootstrap.bundle.min.js></script><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script defer src=/js/search.min.c590d9a08e125edb257cb869250fd256afcfd19b0fe36691c74648d868735c21.js integrity="sha256-xZDZoI4SXtslfLhpJQ/SVq/P0ZsP42aRx0ZI2GhzXCE="></script><script type=module>
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
   
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'base',
-    themeVariables: {
+  function getThemeVariables() {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
       primaryColor: isDarkMode ? '#1c2530' : '#ffffff',
       primaryTextColor: isDarkMode ? '#e6edf3' : '#1a2332',
       primaryBorderColor: isDarkMode ? '#5eead4' : '#0f766e',
       lineColor: isDarkMode ? '#9aa7b3' : '#5b6b7c',
-      secondaryColor: isDarkMode ? '#0f766e1a' : '#0f766e1a',
+      secondaryColor: isDarkMode ? '#5eead41a' : '#0f766e1a',
       tertiaryColor: isDarkMode ? '#0f1720' : '#f4f7f9',
-      fontFamily: 'inherit',
+      fontFamily: 'inherit'
+    };
+  }
+
+  async function renderMermaid() {
+    const wrappers = document.querySelectorAll('.mermaid-wrapper');
+    for (const wrapper of wrappers) {
+      const template = wrapper.querySelector('.mermaid-src');
+      const display = wrapper.querySelector('.mermaid');
+      if (template && display) {
+        display.removeAttribute('data-processed');
+        display.innerHTML = template.innerHTML;
+      }
     }
+    
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: getThemeVariables()
+    });
+    
+    await mermaid.run({
+      querySelector: '.mermaid'
+    });
+  }
+
+  renderMermaid();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-theme') {
+        renderMermaid();
+      }
+    });
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    renderMermaid();
   });
 </script><section id=search-content class=py-2 aria-label="Search results"><div class=container id=search-results></div></section></body></html>

@@ -4,7 +4,7 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 <svg aria-hidden="true" height="24" viewBox="0 0 16 16" width="24" data-view-component="true"><path fill-rule="evenodd" d="M1 2.75A.75.75.0 011.75 2h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 2.75zm0 5A.75.75.0 011.75 7h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 7.75zM1.75 12a.75.75.0 100 1.5h12.5a.75.75.0 100-1.5H1.75z"/></svg></button><div class="collapse navbar-collapse text-wrap primary-font" id=navbarContent><ul class="navbar-nav ms-auto text-center"><li class="nav-item navbar-text d-block d-md-none"><div class=nav-link><input id=search autocomplete=off class="form-control mr-sm-2" placeholder='Ctrl + k to Search...' aria-label=Search oninput=searchOnChange(event)></div></li><li class="nav-item navbar-text"><a class=nav-link href=/about title="About Me">About</a></li><li class="nav-item navbar-text"><a class=nav-link href=/posts title="Blog posts">Blog</a></li><li class="nav-item navbar-text"><a class=nav-link href=/series title=Series>Series</a></li><li class="nav-item navbar-text"><a class=nav-link href=/categories title=Categories>Categories</a></li><li class="nav-item navbar-text"><a class=nav-link href=/tags title=Tags>Tags</a></li><li class="nav-item navbar-text"><div class=text-center><button id=theme-toggle title=theme-toggle>
 <svg id="moon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
 <svg id="sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></li></ul></div></div></nav></header><main id=content role=main><section id=single><div class=container><div class="row justify-content-center"><div class="col-sm-12 col-md-12 col-lg-9"><div class=pr-lg-4><div class="title mb-5"><h1 class="text-center mb-4">Azure Platform Engineering: The Complete Guide to Building an Enterprise Landing Zone</h1><div class=text-center>Apr 1, 2026
-<span id=readingTime>min read</span></div></div><div class=featured-image><img class="img-fluid mx-auto d-block" src=/posts/azure-landing-zone-guide/images/featured_hu_7abdf12a57b9e611.9dc7235dcb9ac633e4551274ad7fd29e6358aa73afbcc60dc770087bd4ba877b.webp alt="Azure Platform Engineering: The Complete Guide to Building an Enterprise Landing Zone" width=784 height=438 integrity="sha256-nccjXcuaxjPkVRJ0rX/SnmNYqnOvvMYNx3AIe9S6h3s=" fetchpriority=high loading=eager></div><article class="page-content p-2"><p>Your Azure bill arrives and one line item is $47,000. Nobody on your team knows which subscription it came from. You trace it back to a developer who spun up a GPU cluster three weeks ago &ldquo;just to test something.&rdquo; There was no policy to stop them. There was no budget alert configured. There was no shared networking — they punched a hole through the firewall themselves. That subscription is a silo. You have fourteen more just like it.</p><p>This is what happens when your Azure estate grows without a foundation. Subscriptions accumulate as independent experiments. Security policies are applied by hand, subscription by subscription, whenever someone remembers. Networking becomes overlapping IP ranges and ad-hoc peerings that nobody fully understands. You aren&rsquo;t running a cloud platform — you&rsquo;re running a collection of accidents.</p><p>An Azure Landing Zone (ALZ) is the architectural foundation that prevents this. It provides the shared services — networking, identity, governance, and logging — that every application needs but no single team should manage alone. In 2026, the standard for building these foundations has shifted from monolithic modules to the <strong>Azure Verified Modules (AVM)</strong> initiative, emphasizing &ldquo;Metadata-First&rdquo; architectures and secret-less CI/CD.</p><p>This is the Pillar Post for the <a href=#>Azure Platform Engineering series</a>. Across the next 10 articles, we will build every layer of this architecture using production-grade Bicep and Terraform.</p><hr><h2 id=1-the-anatomy-of-an-enterprise-landing-zone>1. The Anatomy of an Enterprise Landing Zone</h2><p>A landing zone is not a single resource; it is a multi-layered ecosystem designed according to the <strong>Cloud Adoption Framework (CAF)</strong>. Microsoft divides this ecosystem into eight distinct design areas, ranging from billing and identity to networking and operations.</p><h3 id=platform-vs-application-landing-zones>Platform vs. Application Landing Zones</h3><p>The most critical architectural distinction is between the <strong>Platform</strong> and the <strong>Application</strong>.</p><ul><li><strong>Platform Landing Zones:</strong> These are the shared services subscriptions (Connectivity, Identity, Management). They provide the hub VNet, the Entra ID tenant, and the central Log Analytics Workspace.</li><li><strong>Application Landing Zones:</strong> These are the workload subscriptions where your apps actually run. They are &ldquo;consumers&rdquo; of the platform, inheriting its security policies and peering back to the hub.</li></ul><h3 id=alz-management-group-hierarchy>ALZ Management Group Hierarchy</h3><p>The hierarchy is the &ldquo;Gavel&rdquo; of your landing zone. It determines how policies and permissions cascade down to resources.</p><div class=mermaid>flowchart TD
+<span id=readingTime>min read</span></div></div><div class=featured-image><img class="img-fluid mx-auto d-block" src=/posts/azure-landing-zone-guide/images/featured_hu_7abdf12a57b9e611.9dc7235dcb9ac633e4551274ad7fd29e6358aa73afbcc60dc770087bd4ba877b.webp alt="Azure Platform Engineering: The Complete Guide to Building an Enterprise Landing Zone" width=784 height=438 integrity="sha256-nccjXcuaxjPkVRJ0rX/SnmNYqnOvvMYNx3AIe9S6h3s=" fetchpriority=high loading=eager></div><article class="page-content p-2"><p>Your Azure bill arrives and one line item is $47,000. Nobody on your team knows which subscription it came from. You trace it back to a developer who spun up a GPU cluster three weeks ago &ldquo;just to test something.&rdquo; There was no policy to stop them. There was no budget alert configured. There was no shared networking — they punched a hole through the firewall themselves. That subscription is a silo. You have fourteen more just like it.</p><p>This is what happens when your Azure estate grows without a foundation. Subscriptions accumulate as independent experiments. Security policies are applied by hand, subscription by subscription, whenever someone remembers. Networking becomes overlapping IP ranges and ad-hoc peerings that nobody fully understands. You aren&rsquo;t running a cloud platform — you&rsquo;re running a collection of accidents.</p><p>An Azure Landing Zone (ALZ) is the architectural foundation that prevents this. It provides the shared services — networking, identity, governance, and logging — that every application needs but no single team should manage alone. In 2026, the standard for building these foundations has shifted from monolithic modules to the <strong>Azure Verified Modules (AVM)</strong> initiative, emphasizing &ldquo;Metadata-First&rdquo; architectures and secret-less CI/CD.</p><p>This is the Pillar Post for the <a href=#>Azure Platform Engineering series</a>. Across the next 10 articles, we will build every layer of this architecture using production-grade Bicep and Terraform.</p><hr><h2 id=1-the-anatomy-of-an-enterprise-landing-zone>1. The Anatomy of an Enterprise Landing Zone</h2><p>A landing zone is not a single resource; it is a multi-layered ecosystem designed according to the <strong>Cloud Adoption Framework (CAF)</strong>. Microsoft divides this ecosystem into eight distinct design areas, ranging from billing and identity to networking and operations.</p><h3 id=platform-vs-application-landing-zones>Platform vs. Application Landing Zones</h3><p>The most critical architectural distinction is between the <strong>Platform</strong> and the <strong>Application</strong>.</p><ul><li><strong>Platform Landing Zones:</strong> These are the shared services subscriptions (Connectivity, Identity, Management). They provide the hub VNet, the Entra ID tenant, and the central Log Analytics Workspace.</li><li><strong>Application Landing Zones:</strong> These are the workload subscriptions where your apps actually run. They are &ldquo;consumers&rdquo; of the platform, inheriting its security policies and peering back to the hub.</li></ul><h3 id=alz-management-group-hierarchy>ALZ Management Group Hierarchy</h3><p>The hierarchy is the &ldquo;Gavel&rdquo; of your landing zone. It determines how policies and permissions cascade down to resources.</p><div class=mermaid-wrapper><template class=mermaid-src>flowchart TD
 subgraph Root["Tenant Root Management Group"]
 subgraph Platform["[ Platform ]"]
 P_Sub["- Connectivity<br>- Identity<br>- Management"]
@@ -18,7 +18,21 @@ end
 subgraph Decomm["[ Decommissioned ]"]
 D_Sub["- (Resources to Purge)"]
 end
-end</div><h2 id=2-design-area-1-network-isolation-hub-and-spoke>2. Design Area 1: Network Isolation (Hub-and-Spoke)</h2><p>Networking is the foundation of isolation. In a landing zone, we use a <strong>Hub-and-Spoke</strong> topology to centralize shared network services and enforce a single egress point to the internet.</p><h3 id=hub-and-spoke-core-architecture>Hub-and-Spoke Core Architecture</h3><div class=mermaid>flowchart TD
+end</template><div class=mermaid>flowchart TD
+subgraph Root["Tenant Root Management Group"]
+subgraph Platform["[ Platform ]"]
+P_Sub["- Connectivity<br>- Identity<br>- Management"]
+end
+subgraph LZ["[ Landing Zones ]"]
+LZ_Sub["- Corp (Internal)<br>- Online (External)"]
+end
+subgraph Sandbox["[ Sandbox ]"]
+S_Sub["- (Experimentation)"]
+end
+subgraph Decomm["[ Decommissioned ]"]
+D_Sub["- (Resources to Purge)"]
+end
+end</div></div><h2 id=2-design-area-1-network-isolation-hub-and-spoke>2. Design Area 1: Network Isolation (Hub-and-Spoke)</h2><p>Networking is the foundation of isolation. In a landing zone, we use a <strong>Hub-and-Spoke</strong> topology to centralize shared network services and enforce a single egress point to the internet.</p><h3 id=hub-and-spoke-core-architecture>Hub-and-Spoke Core Architecture</h3><div class=mermaid-wrapper><template class=mermaid-src>flowchart TD
 subgraph Hub["[ HUB VNET ] (Connectivity Sub)"]
 FW["[ Azure Firewall ]<br>(Central Egress)"]
 VPN["[ VPN / ER ]<br>(On-Premises)"]
@@ -29,7 +43,18 @@ end
 subgraph Spoke["[ SPOKE VNET A ] (Corp Sub)"]
 Apps["- App VMs / Private Endpoints<br>- (UDR to Firewall)"]
 end
-Hub <-->|VNet Peering - Transit| Spoke</div><p>In 2026, the <strong>Azure DNS Private Resolver</strong> is the standard for hybrid name resolution, replacing the need for complex, manual VM-based DNS forwarders. When combined with <strong>Azure Firewall Premium</strong>, you gain deep packet inspection and TLS termination at the network boundary.</p><h2 id=3-design-area-2-identity--governance-zero-trust>3. Design Area 2: Identity & Governance (Zero Trust)</h2><p>API keys and standing &ldquo;Owner&rdquo; permissions are the primary risks in the modern cloud. Our blueprint moves to a <strong>&ldquo;Keyless and Standing-Access-Free&rdquo;</strong> model.</p><h3 id=managed-identity-and-oidc>Managed Identity and OIDC</h3><p>For CI/CD, we use <strong>Workload Identity Federation (OIDC)</strong>. GitHub Actions and Azure DevOps runners authenticate to Azure using short-lived tokens, eliminating the need to store secrets in your repository settings.</p><h3 id=privileged-identity-management-pim>Privileged Identity Management (PIM)</h3><p>For human administrators, we enforce <strong>PIM-only</strong> access. No user holds a permanent &ldquo;Owner&rdquo; or &ldquo;Contributor&rdquo; role. Instead, they are <em>eligible</em> for the role and must activate it for a 4-8 hour window with a business justification and MFA.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># Example: Assigning a Management Group Contributor role to a pipeline SPN at root.</span>
+Hub <-->|VNet Peering - Transit| Spoke</template><div class=mermaid>flowchart TD
+subgraph Hub["[ HUB VNET ] (Connectivity Sub)"]
+FW["[ Azure Firewall ]<br>(Central Egress)"]
+VPN["[ VPN / ER ]<br>(On-Premises)"]
+Bastion["[ Bastion ]"]
+DNS["[ DNS Private Resolver ]"]
+VPN --> FW
+end
+subgraph Spoke["[ SPOKE VNET A ] (Corp Sub)"]
+Apps["- App VMs / Private Endpoints<br>- (UDR to Firewall)"]
+end
+Hub <-->|VNet Peering - Transit| Spoke</div></div><p>In 2026, the <strong>Azure DNS Private Resolver</strong> is the standard for hybrid name resolution, replacing the need for complex, manual VM-based DNS forwarders. When combined with <strong>Azure Firewall Premium</strong>, you gain deep packet inspection and TLS termination at the network boundary.</p><h2 id=3-design-area-2-identity--governance-zero-trust>3. Design Area 2: Identity & Governance (Zero Trust)</h2><p>API keys and standing &ldquo;Owner&rdquo; permissions are the primary risks in the modern cloud. Our blueprint moves to a <strong>&ldquo;Keyless and Standing-Access-Free&rdquo;</strong> model.</p><h3 id=managed-identity-and-oidc>Managed Identity and OIDC</h3><p>For CI/CD, we use <strong>Workload Identity Federation (OIDC)</strong>. GitHub Actions and Azure DevOps runners authenticate to Azure using short-lived tokens, eliminating the need to store secrets in your repository settings.</p><h3 id=privileged-identity-management-pim>Privileged Identity Management (PIM)</h3><p>For human administrators, we enforce <strong>PIM-only</strong> access. No user holds a permanent &ldquo;Owner&rdquo; or &ldquo;Contributor&rdquo; role. Instead, they are <em>eligible</em> for the role and must activate it for a 4-8 hour window with a business justification and MFA.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># Example: Assigning a Management Group Contributor role to a pipeline SPN at root.</span>
 </span></span><span class=line><span class=cl><span class=c1># Note: This requires Global Administrator privileges (Elevate Access) to execute at root.</span>
 </span></span><span class=line><span class=cl>az role assignment create <span class=se>\
 </span></span></span><span class=line><span class=cl>  --role <span class=s2>&#34;Management Group Contributor&#34;</span> <span class=se>\
@@ -51,7 +76,7 @@ Hub <-->|VNet Peering - Transit| Spoke</div><p>In 2026, the <strong>Azure DNS Pr
 </span></span></span><span class=line><span class=cl>    }
 </span></span><span class=line><span class=cl>  }
 </span></span><span class=line><span class=cl>}
-</span></span></code></pre></div><h2 id=5-the-deployment-lifecycle-cicd>5. The Deployment Lifecycle (CI/CD)</h2><p>Deploying a landing zone from a laptop is a single point of failure. A production-grade foundation requires a <strong>GitOps</strong> workflow.</p><h3 id=the-deployment-lifecycle-avm--cicd>The Deployment Lifecycle (AVM + CI/CD)</h3><div class=mermaid>sequenceDiagram
+</span></span></code></pre></div><h2 id=5-the-deployment-lifecycle-cicd>5. The Deployment Lifecycle (CI/CD)</h2><p>Deploying a landing zone from a laptop is a single point of failure. A production-grade foundation requires a <strong>GitOps</strong> workflow.</p><h3 id=the-deployment-lifecycle-avm--cicd>The Deployment Lifecycle (AVM + CI/CD)</h3><div class=mermaid-wrapper><template class=mermaid-src>sequenceDiagram
 participant PR as PR CREATED
 participant GH as GITHUB ACTIONS
 participant Azure as AZURE PLATFORM
@@ -61,7 +86,17 @@ GH-->>PR: 3. Post Comment
 note over PR: 4. HUMAN REVIEW<br>5. MERGE TO MAIN
 PR->>GH: Merge
 note over GH: 6. ENVIRONMENT GATE
-GH->>Azure: 7. APPLY / STACK CREATE</div><h2 id=6-hands-on-scaffolding-your-landing-zone>6. Hands-On: Scaffolding Your Landing Zone</h2><p>Start with the <strong>ALZ Accelerator</strong>. This tool generates the repository structure, OIDC identities, and initial GitHub Actions workflows for your specific environment. The defaults are designed for a demo. You&rsquo;re not running a demo — run through the prompts and override what you need.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=c># Install the ALZ Accelerator PowerShell module</span>
+GH->>Azure: 7. APPLY / STACK CREATE</template><div class=mermaid>sequenceDiagram
+participant PR as PR CREATED
+participant GH as GITHUB ACTIONS
+participant Azure as AZURE PLATFORM
+PR->>GH: 1. Lint & Scan
+GH->>Azure: 2. Plan / What-If
+GH-->>PR: 3. Post Comment
+note over PR: 4. HUMAN REVIEW<br>5. MERGE TO MAIN
+PR->>GH: Merge
+note over GH: 6. ENVIRONMENT GATE
+GH->>Azure: 7. APPLY / STACK CREATE</div></div><h2 id=6-hands-on-scaffolding-your-landing-zone>6. Hands-On: Scaffolding Your Landing Zone</h2><p>Start with the <strong>ALZ Accelerator</strong>. This tool generates the repository structure, OIDC identities, and initial GitHub Actions workflows for your specific environment. The defaults are designed for a demo. You&rsquo;re not running a demo — run through the prompts and override what you need.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=c># Install the ALZ Accelerator PowerShell module</span>
 </span></span><span class=line><span class=cl><span class=nb>Install-Module</span> <span class=n>-Name</span> <span class=n>ALZ</span> <span class=n>-Force</span> <span class=n>-Scope</span> <span class=n>CurrentUser</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c># Scaffolding a new environment for GitHub Actions</span>
@@ -74,20 +109,54 @@ GH->>Azure: 7. APPLY / STACK CREATE</div><h2 id=6-hands-on-scaffolding-your-land
 </a></span><span class=px-1><a href=https://www.linkedin.com/in/larryjameshenry aria-label=linkedin><svg width="2.4em" height="2.4em" fill="#fff" aria-label="LinkedIn" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0077b5" rx="15%"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 Larry James Henry. All rights reserved.</div></div></div></footer><script defer src=/bootstrap-5/js/bootstrap.bundle.min.js></script><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script defer src=/js/search.min.c590d9a08e125edb257cb869250fd256afcfd19b0fe36691c74648d868735c21.js integrity="sha256-xZDZoI4SXtslfLhpJQ/SVq/P0ZsP42aRx0ZI2GhzXCE="></script><script type=module>
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
   
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'base',
-    themeVariables: {
+  function getThemeVariables() {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
       primaryColor: isDarkMode ? '#1c2530' : '#ffffff',
       primaryTextColor: isDarkMode ? '#e6edf3' : '#1a2332',
       primaryBorderColor: isDarkMode ? '#5eead4' : '#0f766e',
       lineColor: isDarkMode ? '#9aa7b3' : '#5b6b7c',
-      secondaryColor: isDarkMode ? '#0f766e1a' : '#0f766e1a',
+      secondaryColor: isDarkMode ? '#5eead41a' : '#0f766e1a',
       tertiaryColor: isDarkMode ? '#0f1720' : '#f4f7f9',
-      fontFamily: 'inherit',
+      fontFamily: 'inherit'
+    };
+  }
+
+  async function renderMermaid() {
+    const wrappers = document.querySelectorAll('.mermaid-wrapper');
+    for (const wrapper of wrappers) {
+      const template = wrapper.querySelector('.mermaid-src');
+      const display = wrapper.querySelector('.mermaid');
+      if (template && display) {
+        display.removeAttribute('data-processed');
+        display.innerHTML = template.innerHTML;
+      }
     }
+    
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: getThemeVariables()
+    });
+    
+    await mermaid.run({
+      querySelector: '.mermaid'
+    });
+  }
+
+  renderMermaid();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-theme') {
+        renderMermaid();
+      }
+    });
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    renderMermaid();
   });
 </script><section id=search-content class=py-2 aria-label="Search results"><div class=container id=search-results></div></section></body></html>

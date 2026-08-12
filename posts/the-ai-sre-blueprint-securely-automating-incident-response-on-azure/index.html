@@ -4,7 +4,7 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 <svg aria-hidden="true" height="24" viewBox="0 0 16 16" width="24" data-view-component="true"><path fill-rule="evenodd" d="M1 2.75A.75.75.0 011.75 2h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 2.75zm0 5A.75.75.0 011.75 7h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 7.75zM1.75 12a.75.75.0 100 1.5h12.5a.75.75.0 100-1.5H1.75z"/></svg></button><div class="collapse navbar-collapse text-wrap primary-font" id=navbarContent><ul class="navbar-nav ms-auto text-center"><li class="nav-item navbar-text d-block d-md-none"><div class=nav-link><input id=search autocomplete=off class="form-control mr-sm-2" placeholder='Ctrl + k to Search...' aria-label=Search oninput=searchOnChange(event)></div></li><li class="nav-item navbar-text"><a class=nav-link href=/about title="About Me">About</a></li><li class="nav-item navbar-text"><a class=nav-link href=/posts title="Blog posts">Blog</a></li><li class="nav-item navbar-text"><a class=nav-link href=/series title=Series>Series</a></li><li class="nav-item navbar-text"><a class=nav-link href=/categories title=Categories>Categories</a></li><li class="nav-item navbar-text"><a class=nav-link href=/tags title=Tags>Tags</a></li><li class="nav-item navbar-text"><div class=text-center><button id=theme-toggle title=theme-toggle>
 <svg id="moon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
 <svg id="sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></li></ul></div></div></nav></header><main id=content role=main><section id=single><div class=container><div class="row justify-content-center"><div class="col-sm-12 col-md-12 col-lg-9"><div class=pr-lg-4><div class="title mb-5"><h1 class="text-center mb-4">The AI SRE Blueprint: Securely Automating Incident Response on Azure</h1><div class=text-center>May 9, 2026
-<span id=readingTime>min read</span></div></div><div class=featured-image><img class="img-fluid mx-auto d-block" src=/posts/the-ai-sre-blueprint-securely-automating-incident-response-on-azure/images/featured_hu_968f4e816028f88e.5d3b0c9b8a1fb847b660e51d7f6188404f3c3e7da9bb5cfa06050473229ecebc.webp alt="The AI SRE Blueprint: Securely Automating Incident Response on Azure" width=784 height=438 integrity="sha256-XTsMm4ofuEe2YOUdf2GIQE88Pn2pu1z6BgUEcyKezrw=" fetchpriority=high loading=eager></div><article class="page-content p-2"><p>It&rsquo;s 2:47am. Your AKS node pool has exhausted its memory. Azure Monitor fires an alert. Your phone screams. You fumble for your laptop, SSH into the cluster, run <code>kubectl top pods</code>, identify the offending deployment, and scale it down. Eleven minutes of groggy, reactive work—for a problem the system could have diagnosed and fixed in 90 seconds.</p><p>The agent to do that job isn&rsquo;t hard to build. Building it so that a compromised agent, a hallucinated action, or a reasoning error cannot take down the rest of production—that&rsquo;s the actual engineering challenge. In 2026, we&rsquo;re moving from chatbots to <strong>Agentic SREs</strong>—non-human identities capable of executing Azure Resource Manager calls and KQL queries at 3am without waking anyone. Security for these agents isn&rsquo;t a footnote. It&rsquo;s the primary design constraint.</p><p>This article walks through a &ldquo;Zero Trust for AI&rdquo; (ZT4AI) framework using Azure Durable Functions, Privileged Identity Management (PIM), and Teams Adaptive Cards—an architecture where the agent has just enough access to understand what went wrong, and needs your explicit sign-off to fix it.</p><h3 id=ai-sre-orchestration-workflow>AI SRE Orchestration Workflow</h3><div class=mermaid>sequenceDiagram
+<span id=readingTime>min read</span></div></div><div class=featured-image><img class="img-fluid mx-auto d-block" src=/posts/the-ai-sre-blueprint-securely-automating-incident-response-on-azure/images/featured_hu_968f4e816028f88e.5d3b0c9b8a1fb847b660e51d7f6188404f3c3e7da9bb5cfa06050473229ecebc.webp alt="The AI SRE Blueprint: Securely Automating Incident Response on Azure" width=784 height=438 integrity="sha256-XTsMm4ofuEe2YOUdf2GIQE88Pn2pu1z6BgUEcyKezrw=" fetchpriority=high loading=eager></div><article class="page-content p-2"><p>It&rsquo;s 2:47am. Your AKS node pool has exhausted its memory. Azure Monitor fires an alert. Your phone screams. You fumble for your laptop, SSH into the cluster, run <code>kubectl top pods</code>, identify the offending deployment, and scale it down. Eleven minutes of groggy, reactive work—for a problem the system could have diagnosed and fixed in 90 seconds.</p><p>The agent to do that job isn&rsquo;t hard to build. Building it so that a compromised agent, a hallucinated action, or a reasoning error cannot take down the rest of production—that&rsquo;s the actual engineering challenge. In 2026, we&rsquo;re moving from chatbots to <strong>Agentic SREs</strong>—non-human identities capable of executing Azure Resource Manager calls and KQL queries at 3am without waking anyone. Security for these agents isn&rsquo;t a footnote. It&rsquo;s the primary design constraint.</p><p>This article walks through a &ldquo;Zero Trust for AI&rdquo; (ZT4AI) framework using Azure Durable Functions, Privileged Identity Management (PIM), and Teams Adaptive Cards—an architecture where the agent has just enough access to understand what went wrong, and needs your explicit sign-off to fix it.</p><h3 id=ai-sre-orchestration-workflow>AI SRE Orchestration Workflow</h3><div class=mermaid-wrapper><template class=mermaid-src>sequenceDiagram
 participant Mon as Azure Monitor<br>(Alert Fired)
 participant Orch as AI SRE Orchestrator<br>(Durable Function)
 participant Teams as Teams (On-Call)<br>(Human-in-the-Loop)
@@ -13,7 +13,16 @@ note over Orch: 2. ReAct reasoning Loop<br>(Log Queries, Metrics)
 Orch->>Teams: 3. Send Approval Card
 note over Orch: 4. Await Response<br>(PAUSED)
 Teams->>Orch: 5. CLICK [APPROVE]
-note over Orch: 6. PIM Elevation<br>7. Execute Fix<br>8. Write Immutable Log</div><h2 id=1-the-ai-sre-dual-identity-model>1. The AI SRE Dual Identity Model</h2><p>The most common security failure in agentic DevOps is granting an AI agent persistent <code>Contributor</code> access. That makes the agent&rsquo;s Managed Identity the highest-value target in your subscription. Instead, use a <strong>Separation of Concerns</strong> model with two distinct identities.</p><h3 id=observer-vs-remediator>Observer vs. Remediator</h3><table><thead><tr><th style=text-align:left>Identity</th><th style=text-align:left>Persistence</th><th style=text-align:left>RBAC Roles</th><th style=text-align:left>Primary Function</th></tr></thead><tbody><tr><td style=text-align:left><strong>Observer</strong></td><td style=text-align:left>Always-On</td><td style=text-align:left><code>Monitoring Reader</code>, <code>Log Analytics Reader</code></td><td style=text-align:left>Diagnostic investigation, reading metrics/logs.</td></tr><tr><td style=text-align:left><strong>Remediator</strong></td><td style=text-align:left><strong>JIT Only</strong></td><td style=text-align:left><code>AKS Cluster Admin</code>, <code>Contributor</code></td><td style=text-align:left>Executing approved changes (scaling, restarts).</td></tr></tbody></table><p>The agent runtime always operates as the <strong>Observer</strong>. It has enough permission to understand <em>why</em> an incident is happening but no permission to change anything. The <strong>Remediator</strong> identity only activates via <strong>Privileged Identity Management (PIM)</strong> for a 15-minute window <em>after</em> a human has approved a specific proposed action.</p><p>The defaults are designed for a demo. You&rsquo;re not running a demo.</p><p><strong>Prerequisite:</strong> The remediator identity must have an <strong>Eligible</strong> assignment for the required roles at the target scope. The agent cannot &ldquo;grant&rdquo; itself a role; it can only &ldquo;activate&rdquo; an existing eligibility.</p><h2 id=2-stateful-orchestration-with-durable-functions>2. Stateful Orchestration with Durable Functions</h2><p>Incident response is inherently stateful. An agent must investigate, propose, wait for a human, and then execute. <strong>Azure Durable Functions</strong> (running in a VNet-integrated Function App) is the ideal runtime for this &ldquo;Human Interaction&rdquo; pattern.</p><h3 id=the-react-reasoning-loop>The ReAct reasoning Loop</h3><p>The agent uses a <strong>ReAct (Reasoning + Acting)</strong> pattern. Given an alert, it iterates through a cycle: Thought -> Tool Call (e.g., <code>get_top_pods_by_memory</code>) -> Observation -> Repeat.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># Durable Functions Orchestrator: The Reasoning Loop</span>
+note over Orch: 6. PIM Elevation<br>7. Execute Fix<br>8. Write Immutable Log</template><div class=mermaid>sequenceDiagram
+participant Mon as Azure Monitor<br>(Alert Fired)
+participant Orch as AI SRE Orchestrator<br>(Durable Function)
+participant Teams as Teams (On-Call)<br>(Human-in-the-Loop)
+Mon->>Orch: 1. Alert Webhook
+note over Orch: 2. ReAct reasoning Loop<br>(Log Queries, Metrics)
+Orch->>Teams: 3. Send Approval Card
+note over Orch: 4. Await Response<br>(PAUSED)
+Teams->>Orch: 5. CLICK [APPROVE]
+note over Orch: 6. PIM Elevation<br>7. Execute Fix<br>8. Write Immutable Log</div></div><h2 id=1-the-ai-sre-dual-identity-model>1. The AI SRE Dual Identity Model</h2><p>The most common security failure in agentic DevOps is granting an AI agent persistent <code>Contributor</code> access. That makes the agent&rsquo;s Managed Identity the highest-value target in your subscription. Instead, use a <strong>Separation of Concerns</strong> model with two distinct identities.</p><h3 id=observer-vs-remediator>Observer vs. Remediator</h3><table><thead><tr><th style=text-align:left>Identity</th><th style=text-align:left>Persistence</th><th style=text-align:left>RBAC Roles</th><th style=text-align:left>Primary Function</th></tr></thead><tbody><tr><td style=text-align:left><strong>Observer</strong></td><td style=text-align:left>Always-On</td><td style=text-align:left><code>Monitoring Reader</code>, <code>Log Analytics Reader</code></td><td style=text-align:left>Diagnostic investigation, reading metrics/logs.</td></tr><tr><td style=text-align:left><strong>Remediator</strong></td><td style=text-align:left><strong>JIT Only</strong></td><td style=text-align:left><code>AKS Cluster Admin</code>, <code>Contributor</code></td><td style=text-align:left>Executing approved changes (scaling, restarts).</td></tr></tbody></table><p>The agent runtime always operates as the <strong>Observer</strong>. It has enough permission to understand <em>why</em> an incident is happening but no permission to change anything. The <strong>Remediator</strong> identity only activates via <strong>Privileged Identity Management (PIM)</strong> for a 15-minute window <em>after</em> a human has approved a specific proposed action.</p><p>The defaults are designed for a demo. You&rsquo;re not running a demo.</p><p><strong>Prerequisite:</strong> The remediator identity must have an <strong>Eligible</strong> assignment for the required roles at the target scope. The agent cannot &ldquo;grant&rdquo; itself a role; it can only &ldquo;activate&rdquo; an existing eligibility.</p><h2 id=2-stateful-orchestration-with-durable-functions>2. Stateful Orchestration with Durable Functions</h2><p>Incident response is inherently stateful. An agent must investigate, propose, wait for a human, and then execute. <strong>Azure Durable Functions</strong> (running in a VNet-integrated Function App) is the ideal runtime for this &ldquo;Human Interaction&rdquo; pattern.</p><h3 id=the-react-reasoning-loop>The ReAct reasoning Loop</h3><p>The agent uses a <strong>ReAct (Reasoning + Acting)</strong> pattern. Given an alert, it iterates through a cycle: Thought -> Tool Call (e.g., <code>get_top_pods_by_memory</code>) -> Observation -> Repeat.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># Durable Functions Orchestrator: The Reasoning Loop</span>
 </span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>orchestrator_function</span><span class=p>(</span><span class=n>context</span><span class=p>:</span> <span class=n>df</span><span class=o>.</span><span class=n>DurableOrchestrationContext</span><span class=p>):</span>
 </span></span><span class=line><span class=cl>    <span class=n>alert_context</span> <span class=o>=</span> <span class=n>context</span><span class=o>.</span><span class=n>get_input</span><span class=p>()</span>
 </span></span><span class=line><span class=cl>    <span class=n>reasoning_history</span> <span class=o>=</span> <span class=p>[]</span>
@@ -32,14 +41,21 @@ note over Orch: 6. PIM Elevation<br>7. Execute Fix<br>8. Write Immutable Log</di
 </span></span><span class=line><span class=cl>        <span class=k>elif</span> <span class=n>proposal</span><span class=o>.</span><span class=n>type</span> <span class=o>==</span> <span class=s2>&#34;REMEDIATION&#34;</span><span class=p>:</span>
 </span></span><span class=line><span class=cl>            <span class=c1># 3. Transition to Human-in-the-Loop</span>
 </span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=k>yield</span> <span class=n>context</span><span class=o>.</span><span class=n>call_sub_orchestrator</span><span class=p>(</span><span class=s2>&#34;HumanApprovalWorkflow&#34;</span><span class=p>,</span> <span class=n>proposal</span><span class=p>)</span>
-</span></span></code></pre></div><h2 id=3-the-human-in-the-loop-gate>3. The Human-in-the-Loop Gate</h2><p>For production workloads, autonomous action is a risk. We implement a hard gate using <strong>Teams Adaptive Cards</strong>. The orchestrator sends a card to the on-call engineer&rsquo;s Teams channel and pauses execution using <code>wait_for_external_event</code>.</p><h3 id=hitl-approval-flow-via-teams>HITL Approval Flow via Teams</h3><div class=mermaid>sequenceDiagram
+</span></span></code></pre></div><h2 id=3-the-human-in-the-loop-gate>3. The Human-in-the-Loop Gate</h2><p>For production workloads, autonomous action is a risk. We implement a hard gate using <strong>Teams Adaptive Cards</strong>. The orchestrator sends a card to the on-call engineer&rsquo;s Teams channel and pauses execution using <code>wait_for_external_event</code>.</p><h3 id=hitl-approval-flow-via-teams>HITL Approval Flow via Teams</h3><div class=mermaid-wrapper><template class=mermaid-src>sequenceDiagram
 participant Agent as [ AI Agent ]
 participant Bot as [ Logic App / Bot ]
 participant Eng as [ On-Call Engineer ]
 Agent->>Bot: 1. Propose Action
 Bot->>Eng: 2. Send Adaptive Card
 Eng->>Bot: 3. [ APPROVE ]
-Bot->>Agent: 4. Resume Orchestration</div><p>If the 15-minute timer expires before approval, the agent safe-fails to &ldquo;No-Action&rdquo; and opens a manual P1 incident. <strong>An agent must never act autonomously on timeout.</strong></p><h2 id=4-jit-elevation-via-privileged-identity-management-pim>4. JIT Elevation via Privileged Identity Management (PIM)</h2><p>Once an action is approved, the orchestrator elevates the <strong>Remediator</strong> identity using the Azure Resource Manager REST API to programmatically trigger a PIM activation.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=c># Activating a PIM role via REST API (Simplified)</span>
+Bot->>Agent: 4. Resume Orchestration</template><div class=mermaid>sequenceDiagram
+participant Agent as [ AI Agent ]
+participant Bot as [ Logic App / Bot ]
+participant Eng as [ On-Call Engineer ]
+Agent->>Bot: 1. Propose Action
+Bot->>Eng: 2. Send Adaptive Card
+Eng->>Bot: 3. [ APPROVE ]
+Bot->>Agent: 4. Resume Orchestration</div></div><p>If the 15-minute timer expires before approval, the agent safe-fails to &ldquo;No-Action&rdquo; and opens a manual P1 incident. <strong>An agent must never act autonomously on timeout.</strong></p><h2 id=4-jit-elevation-via-privileged-identity-management-pim>4. JIT Elevation via Privileged Identity Management (PIM)</h2><p>Once an action is approved, the orchestrator elevates the <strong>Remediator</strong> identity using the Azure Resource Manager REST API to programmatically trigger a PIM activation.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-powershell data-lang=powershell><span class=line><span class=cl><span class=c># Activating a PIM role via REST API (Simplified)</span>
 </span></span><span class=line><span class=cl><span class=nv>$body</span> <span class=p>=</span> <span class=vm>@</span><span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=n>properties</span> <span class=p>=</span> <span class=vm>@</span><span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=n>principalId</span> <span class=p>=</span> <span class=nv>$RemediatorPrincipalId</span>
@@ -70,20 +86,54 @@ Bot->>Agent: 4. Resume Orchestration</div><p>If the 15-minute timer expires befo
 </a></span><span class=px-1><a href=https://www.linkedin.com/in/larryjameshenry aria-label=linkedin><svg width="2.4em" height="2.4em" fill="#fff" aria-label="LinkedIn" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0077b5" rx="15%"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 Larry James Henry. All rights reserved.</div></div></div></footer><script defer src=/bootstrap-5/js/bootstrap.bundle.min.js></script><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script defer src=/js/search.min.c590d9a08e125edb257cb869250fd256afcfd19b0fe36691c74648d868735c21.js integrity="sha256-xZDZoI4SXtslfLhpJQ/SVq/P0ZsP42aRx0ZI2GhzXCE="></script><script type=module>
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
   
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'base',
-    themeVariables: {
+  function getThemeVariables() {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
       primaryColor: isDarkMode ? '#1c2530' : '#ffffff',
       primaryTextColor: isDarkMode ? '#e6edf3' : '#1a2332',
       primaryBorderColor: isDarkMode ? '#5eead4' : '#0f766e',
       lineColor: isDarkMode ? '#9aa7b3' : '#5b6b7c',
-      secondaryColor: isDarkMode ? '#0f766e1a' : '#0f766e1a',
+      secondaryColor: isDarkMode ? '#5eead41a' : '#0f766e1a',
       tertiaryColor: isDarkMode ? '#0f1720' : '#f4f7f9',
-      fontFamily: 'inherit',
+      fontFamily: 'inherit'
+    };
+  }
+
+  async function renderMermaid() {
+    const wrappers = document.querySelectorAll('.mermaid-wrapper');
+    for (const wrapper of wrappers) {
+      const template = wrapper.querySelector('.mermaid-src');
+      const display = wrapper.querySelector('.mermaid');
+      if (template && display) {
+        display.removeAttribute('data-processed');
+        display.innerHTML = template.innerHTML;
+      }
     }
+    
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: getThemeVariables()
+    });
+    
+    await mermaid.run({
+      querySelector: '.mermaid'
+    });
+  }
+
+  renderMermaid();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-theme') {
+        renderMermaid();
+      }
+    });
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    renderMermaid();
   });
 </script><section id=search-content class=py-2 aria-label="Search results"><div class=container id=search-results></div></section></body></html>

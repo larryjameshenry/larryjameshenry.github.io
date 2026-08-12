@@ -14,7 +14,7 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nv>requestMessage</span><span class=p>:</span><span class=w> </span><span class=s>&#39;Enable secure vectorization for DevOps indexer.&#39;</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
-</span></span></span></code></pre></div><p><strong>Note:</strong> Once deployed, this connection enters a &ldquo;Pending&rdquo; status and MUST be approved in the target Azure OpenAI resource&rsquo;s <strong>Networking</strong> blade before the indexer can communicate.</p><h3 id=ingestion-path-via-shared-private-link>Ingestion Path via Shared Private Link</h3><div class=mermaid>flowchart LR
+</span></span></span></code></pre></div><p><strong>Note:</strong> Once deployed, this connection enters a &ldquo;Pending&rdquo; status and MUST be approved in the target Azure OpenAI resource&rsquo;s <strong>Networking</strong> blade before the indexer can communicate.</p><h3 id=ingestion-path-via-shared-private-link>Ingestion Path via Shared Private Link</h3><div class=mermaid-wrapper><template class=mermaid-src>flowchart LR
 subgraph Hub["[ HUB VNET ]"]
 Search["Azure AI Search<br>(Indexer)"]
 Link["[ Shared Private Link ]"]
@@ -27,7 +27,20 @@ OpenAI["Azure OpenAI<br>(Embedding Model)"]
 PE["[ Private Endpoint ]"]
 OpenAI --- PE
 end
-Link -->|APPROVED| PE</div><h2 id=3-document-level-security-trimming>3. Document-Level Security Trimming</h2><p>A shared RAG index containing documents from multiple teams creates a real data boundary risk. Without security trimming, a user could craft a query to retrieve documents they aren&rsquo;t authorized to read. The LLM won&rsquo;t refuse—it will happily summarize whatever context you hand it.</p><h3 id=the-identity-filter-pattern>The Identity Filter Pattern</h3><p>The correct solution is the <strong>Identity Filter Pattern</strong>. During ingestion, map source document permissions (e.g., Confluence Space permissions) to Entra ID Group Object IDs. Store these IDs in a <code>Collection(Edm.String)</code> field named <code>allowedGroups</code> in your AI Search index.</p><p>At query time, your orchestrator retrieves the user&rsquo;s active group memberships via the Microsoft Graph API and applies them as a hard OData filter.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># Query-time security trimming using the search.in function</span>
+Link -->|APPROVED| PE</template><div class=mermaid>flowchart LR
+subgraph Hub["[ HUB VNET ]"]
+Search["Azure AI Search<br>(Indexer)"]
+Link["[ Shared Private Link ]"]
+Blob["Azure Blob Storage<br>(Raw Runbooks)"]
+Search --- Link
+Link -->|VNet Internal Transit| Blob
+end
+subgraph Backbone["[ MICROSOFT BACKBONE ]"]
+OpenAI["Azure OpenAI<br>(Embedding Model)"]
+PE["[ Private Endpoint ]"]
+OpenAI --- PE
+end
+Link -->|APPROVED| PE</div></div><h2 id=3-document-level-security-trimming>3. Document-Level Security Trimming</h2><p>A shared RAG index containing documents from multiple teams creates a real data boundary risk. Without security trimming, a user could craft a query to retrieve documents they aren&rsquo;t authorized to read. The LLM won&rsquo;t refuse—it will happily summarize whatever context you hand it.</p><h3 id=the-identity-filter-pattern>The Identity Filter Pattern</h3><p>The correct solution is the <strong>Identity Filter Pattern</strong>. During ingestion, map source document permissions (e.g., Confluence Space permissions) to Entra ID Group Object IDs. Store these IDs in a <code>Collection(Edm.String)</code> field named <code>allowedGroups</code> in your AI Search index.</p><p>At query time, your orchestrator retrieves the user&rsquo;s active group memberships via the Microsoft Graph API and applies them as a hard OData filter.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># Query-time security trimming using the search.in function</span>
 </span></span><span class=line><span class=cl><span class=k>def</span> <span class=nf>get_security_filter</span><span class=p>(</span><span class=n>user_groups</span><span class=p>:</span> <span class=nb>list</span><span class=p>[</span><span class=nb>str</span><span class=p>]):</span>
 </span></span><span class=line><span class=cl>    <span class=c1># &#39;search.in&#39; is optimized for large lists of Group Object IDs</span>
 </span></span><span class=line><span class=cl>    <span class=n>group_string</span> <span class=o>=</span> <span class=s2>&#34;,&#34;</span><span class=o>.</span><span class=n>join</span><span class=p>(</span><span class=n>user_groups</span><span class=p>)</span>
@@ -39,7 +52,7 @@ Link -->|APPROVED| PE</div><h2 id=3-document-level-security-trimming>3. Document
 </span></span><span class=line><span class=cl>    <span class=nb>filter</span><span class=o>=</span><span class=n>get_security_filter</span><span class=p>(</span><span class=n>active_groups</span><span class=p>),</span>
 </span></span><span class=line><span class=cl>    <span class=n>vector_queries</span><span class=o>=</span><span class=p>[</span><span class=n>vector_query</span><span class=p>]</span>
 </span></span><span class=line><span class=cl><span class=p>)</span>
-</span></span></code></pre></div><h3 id=identity-filter-pattern-security-trimming>Identity Filter Pattern (Security Trimming)</h3><div class=mermaid>sequenceDiagram
+</span></span></code></pre></div><h3 id=identity-filter-pattern-security-trimming>Identity Filter Pattern (Security Trimming)</h3><div class=mermaid-wrapper><template class=mermaid-src>sequenceDiagram
 participant Eng as Engineer (Query)
 participant Orch as Orchestrator (Function)
 participant Search as Azure AI Search
@@ -48,7 +61,16 @@ note over Orch: 2. Get User Group IDs<br>(svc-platform, on-call)<br>3. Construct
 Orch->>Search: 4. Hybrid Search + Filter
 note over Search: 5. Match chunks<br>where groups match
 Search-->>Orch: Search Results
-Orch-->>Eng: 6. Return Filtered Context</div><p>By filtering at the retrieval layer, the LLM never receives context blocks that the user isn&rsquo;t permitted to see. Security is enforced at the data source, not the model prompt.</p><h2 id=4-ingestion-pipeline-and-deletion-detection>4. Ingestion Pipeline and Deletion Detection</h2><p>For DevOps content, <strong>Markdown-aware chunking</strong> is superior to arbitrary character counts. Runbooks are structured by headings. Splitting on <code>##</code> ensures that a &ldquo;Node Drain Procedure&rdquo; stays as a single, coherent context block.</p><h3 id=deletion-policy-no-ghost-runbooks>Deletion Policy: No Ghost Runbooks</h3><p>A RAG system that retains deleted runbooks is dangerous. If an incident playbook is archived because it contains a flaw, the AI must stop suggesting it immediately—not at the next scheduled sync, immediately. Use the <strong>Native Blob Soft Delete</strong> pattern. When a file is removed from Blob Storage, the AI Search indexer detects the soft-deleted state and automatically purges the corresponding chunks from the index during the next run.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=c1>// AI Search Indexer Deletion Policy
+Orch-->>Eng: 6. Return Filtered Context</template><div class=mermaid>sequenceDiagram
+participant Eng as Engineer (Query)
+participant Orch as Orchestrator (Function)
+participant Search as Azure AI Search
+Eng->>Orch: 1. Ask "Node Drain?"
+note over Orch: 2. Get User Group IDs<br>(svc-platform, on-call)<br>3. Construct OData Filter<br>allowedGroups/any(g: search.in(g, '...'))
+Orch->>Search: 4. Hybrid Search + Filter
+note over Search: 5. Match chunks<br>where groups match
+Search-->>Orch: Search Results
+Orch-->>Eng: 6. Return Filtered Context</div></div><p>By filtering at the retrieval layer, the LLM never receives context blocks that the user isn&rsquo;t permitted to see. Security is enforced at the data source, not the model prompt.</p><h2 id=4-ingestion-pipeline-and-deletion-detection>4. Ingestion Pipeline and Deletion Detection</h2><p>For DevOps content, <strong>Markdown-aware chunking</strong> is superior to arbitrary character counts. Runbooks are structured by headings. Splitting on <code>##</code> ensures that a &ldquo;Node Drain Procedure&rdquo; stays as a single, coherent context block.</p><h3 id=deletion-policy-no-ghost-runbooks>Deletion Policy: No Ghost Runbooks</h3><p>A RAG system that retains deleted runbooks is dangerous. If an incident playbook is archived because it contains a flaw, the AI must stop suggesting it immediately—not at the next scheduled sync, immediately. Use the <strong>Native Blob Soft Delete</strong> pattern. When a file is removed from Blob Storage, the AI Search indexer detects the soft-deleted state and automatically purges the corresponding chunks from the index during the next run.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=c1>// AI Search Indexer Deletion Policy
 </span></span></span><span class=line><span class=cl><span class=s2>&#34;dataDeletionDetectionPolicy&#34;</span><span class=err>:</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=nt>&#34;@odata.type&#34;</span><span class=p>:</span> <span class=s2>&#34;#Microsoft.Azure.Search.NativeBlobSoftDeleteDeletionDetectionPolicy&#34;</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
@@ -60,20 +82,54 @@ Orch-->>Eng: 6. Return Filtered Context</div><p>By filtering at the retrieval la
 </a></span><span class=px-1><a href=https://www.linkedin.com/in/larryjameshenry aria-label=linkedin><svg width="2.4em" height="2.4em" fill="#fff" aria-label="LinkedIn" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0077b5" rx="15%"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 Larry James Henry. All rights reserved.</div></div></div></footer><script defer src=/bootstrap-5/js/bootstrap.bundle.min.js></script><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script defer src=/js/search.min.c590d9a08e125edb257cb869250fd256afcfd19b0fe36691c74648d868735c21.js integrity="sha256-xZDZoI4SXtslfLhpJQ/SVq/P0ZsP42aRx0ZI2GhzXCE="></script><script type=module>
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
   
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'base',
-    themeVariables: {
+  function getThemeVariables() {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
       primaryColor: isDarkMode ? '#1c2530' : '#ffffff',
       primaryTextColor: isDarkMode ? '#e6edf3' : '#1a2332',
       primaryBorderColor: isDarkMode ? '#5eead4' : '#0f766e',
       lineColor: isDarkMode ? '#9aa7b3' : '#5b6b7c',
-      secondaryColor: isDarkMode ? '#0f766e1a' : '#0f766e1a',
+      secondaryColor: isDarkMode ? '#5eead41a' : '#0f766e1a',
       tertiaryColor: isDarkMode ? '#0f1720' : '#f4f7f9',
-      fontFamily: 'inherit',
+      fontFamily: 'inherit'
+    };
+  }
+
+  async function renderMermaid() {
+    const wrappers = document.querySelectorAll('.mermaid-wrapper');
+    for (const wrapper of wrappers) {
+      const template = wrapper.querySelector('.mermaid-src');
+      const display = wrapper.querySelector('.mermaid');
+      if (template && display) {
+        display.removeAttribute('data-processed');
+        display.innerHTML = template.innerHTML;
+      }
     }
+    
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: getThemeVariables()
+    });
+    
+    await mermaid.run({
+      querySelector: '.mermaid'
+    });
+  }
+
+  renderMermaid();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-theme') {
+        renderMermaid();
+      }
+    });
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    renderMermaid();
   });
 </script><section id=search-content class=py-2 aria-label="Search results"><div class=container id=search-results></div></section></body></html>

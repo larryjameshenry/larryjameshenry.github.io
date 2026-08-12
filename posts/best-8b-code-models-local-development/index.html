@@ -22,7 +22,7 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 </span></span></span></code></pre></div><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ollama pull gemma4:e4b
 </span></span></code></pre></div><h3 id=deepseek-r1-distill-qwen-7b-the-reasoning-specialist>DeepSeek-R1-Distill-Qwen-7B: The Reasoning Specialist</h3><p>DeepSeek-R1-Distill-Qwen-7B shines when tasks require deep chain-of-thought reasoning and complex math/logic. When a task requires intricate algorithmic generation or complex refactoring, its distilled reasoning capabilities allow it to perform well beyond its 7B size class.</p><p>Use it when the task involves heavy logic, math, or complex chain-of-thought generation. Switch to Qwen3.5 or Gemma 4 for standard boilerplate or large-context tasks.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ollama pull deepseek-r1:7b
 </span></span></code></pre></div><h3 id=ibm-granite-41-8b-the-compliance-option>IBM Granite 4.1 8B: The Compliance Option</h3><p>IBM Granite 4.1 8B&rsquo;s distinguishing feature is open data. The IBM team released the full training dataset composition and training logs, meaning you can audit exactly what data the model was trained on.</p><p>While it lacks the massive context window of Qwen3.5 (Granite is limited to 8,192 tokens) and the multimodal capabilities of Gemma 4, it generates predictable, structurally sound code. For compliance-sensitive environments where auditable training data is a requirement, it remains a solid choice.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ollama pull granite-code:8b
-</span></span></code></pre></div><h3 id=the-decision-matrix>The Decision Matrix</h3><p>Once you finish the initial setup, role-based model assignment is the correct mental model:</p><table><thead><tr><th>Use Case</th><th>Model</th><th>Reason</th></tr></thead><tbody><tr><td>Large file context (>8k tokens)</td><td>Qwen3.5 9B</td><td>128K native context window (often run at 32K)</td></tr><tr><td>UI generation from mockups</td><td>Qwen3.5 9B</td><td>Exceptional vision capabilities for precise UI code</td></tr><tr><td>Edge devices / Multimodal AI</td><td>Gemma 4 E4B</td><td>High efficiency (PLE architecture) and native text/image/audio support</td></tr><tr><td>Complex algorithms (Python, C++)</td><td>DeepSeek-R1-Distill-Qwen-7B</td><td>Superior chain-of-thought reasoning and logic capability</td></tr><tr><td>Compliance-audited environments</td><td>IBM Granite 4.1 8B</td><td>Open training data, fully auditable</td></tr></tbody></table><h2 id=hands-on-example-hot-swapping-models-session>Hands-On Example: Hot-Swapping Models Session</h2><p><strong>Scenario:</strong> You&rsquo;re building a web application. Qwen3.5 9B writes the core data processing logic; Gemma 4 E4B generates the UI components.</p><h3 id=diagram>Diagram</h3><p>Visualizes the hot-swapping workflow between specialized local models during development, demonstrating context persistence and role-based execution across VRAM constraints.</p><div class=mermaid>flowchart TD
+</span></span></code></pre></div><h3 id=the-decision-matrix>The Decision Matrix</h3><p>Once you finish the initial setup, role-based model assignment is the correct mental model:</p><table><thead><tr><th>Use Case</th><th>Model</th><th>Reason</th></tr></thead><tbody><tr><td>Large file context (>8k tokens)</td><td>Qwen3.5 9B</td><td>128K native context window (often run at 32K)</td></tr><tr><td>UI generation from mockups</td><td>Qwen3.5 9B</td><td>Exceptional vision capabilities for precise UI code</td></tr><tr><td>Edge devices / Multimodal AI</td><td>Gemma 4 E4B</td><td>High efficiency (PLE architecture) and native text/image/audio support</td></tr><tr><td>Complex algorithms (Python, C++)</td><td>DeepSeek-R1-Distill-Qwen-7B</td><td>Superior chain-of-thought reasoning and logic capability</td></tr><tr><td>Compliance-audited environments</td><td>IBM Granite 4.1 8B</td><td>Open training data, fully auditable</td></tr></tbody></table><h2 id=hands-on-example-hot-swapping-models-session>Hands-On Example: Hot-Swapping Models Session</h2><p><strong>Scenario:</strong> You&rsquo;re building a web application. Qwen3.5 9B writes the core data processing logic; Gemma 4 E4B generates the UI components.</p><h3 id=diagram>Diagram</h3><p>Visualizes the hot-swapping workflow between specialized local models during development, demonstrating context persistence and role-based execution across VRAM constraints.</p><div class=mermaid-wrapper><template class=mermaid-src>flowchart TD
 IDE["OpenCode IDE Session<br>(Persistent Context)"]
 Qwen["Load Qwen3.5 9B<br>(VRAM: ~4.7 - 5.0GB)"]
 Proc["src/api/processor.ts"]
@@ -37,7 +37,22 @@ Proc --> UI
 Gemma -->|(3) Generate UI| UI
 Gemma -->|(4) Run Build/Test| Build
 UI --> Verify
-Verify --> Build</div><p><strong>Visual Notes:</strong></p><ul><li>VRAM allocation emphasizes why models are unloaded sequentially on 8GB-12GB GPUs.</li><li>The OpenCode IDE Session acts as the persistent context bridge between independent model inferences.</li></ul><p><strong>Step 1: Pull both models</strong></p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ollama pull qwen3.5:9b
+Verify --> Build</template><div class=mermaid>flowchart TD
+IDE["OpenCode IDE Session<br>(Persistent Context)"]
+Qwen["Load Qwen3.5 9B<br>(VRAM: ~4.7 - 5.0GB)"]
+Proc["src/api/processor.ts"]
+Gemma["Load Gemma 4 E4B<br>(VRAM: ~3.8 - 4.2GB)"]
+UI["src/components/ui.tsx"]
+Build["npm run build"]
+Verify["Verification"]
+IDE --> Qwen
+Qwen -->|(1) Generate Logic| Proc
+Qwen -->|(2) Unload Qwen3.5| Gemma
+Proc --> UI
+Gemma -->|(3) Generate UI| UI
+Gemma -->|(4) Run Build/Test| Build
+UI --> Verify
+Verify --> Build</div></div><p><strong>Visual Notes:</strong></p><ul><li>VRAM allocation emphasizes why models are unloaded sequentially on 8GB-12GB GPUs.</li><li>The OpenCode IDE Session acts as the persistent context bridge between independent model inferences.</li></ul><p><strong>Step 1: Pull both models</strong></p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>ollama pull qwen3.5:9b
 </span></span><span class=line><span class=cl>ollama pull gemma4:e4b
 </span></span></code></pre></div><p><strong>Step 2: Use Qwen3.5 9B for the complex logic</strong></p><p>In OpenCode:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>/model qwen3.5:9b
 </span></span><span class=line><span class=cl>/add src/api/processor.ts
@@ -55,20 +70,54 @@ Verify --> Build</div><p><strong>Visual Notes:</strong></p><ul><li>VRAM allocati
 </a></span><span class=px-1><a href=https://www.linkedin.com/in/larryjameshenry aria-label=linkedin><svg width="2.4em" height="2.4em" fill="#fff" aria-label="LinkedIn" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0077b5" rx="15%"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 Larry James Henry. All rights reserved.</div></div></div></footer><script defer src=/bootstrap-5/js/bootstrap.bundle.min.js></script><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script defer src=/js/search.min.c590d9a08e125edb257cb869250fd256afcfd19b0fe36691c74648d868735c21.js integrity="sha256-xZDZoI4SXtslfLhpJQ/SVq/P0ZsP42aRx0ZI2GhzXCE="></script><script type=module>
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
   
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'base',
-    themeVariables: {
+  function getThemeVariables() {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
       primaryColor: isDarkMode ? '#1c2530' : '#ffffff',
       primaryTextColor: isDarkMode ? '#e6edf3' : '#1a2332',
       primaryBorderColor: isDarkMode ? '#5eead4' : '#0f766e',
       lineColor: isDarkMode ? '#9aa7b3' : '#5b6b7c',
-      secondaryColor: isDarkMode ? '#0f766e1a' : '#0f766e1a',
+      secondaryColor: isDarkMode ? '#5eead41a' : '#0f766e1a',
       tertiaryColor: isDarkMode ? '#0f1720' : '#f4f7f9',
-      fontFamily: 'inherit',
+      fontFamily: 'inherit'
+    };
+  }
+
+  async function renderMermaid() {
+    const wrappers = document.querySelectorAll('.mermaid-wrapper');
+    for (const wrapper of wrappers) {
+      const template = wrapper.querySelector('.mermaid-src');
+      const display = wrapper.querySelector('.mermaid');
+      if (template && display) {
+        display.removeAttribute('data-processed');
+        display.innerHTML = template.innerHTML;
+      }
     }
+    
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: getThemeVariables()
+    });
+    
+    await mermaid.run({
+      querySelector: '.mermaid'
+    });
+  }
+
+  renderMermaid();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-theme') {
+        renderMermaid();
+      }
+    });
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    renderMermaid();
   });
 </script><section id=search-content class=py-2 aria-label="Search results"><div class=container id=search-results></div></section></body></html>

@@ -34,14 +34,21 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 </span></span><span class=line><span class=cl><span class=n>  virtual_network_id</span>  <span class=o>=</span> <span class=k>module</span><span class=p>.</span><span class=k>hub_vnet</span><span class=p>.</span><span class=k>resource_id</span><span class=c1>
 </span></span></span><span class=line><span class=cl><span class=c1>  # AVM Firewall accepts public_ip_count and virtual_network_id or ip_configurations
 </span></span></span><span class=line><span class=cl>}
-</span></span></code></pre></div><h2 id=3-private-dns-resolution-flow>3. Private DNS Resolution Flow</h2><p>DNS is the most frequent source of post-deployment support tickets. In a hub-and-spoke model, centralize <strong>Private DNS Zones</strong> in the hub and use the <strong>Azure DNS Private Resolver</strong> to handle queries from both cloud and on-premises clients.</p><h3 id=private-dns-resolution-flow-resolver-pattern>Private DNS Resolution Flow (Resolver Pattern)</h3><div class=mermaid>sequenceDiagram
+</span></span></code></pre></div><h2 id=3-private-dns-resolution-flow>3. Private DNS Resolution Flow</h2><p>DNS is the most frequent source of post-deployment support tickets. In a hub-and-spoke model, centralize <strong>Private DNS Zones</strong> in the hub and use the <strong>Azure DNS Private Resolver</strong> to handle queries from both cloud and on-premises clients.</p><h3 id=private-dns-resolution-flow-resolver-pattern>Private DNS Resolution Flow (Resolver Pattern)</h3><div class=mermaid-wrapper><template class=mermaid-src>sequenceDiagram
 participant VM as Spoke VM (App)
 participant Res as DNS Private Resolver
 participant Zone as Private DNS Zone
 VM->>Res: 1. nslookup app.db.local
 Res->>Zone: 2. Check Linked Zones
 Zone-->>Res: 3. Return 10.0.5.4
-Res-->>VM: 4. Resolve to 10.0.5.4</div><p>Link your hub VNet to the Private DNS Zones, and configure your spokes to use the Hub&rsquo;s Firewall or Resolver as their DNS server. That&rsquo;s what makes <code>resource.privatelink.blob.core.windows.net</code> resolve to a private IP across your entire organization—not just in the subscription where the Private Endpoint lives.</p><h2 id=4-vnet-peering-and-gateway-transit>4. VNet Peering and Gateway Transit</h2><p>To connect a spoke to the hub, create a two-way peering. In an enterprise landing zone, enable <strong>Gateway Transit</strong>. This lets spoke VNets use the VPN or ExpressRoute gateway in the hub, so you don&rsquo;t pay for an expensive gateway in every application subscription.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-hcl data-lang=hcl><span class=line><span class=cl><span class=k>resource</span> <span class=s2>&#34;azurerm_virtual_network_peering&#34; &#34;hub_to_spoke&#34;</span> {
+Res-->>VM: 4. Resolve to 10.0.5.4</template><div class=mermaid>sequenceDiagram
+participant VM as Spoke VM (App)
+participant Res as DNS Private Resolver
+participant Zone as Private DNS Zone
+VM->>Res: 1. nslookup app.db.local
+Res->>Zone: 2. Check Linked Zones
+Zone-->>Res: 3. Return 10.0.5.4
+Res-->>VM: 4. Resolve to 10.0.5.4</div></div><p>Link your hub VNet to the Private DNS Zones, and configure your spokes to use the Hub&rsquo;s Firewall or Resolver as their DNS server. That&rsquo;s what makes <code>resource.privatelink.blob.core.windows.net</code> resolve to a private IP across your entire organization—not just in the subscription where the Private Endpoint lives.</p><h2 id=4-vnet-peering-and-gateway-transit>4. VNet Peering and Gateway Transit</h2><p>To connect a spoke to the hub, create a two-way peering. In an enterprise landing zone, enable <strong>Gateway Transit</strong>. This lets spoke VNets use the VPN or ExpressRoute gateway in the hub, so you don&rsquo;t pay for an expensive gateway in every application subscription.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-hcl data-lang=hcl><span class=line><span class=cl><span class=k>resource</span> <span class=s2>&#34;azurerm_virtual_network_peering&#34; &#34;hub_to_spoke&#34;</span> {
 </span></span><span class=line><span class=cl><span class=n>  name</span>                      <span class=o>=</span> <span class=s2>&#34;peer-hub-to-app01&#34;</span>
 </span></span><span class=line><span class=cl><span class=n>  resource_group_name</span>       <span class=o>=</span> <span class=k>module</span><span class=p>.</span><span class=k>hub_vnet</span><span class=p>.</span><span class=k>resource_group_name</span>
 </span></span><span class=line><span class=cl><span class=n>  virtual_network_name</span>      <span class=o>=</span> <span class=k>module</span><span class=p>.</span><span class=k>hub_vnet</span><span class=p>.</span><span class=k>name</span>
@@ -56,20 +63,54 @@ Res-->>VM: 4. Resolve to 10.0.5.4</div><p>Link your hub VNet to the Private DNS 
 </a></span><span class=px-1><a href=https://www.linkedin.com/in/larryjameshenry aria-label=linkedin><svg width="2.4em" height="2.4em" fill="#fff" aria-label="LinkedIn" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0077b5" rx="15%"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 Larry James Henry. All rights reserved.</div></div></div></footer><script defer src=/bootstrap-5/js/bootstrap.bundle.min.js></script><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script defer src=/js/search.min.c590d9a08e125edb257cb869250fd256afcfd19b0fe36691c74648d868735c21.js integrity="sha256-xZDZoI4SXtslfLhpJQ/SVq/P0ZsP42aRx0ZI2GhzXCE="></script><script type=module>
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
   
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'base',
-    themeVariables: {
+  function getThemeVariables() {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
       primaryColor: isDarkMode ? '#1c2530' : '#ffffff',
       primaryTextColor: isDarkMode ? '#e6edf3' : '#1a2332',
       primaryBorderColor: isDarkMode ? '#5eead4' : '#0f766e',
       lineColor: isDarkMode ? '#9aa7b3' : '#5b6b7c',
-      secondaryColor: isDarkMode ? '#0f766e1a' : '#0f766e1a',
+      secondaryColor: isDarkMode ? '#5eead41a' : '#0f766e1a',
       tertiaryColor: isDarkMode ? '#0f1720' : '#f4f7f9',
-      fontFamily: 'inherit',
+      fontFamily: 'inherit'
+    };
+  }
+
+  async function renderMermaid() {
+    const wrappers = document.querySelectorAll('.mermaid-wrapper');
+    for (const wrapper of wrappers) {
+      const template = wrapper.querySelector('.mermaid-src');
+      const display = wrapper.querySelector('.mermaid');
+      if (template && display) {
+        display.removeAttribute('data-processed');
+        display.innerHTML = template.innerHTML;
+      }
     }
+    
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: getThemeVariables()
+    });
+    
+    await mermaid.run({
+      querySelector: '.mermaid'
+    });
+  }
+
+  renderMermaid();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-theme') {
+        renderMermaid();
+      }
+    });
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    renderMermaid();
   });
 </script><section id=search-content class=py-2 aria-label="Search results"><div class=container id=search-results></div></section></body></html>

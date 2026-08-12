@@ -4,7 +4,7 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 <svg aria-hidden="true" height="24" viewBox="0 0 16 16" width="24" data-view-component="true"><path fill-rule="evenodd" d="M1 2.75A.75.75.0 011.75 2h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 2.75zm0 5A.75.75.0 011.75 7h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 7.75zM1.75 12a.75.75.0 100 1.5h12.5a.75.75.0 100-1.5H1.75z"/></svg></button><div class="collapse navbar-collapse text-wrap primary-font" id=navbarContent><ul class="navbar-nav ms-auto text-center"><li class="nav-item navbar-text d-block d-md-none"><div class=nav-link><input id=search autocomplete=off class="form-control mr-sm-2" placeholder='Ctrl + k to Search...' aria-label=Search oninput=searchOnChange(event)></div></li><li class="nav-item navbar-text"><a class=nav-link href=/about title="About Me">About</a></li><li class="nav-item navbar-text"><a class=nav-link href=/posts title="Blog posts">Blog</a></li><li class="nav-item navbar-text"><a class=nav-link href=/series title=Series>Series</a></li><li class="nav-item navbar-text"><a class=nav-link href=/categories title=Categories>Categories</a></li><li class="nav-item navbar-text"><a class=nav-link href=/tags title=Tags>Tags</a></li><li class="nav-item navbar-text"><div class=text-center><button id=theme-toggle title=theme-toggle>
 <svg id="moon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
 <svg id="sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></li></ul></div></div></nav></header><main id=content role=main><section id=single><div class=container><div class="row justify-content-center"><div class="col-sm-12 col-md-12 col-lg-9"><div class=pr-lg-4><div class="title mb-5"><h1 class="text-center mb-4">Debugging Silent Pipeline Failures: When your if Statement Evaluates to Null</h1><div class=text-center>Apr 21, 2026
-<span id=readingTime>min read</span></div></div><div class=featured-image><img class="img-fluid mx-auto d-block" src=/posts/debugging-silent-pipeline-failures/images/featured_hu_33fa623d38c36133.6fc2f20f06268d467a8332dfaa25da3384e20b58f96e046e077f1126cf9f4370.webp alt="Debugging Silent Pipeline Failures: When your if Statement Evaluates to Null" width=784 height=438 integrity="sha256-b8LyDwYmjUZ6gzLfqiXaM4TiC1j5bgRuB38RJs+fQ3A=" fetchpriority=high loading=eager></div><article class="page-content p-2"><p>It’s the ultimate &ldquo;it works on my machine&rdquo; moment for DevOps engineers. You’ve defined a variable, you can see it in the logs, and yet your <code>${{ if eq(variables.isProduction, 'true') }}</code> block is completely ignored. The stage isn&rsquo;t skipped; it’s simply gone, as if the code never existed. You aren&rsquo;t crazy—you’ve just fallen into the &ldquo;Expression Gap.&rdquo;</p><p>A &ldquo;Silent Failure&rdquo; occurs when an Azure DevOps expression evaluates to <code>null</code> or <code>false</code> because it’s being asked to look at data that hasn&rsquo;t been generated yet. The most common culprit is trying to use a runtime variable—like a task output or a variable from a Library group—inside a compile-time <code>${{ }}</code> block. Because <code>${{ }}</code> is evaluated during the pipeline expansion phase (before any tasks run), it sees these future variables as empty. This guide teaches you how to identify, debug, and refactor these silent failures, moving your logic from fragile compile-time guesses to reliable runtime conditions.</p><h2 id=1-the-timing-mismatch-compile-time-vs-runtime>1. The Timing Mismatch: Compile-Time vs. Runtime</h2><p>The primary cause of silent failure is a fundamental misunderstanding of the &ldquo;Boundary of Visibility.&rdquo; Azure DevOps pipelines have two distinct &ldquo;minds&rdquo;: the expansion engine and the execution engine.</p><h3 id=the-expression-gap-timing-mismatch>The Expression Gap (Timing Mismatch)</h3><div class=mermaid>flowchart LR
+<span id=readingTime>min read</span></div></div><div class=featured-image><img class="img-fluid mx-auto d-block" src=/posts/debugging-silent-pipeline-failures/images/featured_hu_33fa623d38c36133.6fc2f20f06268d467a8332dfaa25da3384e20b58f96e046e077f1126cf9f4370.webp alt="Debugging Silent Pipeline Failures: When your if Statement Evaluates to Null" width=784 height=438 integrity="sha256-b8LyDwYmjUZ6gzLfqiXaM4TiC1j5bgRuB38RJs+fQ3A=" fetchpriority=high loading=eager></div><article class="page-content p-2"><p>It’s the ultimate &ldquo;it works on my machine&rdquo; moment for DevOps engineers. You’ve defined a variable, you can see it in the logs, and yet your <code>${{ if eq(variables.isProduction, 'true') }}</code> block is completely ignored. The stage isn&rsquo;t skipped; it’s simply gone, as if the code never existed. You aren&rsquo;t crazy—you’ve just fallen into the &ldquo;Expression Gap.&rdquo;</p><p>A &ldquo;Silent Failure&rdquo; occurs when an Azure DevOps expression evaluates to <code>null</code> or <code>false</code> because it’s being asked to look at data that hasn&rsquo;t been generated yet. The most common culprit is trying to use a runtime variable—like a task output or a variable from a Library group—inside a compile-time <code>${{ }}</code> block. Because <code>${{ }}</code> is evaluated during the pipeline expansion phase (before any tasks run), it sees these future variables as empty. This guide teaches you how to identify, debug, and refactor these silent failures, moving your logic from fragile compile-time guesses to reliable runtime conditions.</p><h2 id=1-the-timing-mismatch-compile-time-vs-runtime>1. The Timing Mismatch: Compile-Time vs. Runtime</h2><p>The primary cause of silent failure is a fundamental misunderstanding of the &ldquo;Boundary of Visibility.&rdquo; Azure DevOps pipelines have two distinct &ldquo;minds&rdquo;: the expansion engine and the execution engine.</p><h3 id=the-expression-gap-timing-mismatch>The Expression Gap (Timing Mismatch)</h3><div class=mermaid-wrapper><template class=mermaid-src>flowchart LR
 subgraph Compile["Expansion Engine (Compile-time)"]
 EvalC["Evaluate ${{ variables.A }}<br>(If null, code is DELETED)"]
 Plan["[ STRUCTURAL PLAN FIXED ]"]
@@ -14,7 +14,17 @@ Invis["[ VALUE INVISIBLE ]"]
 EvalR["Evaluate $[ variables.A ]<br>(Condition merely SKIPS)"]
 end
 EvalC --> Invis
-EvalR --> Plan</div><h3 id=11-what---really-sees>1.1: What ${{ }} Really Sees</h3><p>Compile-time expressions are resolved when the YAML is fetched and templates are unrolled. At this moment, the engine only has access to a very narrow slice of data:</p><ul><li><strong>YAML Parameters:</strong> Explicitly passed into the template.</li><li><strong>Static Variables:</strong> Hardcoded in the <code>variables:</code> block of the YAML files.</li><li><strong>System Variables (Pre-run):</strong> Values known before the first task starts, such as <code>Build.Reason</code>, <code>Build.SourceBranch</code>, or <code>System.TeamProject</code>.</li></ul><p>Everything else—Variables set in the Azure DevOps UI, secret variables, values from Variable Groups, and any data produced by a script—is <strong>invisible</strong> to <code>${{ }}</code>.</p><h3 id=12-the-null-result-trap>1.2: The &ldquo;Null&rdquo; Result Trap</h3><p>When an expression tries to access a non-existent variable, it evaluates to <code>null</code>. In the logic engine, <code>null</code> is functionally identical to <code>false</code>. If you wrap a job in an <code>${{ if }}</code> block that resolves to <code>null</code>, the orchestrator deletes that job from the final plan. Because the code is removed before it even reaches the agent, you won&rsquo;t see a &ldquo;skipped&rdquo; icon in the UI; the code simply vanishes, leaving no trace in the standard execution logs.</p><h2 id=2-three-common-patterns-of-silent-failure>2. Three Common Patterns of Silent Failure</h2><h3 id=21-the-environment-toggle-failure>2.1: The &ldquo;Environment Toggle&rdquo; Failure</h3><p>Engineers often try to use <code>${{ if eq(variables.envName, 'Prod') }}</code> where <code>envName</code> is defined in a Variable Group linked in the Library. Because Variable Groups are injected <em>after</em> the YAML expansion phase, the <code>${{ if }}</code> block always sees <code>null</code>. The specialized security or production steps you intended to run are silently dropped every single time.</p><h3 id=22-the-output-variable-misconception>2.2: The &ldquo;Output Variable&rdquo; Misconception</h3><p>Another frequent mistake is attempting to use <code>${{ if eq(dependencies.A.outputs['task.myVar'], 'true') }}</code>. At compile-time, the <code>dependencies</code> object is entirely empty because Job A hasn&rsquo;t even been assigned to an agent yet. The expression resolves to <code>null</code>, and the dependent step is removed from the plan.</p><h3 id=23-the-template-parameter-vs-variable-blur>2.3: The &ldquo;Template Parameter&rdquo; vs &ldquo;Variable&rdquo; Blur</h3><p>Passing a runtime variable into a template parameter that is then used in an <code>${{ if }}</code> statement is a guaranteed failure.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># Main Pipeline</span><span class=w>
+EvalR --> Plan</template><div class=mermaid>flowchart LR
+subgraph Compile["Expansion Engine (Compile-time)"]
+EvalC["Evaluate ${{ variables.A }}<br>(If null, code is DELETED)"]
+Plan["[ STRUCTURAL PLAN FIXED ]"]
+end
+subgraph Runtime["Execution Engine (Runtime)"]
+Invis["[ VALUE INVISIBLE ]"]
+EvalR["Evaluate $[ variables.A ]<br>(Condition merely SKIPS)"]
+end
+EvalC --> Invis
+EvalR --> Plan</div></div><h3 id=11-what---really-sees>1.1: What ${{ }} Really Sees</h3><p>Compile-time expressions are resolved when the YAML is fetched and templates are unrolled. At this moment, the engine only has access to a very narrow slice of data:</p><ul><li><strong>YAML Parameters:</strong> Explicitly passed into the template.</li><li><strong>Static Variables:</strong> Hardcoded in the <code>variables:</code> block of the YAML files.</li><li><strong>System Variables (Pre-run):</strong> Values known before the first task starts, such as <code>Build.Reason</code>, <code>Build.SourceBranch</code>, or <code>System.TeamProject</code>.</li></ul><p>Everything else—Variables set in the Azure DevOps UI, secret variables, values from Variable Groups, and any data produced by a script—is <strong>invisible</strong> to <code>${{ }}</code>.</p><h3 id=12-the-null-result-trap>1.2: The &ldquo;Null&rdquo; Result Trap</h3><p>When an expression tries to access a non-existent variable, it evaluates to <code>null</code>. In the logic engine, <code>null</code> is functionally identical to <code>false</code>. If you wrap a job in an <code>${{ if }}</code> block that resolves to <code>null</code>, the orchestrator deletes that job from the final plan. Because the code is removed before it even reaches the agent, you won&rsquo;t see a &ldquo;skipped&rdquo; icon in the UI; the code simply vanishes, leaving no trace in the standard execution logs.</p><h2 id=2-three-common-patterns-of-silent-failure>2. Three Common Patterns of Silent Failure</h2><h3 id=21-the-environment-toggle-failure>2.1: The &ldquo;Environment Toggle&rdquo; Failure</h3><p>Engineers often try to use <code>${{ if eq(variables.envName, 'Prod') }}</code> where <code>envName</code> is defined in a Variable Group linked in the Library. Because Variable Groups are injected <em>after</em> the YAML expansion phase, the <code>${{ if }}</code> block always sees <code>null</code>. The specialized security or production steps you intended to run are silently dropped every single time.</p><h3 id=22-the-output-variable-misconception>2.2: The &ldquo;Output Variable&rdquo; Misconception</h3><p>Another frequent mistake is attempting to use <code>${{ if eq(dependencies.A.outputs['task.myVar'], 'true') }}</code>. At compile-time, the <code>dependencies</code> object is entirely empty because Job A hasn&rsquo;t even been assigned to an agent yet. The expression resolves to <code>null</code>, and the dependent step is removed from the plan.</p><h3 id=23-the-template-parameter-vs-variable-blur>2.3: The &ldquo;Template Parameter&rdquo; vs &ldquo;Variable&rdquo; Blur</h3><p>Passing a runtime variable into a template parameter that is then used in an <code>${{ if }}</code> statement is a guaranteed failure.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># Main Pipeline</span><span class=w>
 </span></span></span><span class=line><span class=cl>- <span class=nt>template</span><span class=p>:</span><span class=w> </span><span class=l>my-template.yml</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>parameters</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>isProd</span><span class=p>:</span><span class=w> </span><span class=l>$(isProdVariable)</span><span class=w> </span><span class=c># Literal string passed</span><span class=w>
@@ -38,7 +48,7 @@ EvalR --> Plan</div><h3 id=11-what---really-sees>1.1: What ${{ }} Really Sees</h
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>condition</span><span class=p>:</span><span class=w> </span><span class=l>eq(variables.readyFlag, &#39;true&#39;)</span><span class=w>
 </span></span></span></code></pre></div><h2 id=5-best-practices-to-avoid-the-gap>5. Best Practices to Avoid the Gap</h2><ol><li><strong>Parameters for Structure:</strong> If a value determines <em>what</em> steps are in the pipeline (e.g., Windows vs Linux), use a <code>parameter</code>.</li><li><strong>Variables for Values:</strong> If a value determines <em>if</em> a step runs (e.g., Branch name or Approval), use a <code>variable</code> and a <code>condition:</code>.</li><li><strong>The &ldquo;Fail-Fast&rdquo; Strategy:</strong> Use <code>runtime parameters</code> with restricted <code>values</code> to prevent invalid states from ever reaching the engine.</li><li><strong>Never Check UI Variables in ${{ }}:</strong> Treat any variable not hardcoded in the current YAML file as &ldquo;invisible&rdquo; to the <code>${{ }}</code> syntax.</li></ol><h2 id=hands-on-example-the-vanish-bug>Hands-On Example: The &ldquo;Vanish&rdquo; Bug</h2><p>Consider a deployment step that only runs for the <code>main</code> branch. A developer writes:
 <code>${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}</code>.
-The pipeline runs for a PR, but the deployment step is missing from the logs entirely.</p><h3 id=the-vanish-bug-diagnostic-flow>The &ldquo;Vanish Bug&rdquo; Diagnostic Flow</h3><div class=mermaid>sequenceDiagram
+The pipeline runs for a PR, but the deployment step is missing from the logs entirely.</p><h3 id=the-vanish-bug-diagnostic-flow>The &ldquo;Vanish Bug&rdquo; Diagnostic Flow</h3><div class=mermaid-wrapper><template class=mermaid-src>sequenceDiagram
 participant YAML as [ YAML CODE ]
 participant Exp as [ EXPANDED YAML ]
 participant UI as [ RUNTIME UI ]
@@ -46,7 +56,15 @@ note over YAML: 1. ${{ if eq(X) }}
 YAML->>Exp: [ X is null ]
 note over Exp: 2. [ CODE DELETED ]
 Exp->>UI: Run pipeline
-note over UI: 3. [ NO TRACE ]<br>(Stage missing)</div><p><strong>The Fix:</strong>
+note over UI: 3. [ NO TRACE ]<br>(Stage missing)</template><div class=mermaid>sequenceDiagram
+participant YAML as [ YAML CODE ]
+participant Exp as [ EXPANDED YAML ]
+participant UI as [ RUNTIME UI ]
+note over YAML: 1. ${{ if eq(X) }}
+YAML->>Exp: [ X is null ]
+note over Exp: 2. [ CODE DELETED ]
+Exp->>UI: Run pipeline
+note over UI: 3. [ NO TRACE ]<br>(Stage missing)</div></div><p><strong>The Fix:</strong>
 Map the branch name to a runtime variable and use a <code>condition:</code>.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>variables</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>isMain</span><span class=p>:</span><span class=w> </span><span class=l>$[ eq(variables[&#39;Build.SourceBranch&#39;], &#39;refs/heads/main&#39;) ]</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>
@@ -61,20 +79,54 @@ Map the branch name to a runtime variable and use a <code>condition:</code>.</p>
 </a></span><span class=px-1><a href=https://www.linkedin.com/in/larryjameshenry aria-label=linkedin><svg width="2.4em" height="2.4em" fill="#fff" aria-label="LinkedIn" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0077b5" rx="15%"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 Larry James Henry. All rights reserved.</div></div></div></footer><script defer src=/bootstrap-5/js/bootstrap.bundle.min.js></script><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script defer src=/js/search.min.c590d9a08e125edb257cb869250fd256afcfd19b0fe36691c74648d868735c21.js integrity="sha256-xZDZoI4SXtslfLhpJQ/SVq/P0ZsP42aRx0ZI2GhzXCE="></script><script type=module>
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
   
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'base',
-    themeVariables: {
+  function getThemeVariables() {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
       primaryColor: isDarkMode ? '#1c2530' : '#ffffff',
       primaryTextColor: isDarkMode ? '#e6edf3' : '#1a2332',
       primaryBorderColor: isDarkMode ? '#5eead4' : '#0f766e',
       lineColor: isDarkMode ? '#9aa7b3' : '#5b6b7c',
-      secondaryColor: isDarkMode ? '#0f766e1a' : '#0f766e1a',
+      secondaryColor: isDarkMode ? '#5eead41a' : '#0f766e1a',
       tertiaryColor: isDarkMode ? '#0f1720' : '#f4f7f9',
-      fontFamily: 'inherit',
+      fontFamily: 'inherit'
+    };
+  }
+
+  async function renderMermaid() {
+    const wrappers = document.querySelectorAll('.mermaid-wrapper');
+    for (const wrapper of wrappers) {
+      const template = wrapper.querySelector('.mermaid-src');
+      const display = wrapper.querySelector('.mermaid');
+      if (template && display) {
+        display.removeAttribute('data-processed');
+        display.innerHTML = template.innerHTML;
+      }
     }
+    
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: getThemeVariables()
+    });
+    
+    await mermaid.run({
+      querySelector: '.mermaid'
+    });
+  }
+
+  renderMermaid();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-theme') {
+        renderMermaid();
+      }
+    });
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    renderMermaid();
   });
 </script><section id=search-content class=py-2 aria-label="Search results"><div class=container id=search-results></div></section></body></html>

@@ -4,7 +4,7 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 <svg aria-hidden="true" height="24" viewBox="0 0 16 16" width="24" data-view-component="true"><path fill-rule="evenodd" d="M1 2.75A.75.75.0 011.75 2h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 2.75zm0 5A.75.75.0 011.75 7h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 7.75zM1.75 12a.75.75.0 100 1.5h12.5a.75.75.0 100-1.5H1.75z"/></svg></button><div class="collapse navbar-collapse text-wrap primary-font" id=navbarContent><ul class="navbar-nav ms-auto text-center"><li class="nav-item navbar-text d-block d-md-none"><div class=nav-link><input id=search autocomplete=off class="form-control mr-sm-2" placeholder='Ctrl + k to Search...' aria-label=Search oninput=searchOnChange(event)></div></li><li class="nav-item navbar-text"><a class=nav-link href=/about title="About Me">About</a></li><li class="nav-item navbar-text"><a class=nav-link href=/posts title="Blog posts">Blog</a></li><li class="nav-item navbar-text"><a class=nav-link href=/series title=Series>Series</a></li><li class="nav-item navbar-text"><a class=nav-link href=/categories title=Categories>Categories</a></li><li class="nav-item navbar-text"><a class=nav-link href=/tags title=Tags>Tags</a></li><li class="nav-item navbar-text"><div class=text-center><button id=theme-toggle title=theme-toggle>
 <svg id="moon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
 <svg id="sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></li></ul></div></div></nav></header><main id=content role=main><section id=single><div class=container><div class="row justify-content-center"><div class="col-sm-12 col-md-12 col-lg-9"><div class=pr-lg-4><div class="title mb-5"><h1 class="text-center mb-4">CI/CD Pipeline for Your Landing Zone: Deploying Azure Verified Modules with GitHub Actions</h1><div class=text-center>Apr 9, 2026
-<span id=readingTime>min read</span></div></div><div class=featured-image><img class="img-fluid mx-auto d-block" src=/posts/azure-landing-zone-cicd/images/featured_hu_d6bd7434e8aaf497.475ff0b8bf97a285b4063807e732b4e46ce611985335c7f429327901d24071ba.webp alt="CI/CD Pipeline for Your Landing Zone: Deploying Azure Verified Modules with GitHub Actions" width=784 height=438 integrity="sha256-R1/wuL+XooW0BjgH5zK05GzmEZhTNcf0KTJ5AdJAcbo=" fetchpriority=high loading=eager></div><article class="page-content p-2"><p>Someone on your team runs <code>terraform apply</code> from their laptop. The change goes straight to production. There&rsquo;s no PR, no review, no record of what changed or why. A week later, something breaks in the landing zone and nobody can explain what happened. You check the Azure activity log and find a dozen manual changes made by three different engineers over the past month — all from local terminals, all with permanent admin credentials stored in <code>.env</code> files.</p><p>This is not a process problem. It&rsquo;s an architecture problem. When your pipeline is &ldquo;run it locally and hope,&rdquo; every deployment is a single point of failure.</p><p>A <strong>GitOps</strong> approach fixes this. Every change to the infrastructure is a pull request. Every PR triggers a plan. Every plan gets reviewed before it merges. The pipeline authenticates with a short-lived token, not a stored secret. Nothing reaches Azure without a second set of eyes on the predicted diff.</p><p>In 2026, the standard for these pipelines is <strong>Workload Identity Federation (OIDC)</strong>, which eliminates static API keys, and <strong>Shift-Left Testing</strong> using tools like PSRule. Here&rsquo;s how to build it with GitHub Actions to deploy <strong>Azure Verified Modules (AVM)</strong>.</p><h2 id=1-the-pr-driven-plan-first-workflow>1. The PR-Driven Plan-First Workflow</h2><p>The goal is simple: no change reaches Azure without a human review of the predicted impact. We implement a <strong>Plan-First</strong> workflow.</p><h3 id=pr-driven-plan-first-workflow>PR-Driven Plan-First Workflow</h3><div class=mermaid>sequenceDiagram
+<span id=readingTime>min read</span></div></div><div class=featured-image><img class="img-fluid mx-auto d-block" src=/posts/azure-landing-zone-cicd/images/featured_hu_d6bd7434e8aaf497.475ff0b8bf97a285b4063807e732b4e46ce611985335c7f429327901d24071ba.webp alt="CI/CD Pipeline for Your Landing Zone: Deploying Azure Verified Modules with GitHub Actions" width=784 height=438 integrity="sha256-R1/wuL+XooW0BjgH5zK05GzmEZhTNcf0KTJ5AdJAcbo=" fetchpriority=high loading=eager></div><article class="page-content p-2"><p>Someone on your team runs <code>terraform apply</code> from their laptop. The change goes straight to production. There&rsquo;s no PR, no review, no record of what changed or why. A week later, something breaks in the landing zone and nobody can explain what happened. You check the Azure activity log and find a dozen manual changes made by three different engineers over the past month — all from local terminals, all with permanent admin credentials stored in <code>.env</code> files.</p><p>This is not a process problem. It&rsquo;s an architecture problem. When your pipeline is &ldquo;run it locally and hope,&rdquo; every deployment is a single point of failure.</p><p>A <strong>GitOps</strong> approach fixes this. Every change to the infrastructure is a pull request. Every PR triggers a plan. Every plan gets reviewed before it merges. The pipeline authenticates with a short-lived token, not a stored secret. Nothing reaches Azure without a second set of eyes on the predicted diff.</p><p>In 2026, the standard for these pipelines is <strong>Workload Identity Federation (OIDC)</strong>, which eliminates static API keys, and <strong>Shift-Left Testing</strong> using tools like PSRule. Here&rsquo;s how to build it with GitHub Actions to deploy <strong>Azure Verified Modules (AVM)</strong>.</p><h2 id=1-the-pr-driven-plan-first-workflow>1. The PR-Driven Plan-First Workflow</h2><p>The goal is simple: no change reaches Azure without a human review of the predicted impact. We implement a <strong>Plan-First</strong> workflow.</p><h3 id=pr-driven-plan-first-workflow>PR-Driven Plan-First Workflow</h3><div class=mermaid-wrapper><template class=mermaid-src>sequenceDiagram
 participant Dev as DEVELOPER PR
 participant GH as GITHUB ACTIONS
 participant Azure as AZURE PLATFORM
@@ -15,27 +15,52 @@ GH-->>Dev: 4. Post collapsible comment
 note over Dev: 5. HUMAN REVIEW<br>6. MERGE TO MAIN
 Dev->>GH: Merge
 GH->>Azure: 7. `terraform apply`
-note over Azure: 8. [ DEPLOYED ]</div><p>When you open a PR, the pipeline runs a &ldquo;What-If&rdquo; analysis and posts the result as a collapsible comment. Your reviewer sees exactly which resources will be created, modified, or destroyed before clicking merge. No surprises.</p><h2 id=2-secure-authentication-with-oidc>2. Secure Authentication with OIDC</h2><p>Storing <code>AZURE_CLIENT_SECRET</code> in GitHub Secrets is a high-risk legacy pattern. If the secret leaks, an attacker has permanent access until someone notices and rotates it. You probably won&rsquo;t notice for a while. <strong>OpenID Connect (OIDC)</strong> solves this by using a trust relationship between GitHub and Entra ID instead of a static credential.</p><h3 id=github-oidc-security-boundary>GitHub OIDC Security Boundary</h3><div class=mermaid>sequenceDiagram
+note over Azure: 8. [ DEPLOYED ]</template><div class=mermaid>sequenceDiagram
+participant Dev as DEVELOPER PR
+participant GH as GITHUB ACTIONS
+participant Azure as AZURE PLATFORM
+Dev->>GH: 1. Commit Change
+note over GH: 2. `terraform plan`<br>3. [ Resource Delta ]
+GH->>Azure: terraform plan
+GH-->>Dev: 4. Post collapsible comment
+note over Dev: 5. HUMAN REVIEW<br>6. MERGE TO MAIN
+Dev->>GH: Merge
+GH->>Azure: 7. `terraform apply`
+note over Azure: 8. [ DEPLOYED ]</div></div><p>When you open a PR, the pipeline runs a &ldquo;What-If&rdquo; analysis and posts the result as a collapsible comment. Your reviewer sees exactly which resources will be created, modified, or destroyed before clicking merge. No surprises.</p><h2 id=2-secure-authentication-with-oidc>2. Secure Authentication with OIDC</h2><p>Storing <code>AZURE_CLIENT_SECRET</code> in GitHub Secrets is a high-risk legacy pattern. If the secret leaks, an attacker has permanent access until someone notices and rotates it. You probably won&rsquo;t notice for a while. <strong>OpenID Connect (OIDC)</strong> solves this by using a trust relationship between GitHub and Entra ID instead of a static credential.</p><h3 id=github-oidc-security-boundary>GitHub OIDC Security Boundary</h3><div class=mermaid-wrapper><template class=mermaid-src>sequenceDiagram
 participant GH as GITHUB ACTIONS
 participant Entra as ENTRA ID (AZURE)
 participant Azure as AZURE RESOURCES
 GH->>Entra: 1. Request Token<br>(id-token: write)
 note over Entra: 2. Validate Subject<br>(repo:org/repo:environment:prod)
 Entra-->>GH: 3. Issue Access Token
-GH->>Azure: 4. Run IaC (Bearer Token)</div><p>In 2026, we use <strong>Environment-scoped Federated Credentials</strong>. This ensures that the production deployment identity can <em>only</em> be used by a workflow running in the <code>production</code> environment branch on GitHub, providing a cryptographic boundary between your dev and prod infrastructure.</p><h2 id=3-shift-left-testing-with-psrule>3. Shift-Left Testing with PSRule</h2><p>Compliance should be caught in the pipeline, not in a post-deployment audit. This is the boring part. Do it anyway.</p><p>We use <strong>PSRule for Azure</strong> to validate our Bicep and Terraform code against the Well-Architected Framework (WAF) before it is deployed.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># GitHub Actions: PSRule WAF Compliance</span><span class=w>
+GH->>Azure: 4. Run IaC (Bearer Token)</template><div class=mermaid>sequenceDiagram
+participant GH as GITHUB ACTIONS
+participant Entra as ENTRA ID (AZURE)
+participant Azure as AZURE RESOURCES
+GH->>Entra: 1. Request Token<br>(id-token: write)
+note over Entra: 2. Validate Subject<br>(repo:org/repo:environment:prod)
+Entra-->>GH: 3. Issue Access Token
+GH->>Azure: 4. Run IaC (Bearer Token)</div></div><p>In 2026, we use <strong>Environment-scoped Federated Credentials</strong>. This ensures that the production deployment identity can <em>only</em> be used by a workflow running in the <code>production</code> environment branch on GitHub, providing a cryptographic boundary between your dev and prod infrastructure.</p><h2 id=3-shift-left-testing-with-psrule>3. Shift-Left Testing with PSRule</h2><p>Compliance should be caught in the pipeline, not in a post-deployment audit. This is the boring part. Do it anyway.</p><p>We use <strong>PSRule for Azure</strong> to validate our Bicep and Terraform code against the Well-Architected Framework (WAF) before it is deployed.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># GitHub Actions: PSRule WAF Compliance</span><span class=w>
 </span></span></span><span class=line><span class=cl>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>PSRule WAF Compliance</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>uses</span><span class=p>:</span><span class=w> </span><span class=l>microsoft/ps-rule@v2</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>with</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>modules</span><span class=p>:</span><span class=w> </span><span class=l>PSRule.Rules.Azure</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>inputPath</span><span class=p>:</span><span class=w> </span><span class=l>live/</span><span class=w>
-</span></span></span></code></pre></div><p>If a developer attempts to deploy a VNet without a diagnostic setting or an unencrypted Storage Account, PSRule fails the build, preventing the non-compliant code from ever reaching the main branch.</p><h2 id=4-safe-state-storage-architecture>4. Safe State Storage Architecture</h2><p>Your Terraform state files or Bicep Deployment Stacks contain the blueprint of your entire cloud estate. Treat them accordingly.</p><h3 id=safe-state-storage-architecture>Safe State Storage Architecture</h3><div class=mermaid>flowchart TD
+</span></span></span></code></pre></div><p>If a developer attempts to deploy a VNet without a diagnostic setting or an unencrypted Storage Account, PSRule fails the build, preventing the non-compliant code from ever reaching the main branch.</p><h2 id=4-safe-state-storage-architecture>4. Safe State Storage Architecture</h2><p>Your Terraform state files or Bicep Deployment Stacks contain the blueprint of your entire cloud estate. Treat them accordingly.</p><h3 id=safe-state-storage-architecture>Safe State Storage Architecture</h3><div class=mermaid-wrapper><template class=mermaid-src>flowchart TD
 subgraph Hub["[ HUB VNET ] (Management Sub)"]
 Storage["[ Storage Account ] (State Files)<br>- Private Endpoint<br>- Versioning Enabled<br>- Soft Delete Enabled"]
 end
 subgraph Runner["[ SELF-HOSTED RUNNER ]"]
 MI["- Managed Identity<br>- (Contributor on Container)"]
 end
-Runner -->|RBAC-Only Access| Hub</div><p>By using <strong>Private Endpoints</strong> and <strong>RBAC-only access</strong> (disabling storage account keys), you ensure that only your authorized CI/CD runners can read or write the state.</p><h2 id=5-bicep-deployment-stacks-the-native-way>5. Bicep Deployment Stacks: The Native Way</h2><p>For Bicep users, <strong>Deployment Stacks</strong> (GA in 2025) provide the state management and &ldquo;Action on Unmanage&rdquo; features previously only found in Terraform.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>az stack mg create <span class=se>\
+Runner -->|RBAC-Only Access| Hub</template><div class=mermaid>flowchart TD
+subgraph Hub["[ HUB VNET ] (Management Sub)"]
+Storage["[ Storage Account ] (State Files)<br>- Private Endpoint<br>- Versioning Enabled<br>- Soft Delete Enabled"]
+end
+subgraph Runner["[ SELF-HOSTED RUNNER ]"]
+MI["- Managed Identity<br>- (Contributor on Container)"]
+end
+Runner -->|RBAC-Only Access| Hub</div></div><p>By using <strong>Private Endpoints</strong> and <strong>RBAC-only access</strong> (disabling storage account keys), you ensure that only your authorized CI/CD runners can read or write the state.</p><h2 id=5-bicep-deployment-stacks-the-native-way>5. Bicep Deployment Stacks: The Native Way</h2><p>For Bicep users, <strong>Deployment Stacks</strong> (GA in 2025) provide the state management and &ldquo;Action on Unmanage&rdquo; features previously only found in Terraform.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>az stack mg create <span class=se>\
 </span></span></span><span class=line><span class=cl>  --name <span class=s2>&#34;lz-management-layer&#34;</span> <span class=se>\
 </span></span></span><span class=line><span class=cl>  --management-group-id <span class=s2>&#34;mg-platform&#34;</span> <span class=se>\
 </span></span></span><span class=line><span class=cl>  --deny-settings-mode <span class=s2>&#34;denyDelete&#34;</span> <span class=se>\
@@ -48,20 +73,54 @@ Runner -->|RBAC-Only Access| Hub</div><p>By using <strong>Private Endpoints</str
 </a></span><span class=px-1><a href=https://www.linkedin.com/in/larryjameshenry aria-label=linkedin><svg width="2.4em" height="2.4em" fill="#fff" aria-label="LinkedIn" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0077b5" rx="15%"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 Larry James Henry. All rights reserved.</div></div></div></footer><script defer src=/bootstrap-5/js/bootstrap.bundle.min.js></script><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script defer src=/js/search.min.c590d9a08e125edb257cb869250fd256afcfd19b0fe36691c74648d868735c21.js integrity="sha256-xZDZoI4SXtslfLhpJQ/SVq/P0ZsP42aRx0ZI2GhzXCE="></script><script type=module>
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
   
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'base',
-    themeVariables: {
+  function getThemeVariables() {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
       primaryColor: isDarkMode ? '#1c2530' : '#ffffff',
       primaryTextColor: isDarkMode ? '#e6edf3' : '#1a2332',
       primaryBorderColor: isDarkMode ? '#5eead4' : '#0f766e',
       lineColor: isDarkMode ? '#9aa7b3' : '#5b6b7c',
-      secondaryColor: isDarkMode ? '#0f766e1a' : '#0f766e1a',
+      secondaryColor: isDarkMode ? '#5eead41a' : '#0f766e1a',
       tertiaryColor: isDarkMode ? '#0f1720' : '#f4f7f9',
-      fontFamily: 'inherit',
+      fontFamily: 'inherit'
+    };
+  }
+
+  async function renderMermaid() {
+    const wrappers = document.querySelectorAll('.mermaid-wrapper');
+    for (const wrapper of wrappers) {
+      const template = wrapper.querySelector('.mermaid-src');
+      const display = wrapper.querySelector('.mermaid');
+      if (template && display) {
+        display.removeAttribute('data-processed');
+        display.innerHTML = template.innerHTML;
+      }
     }
+    
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: getThemeVariables()
+    });
+    
+    await mermaid.run({
+      querySelector: '.mermaid'
+    });
+  }
+
+  renderMermaid();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-theme') {
+        renderMermaid();
+      }
+    });
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    renderMermaid();
   });
 </script><section id=search-content class=py-2 aria-label="Search results"><div class=container id=search-results></div></section></body></html>

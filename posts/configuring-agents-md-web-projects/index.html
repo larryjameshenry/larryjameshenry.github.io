@@ -4,7 +4,7 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 <svg aria-hidden="true" height="24" viewBox="0 0 16 16" width="24" data-view-component="true"><path fill-rule="evenodd" d="M1 2.75A.75.75.0 011.75 2h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 2.75zm0 5A.75.75.0 011.75 7h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 7.75zM1.75 12a.75.75.0 100 1.5h12.5a.75.75.0 100-1.5H1.75z"/></svg></button><div class="collapse navbar-collapse text-wrap primary-font" id=navbarContent><ul class="navbar-nav ms-auto text-center"><li class="nav-item navbar-text d-block d-md-none"><div class=nav-link><input id=search autocomplete=off class="form-control mr-sm-2" placeholder='Ctrl + k to Search...' aria-label=Search oninput=searchOnChange(event)></div></li><li class="nav-item navbar-text"><a class=nav-link href=/about title="About Me">About</a></li><li class="nav-item navbar-text"><a class=nav-link href=/posts title="Blog posts">Blog</a></li><li class="nav-item navbar-text"><a class=nav-link href=/series title=Series>Series</a></li><li class="nav-item navbar-text"><a class=nav-link href=/categories title=Categories>Categories</a></li><li class="nav-item navbar-text"><a class=nav-link href=/tags title=Tags>Tags</a></li><li class="nav-item navbar-text"><div class=text-center><button id=theme-toggle title=theme-toggle>
 <svg id="moon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
 <svg id="sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></li></ul></div></div></nav></header><main id=content role=main><section id=single><div class=container><div class="row justify-content-center"><div class="col-sm-12 col-md-12 col-lg-9"><div class=pr-lg-4><div class="title mb-5"><h1 class="text-center mb-4">Mastering Context: Configuring AGENTS.md for Web Projects</h1><div class=text-center>Jul 23, 2026
-<span id=readingTime>min read</span></div></div><div class=featured-image><img class="img-fluid mx-auto d-block" src=/posts/configuring-agents-md-web-projects/images/featured_hu_55fa6b65c6f65519.425dbe0b71fb866fd59daecdbe28d7ac44ac78196e4f302e1f03d65914a7e844.webp alt="Mastering Context: Configuring AGENTS.md for Web Projects" width=784 height=438 integrity="sha256-Ql2+C3H7hm/Vna7NvijXrESseBluTzAuHwPWWRSn6EQ=" fetchpriority=high loading=eager></div><article class="page-content p-2"><p>You tell your agent to use tabs instead of spaces. It fixes the file. Ten minutes and four prompts later, you glance at a new component and there they are again — two spaces, indenting quietly like you never said a word. You didn&rsquo;t imagine the first fix. The model just forgot it happened, because as far as its attention is concerned, that instruction is now buried under everything you&rsquo;ve asked for since.</p><p>That&rsquo;s not a bug in Qwen3.5 9B, it&rsquo;s arithmetic. The model&rsquo;s context window tops out at a theoretical 262,144 tokens, but coding tasks start showing real degradation once a session crosses roughly 25,000-30,000 tokens. Instructions from early in the conversation stop getting the attention weight they need to actually govern new output. Cloud models with a trillion parameters and a business model built on burning GPU-hours can paper over this with sheer scale. A 9B model running locally can&rsquo;t, especially when a 30,000 token context window easily spills past the VRAM of a standard 8GB graphics card. Pretending otherwise means re-explaining your tabs preference every fifteen minutes for the rest of the afternoon.</p><p><code>AGENTS.md</code> is the fix, and it works for a reason that&rsquo;s easy to miss if you think of it as &ldquo;a longer system prompt.&rdquo; It isn&rsquo;t reprocessed and reweighted the way conversation history is. OpenCode treats it as a standing project reference the agent consults fresh, which means your rules don&rsquo;t degrade the way a message from twenty turns ago does. Get this file right once, and every session starts from the same architectural baseline instead of drifting back toward whatever the model saw most in training.</p><h2 id=the-anatomy-of-agentsmd>The Anatomy of AGENTS.md</h2><h3 id=why-standard-prompts-fail>Why Standard Prompts Fail</h3><p>A system prompt sets the model&rsquo;s baseline persona for a conversation. <code>AGENTS.md</code> does something different: it&rsquo;s a persistent, project-specific reference that survives session restarts and context flushes entirely, because OpenCode loads it fresh from disk rather than carrying it as aging conversation history. Type &ldquo;always use Prisma, never raw SQL&rdquo; into chat and that instruction is subject to the same context sliding as everything else you type. Put it in <code>AGENTS.md</code> and it&rsquo;s there on turn one and turn two hundred, unchanged.</p><p>The practical difference shows up exactly where you&rsquo;d expect — long sessions. Ask for five components in a row without <code>AGENTS.md</code>, and by the fourth or fifth the model has quietly stopped following a rule you gave it at the start, not out of defiance but because that instruction has slid out of its effective attention window. <code>AGENTS.md</code> doesn&rsquo;t get pushed out that way.</p><h3 id=agent-context-window-diagram>Agent Context Window Diagram</h3><p>Visualizes how <code>AGENTS.md</code> provides persistent, undegraded context to the agent, bypassing the naturally decaying attention weight of long conversation histories.</p><div class=mermaid>flowchart TD
+<span id=readingTime>min read</span></div></div><div class=featured-image><img class="img-fluid mx-auto d-block" src=/posts/configuring-agents-md-web-projects/images/featured_hu_55fa6b65c6f65519.425dbe0b71fb866fd59daecdbe28d7ac44ac78196e4f302e1f03d65914a7e844.webp alt="Mastering Context: Configuring AGENTS.md for Web Projects" width=784 height=438 integrity="sha256-Ql2+C3H7hm/Vna7NvijXrESseBluTzAuHwPWWRSn6EQ=" fetchpriority=high loading=eager></div><article class="page-content p-2"><p>You tell your agent to use tabs instead of spaces. It fixes the file. Ten minutes and four prompts later, you glance at a new component and there they are again — two spaces, indenting quietly like you never said a word. You didn&rsquo;t imagine the first fix. The model just forgot it happened, because as far as its attention is concerned, that instruction is now buried under everything you&rsquo;ve asked for since.</p><p>That&rsquo;s not a bug in Qwen3.5 9B, it&rsquo;s arithmetic. The model&rsquo;s context window tops out at a theoretical 262,144 tokens, but coding tasks start showing real degradation once a session crosses roughly 25,000-30,000 tokens. Instructions from early in the conversation stop getting the attention weight they need to actually govern new output. Cloud models with a trillion parameters and a business model built on burning GPU-hours can paper over this with sheer scale. A 9B model running locally can&rsquo;t, especially when a 30,000 token context window easily spills past the VRAM of a standard 8GB graphics card. Pretending otherwise means re-explaining your tabs preference every fifteen minutes for the rest of the afternoon.</p><p><code>AGENTS.md</code> is the fix, and it works for a reason that&rsquo;s easy to miss if you think of it as &ldquo;a longer system prompt.&rdquo; It isn&rsquo;t reprocessed and reweighted the way conversation history is. OpenCode treats it as a standing project reference the agent consults fresh, which means your rules don&rsquo;t degrade the way a message from twenty turns ago does. Get this file right once, and every session starts from the same architectural baseline instead of drifting back toward whatever the model saw most in training.</p><h2 id=the-anatomy-of-agentsmd>The Anatomy of AGENTS.md</h2><h3 id=why-standard-prompts-fail>Why Standard Prompts Fail</h3><p>A system prompt sets the model&rsquo;s baseline persona for a conversation. <code>AGENTS.md</code> does something different: it&rsquo;s a persistent, project-specific reference that survives session restarts and context flushes entirely, because OpenCode loads it fresh from disk rather than carrying it as aging conversation history. Type &ldquo;always use Prisma, never raw SQL&rdquo; into chat and that instruction is subject to the same context sliding as everything else you type. Put it in <code>AGENTS.md</code> and it&rsquo;s there on turn one and turn two hundred, unchanged.</p><p>The practical difference shows up exactly where you&rsquo;d expect — long sessions. Ask for five components in a row without <code>AGENTS.md</code>, and by the fourth or fifth the model has quietly stopped following a rule you gave it at the start, not out of defiance but because that instruction has slid out of its effective attention window. <code>AGENTS.md</code> doesn&rsquo;t get pushed out that way.</p><h3 id=agent-context-window-diagram>Agent Context Window Diagram</h3><p>Visualizes how <code>AGENTS.md</code> provides persistent, undegraded context to the agent, bypassing the naturally decaying attention weight of long conversation histories.</p><div class=mermaid-wrapper><template class=mermaid-src>flowchart TD
 subgraph Context["Agent Context Window"]
 Agents["AGENTS.md<br>(Persistent)"]
 Prompt["Current Prompt<br>(High Weight)"]
@@ -13,7 +13,16 @@ History["Conversation History (Degrading)<br>[Turn 20] (Low Weight)<br>[Turn 10]
 Agents --> Engine
 Prompt --> Engine
 History --> Engine
-end</div><p><strong>Visual Notes:</strong></p><ul><li>The persistent nature of AGENTS.md means it maintains high attention weight alongside the current prompt.</li><li>Conversation history degrades over time, illustrating why rules defined early in the chat are eventually ignored by the Code Generation Engine.</li></ul><h3 id=core-components-of-the-file>Core Components of the File</h3><p>A working <code>AGENTS.md</code> has three parts, in this order, because order determines what actually gets followed:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-markdown data-lang=markdown><span class=line><span class=cl><span class=gh># AGENTS.md
+end</template><div class=mermaid>flowchart TD
+subgraph Context["Agent Context Window"]
+Agents["AGENTS.md<br>(Persistent)"]
+Prompt["Current Prompt<br>(High Weight)"]
+Engine["Code Generation Engine"]
+History["Conversation History (Degrading)<br>[Turn 20] (Low Weight)<br>[Turn 10] (Med Weight)<br>[Turn 1] (Dropped)"]
+Agents --> Engine
+Prompt --> Engine
+History --> Engine
+end</div></div><p><strong>Visual Notes:</strong></p><ul><li>The persistent nature of AGENTS.md means it maintains high attention weight alongside the current prompt.</li><li>Conversation history degrades over time, illustrating why rules defined early in the chat are eventually ignored by the Code Generation Engine.</li></ul><h3 id=core-components-of-the-file>Core Components of the File</h3><p>A working <code>AGENTS.md</code> has three parts, in this order, because order determines what actually gets followed:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-markdown data-lang=markdown><span class=line><span class=cl><span class=gh># AGENTS.md
 </span></span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>## Project Overview
 </span></span></span><span class=line><span class=cl>Full-stack web app: Next.js 15 (App Router) frontend, Express.js REST backend.
@@ -72,20 +81,54 @@ This usually isn&rsquo;t <code>AGENTS.md</code>&rsquo;s fault directly — it&rs
 </a></span><span class=px-1><a href=https://www.linkedin.com/in/larryjameshenry aria-label=linkedin><svg width="2.4em" height="2.4em" fill="#fff" aria-label="LinkedIn" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0077b5" rx="15%"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 Larry James Henry. All rights reserved.</div></div></div></footer><script defer src=/bootstrap-5/js/bootstrap.bundle.min.js></script><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script defer src=/js/search.min.c590d9a08e125edb257cb869250fd256afcfd19b0fe36691c74648d868735c21.js integrity="sha256-xZDZoI4SXtslfLhpJQ/SVq/P0ZsP42aRx0ZI2GhzXCE="></script><script type=module>
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
   
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'base',
-    themeVariables: {
+  function getThemeVariables() {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
       primaryColor: isDarkMode ? '#1c2530' : '#ffffff',
       primaryTextColor: isDarkMode ? '#e6edf3' : '#1a2332',
       primaryBorderColor: isDarkMode ? '#5eead4' : '#0f766e',
       lineColor: isDarkMode ? '#9aa7b3' : '#5b6b7c',
-      secondaryColor: isDarkMode ? '#0f766e1a' : '#0f766e1a',
+      secondaryColor: isDarkMode ? '#5eead41a' : '#0f766e1a',
       tertiaryColor: isDarkMode ? '#0f1720' : '#f4f7f9',
-      fontFamily: 'inherit',
+      fontFamily: 'inherit'
+    };
+  }
+
+  async function renderMermaid() {
+    const wrappers = document.querySelectorAll('.mermaid-wrapper');
+    for (const wrapper of wrappers) {
+      const template = wrapper.querySelector('.mermaid-src');
+      const display = wrapper.querySelector('.mermaid');
+      if (template && display) {
+        display.removeAttribute('data-processed');
+        display.innerHTML = template.innerHTML;
+      }
     }
+    
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: getThemeVariables()
+    });
+    
+    await mermaid.run({
+      querySelector: '.mermaid'
+    });
+  }
+
+  renderMermaid();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-theme') {
+        renderMermaid();
+      }
+    });
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    renderMermaid();
   });
 </script><section id=search-content class=py-2 aria-label="Search results"><div class=container id=search-results></div></section></body></html>

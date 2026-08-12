@@ -4,7 +4,7 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 <svg aria-hidden="true" height="24" viewBox="0 0 16 16" width="24" data-view-component="true"><path fill-rule="evenodd" d="M1 2.75A.75.75.0 011.75 2h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 2.75zm0 5A.75.75.0 011.75 7h12.5a.75.75.0 110 1.5H1.75A.75.75.0 011 7.75zM1.75 12a.75.75.0 100 1.5h12.5a.75.75.0 100-1.5H1.75z"/></svg></button><div class="collapse navbar-collapse text-wrap primary-font" id=navbarContent><ul class="navbar-nav ms-auto text-center"><li class="nav-item navbar-text d-block d-md-none"><div class=nav-link><input id=search autocomplete=off class="form-control mr-sm-2" placeholder='Ctrl + k to Search...' aria-label=Search oninput=searchOnChange(event)></div></li><li class="nav-item navbar-text"><a class=nav-link href=/about title="About Me">About</a></li><li class="nav-item navbar-text"><a class=nav-link href=/posts title="Blog posts">Blog</a></li><li class="nav-item navbar-text"><a class=nav-link href=/series title=Series>Series</a></li><li class="nav-item navbar-text"><a class=nav-link href=/categories title=Categories>Categories</a></li><li class="nav-item navbar-text"><a class=nav-link href=/tags title=Tags>Tags</a></li><li class="nav-item navbar-text"><div class=text-center><button id=theme-toggle title=theme-toggle>
 <svg id="moon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
 <svg id="sun" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></li></ul></div></div></nav></header><main id=content role=main><section id=single><div class=container><div class="row justify-content-center"><div class="col-sm-12 col-md-12 col-lg-9"><div class=pr-lg-4><div class="title mb-5"><h1 class="text-center mb-4">Identity and Access Architecture for Azure Landing Zones: Entra ID, RBAC, and PIM</h1><div class=text-center>Apr 4, 2026
-<span id=readingTime>min read</span></div></div><div class=featured-image><img class="img-fluid mx-auto d-block" src=/posts/azure-identity-architecture/images/featured_hu_babe49059b6715cd.6432b5d7d5647344aaf30f3cda4ef547a9b81976bd4495fc71f283ea7cb41f89.webp alt="Identity and Access Architecture for Azure Landing Zones: Entra ID, RBAC, and PIM" width=784 height=438 integrity="sha256-ZDK119Vkc0Sq8w882k71R6m4GXa9RJX8cfKD6ny0H4k=" fetchpriority=high loading=eager></div><article class="page-content p-2"><p>The security team&rsquo;s Slack message arrives on a Tuesday afternoon: &ldquo;We&rsquo;re seeing resource deletions in prod. Investigating.&rdquo; Your heart rate goes up. You pull the Azure Activity Log. The deletions are attributed to a service principal—one your team created eight months ago for a deployment pipeline. The pipeline finished its job. Nobody revoked the credential. The client secret was valid for two years.</p><p>It wasn&rsquo;t a sophisticated attack. Someone found the secret in a Git history, and the principal had Contributor on the entire subscription. Everything it could touch, they touched.</p><p>This is the failure mode that network firewalls and VPN gateways don&rsquo;t prevent. Authentication succeeded. Authorization succeeded. The blast radius was just enormous because nobody thought about what &ldquo;temporary access for a deployment pipeline&rdquo; means when the pipeline is gone but the credential isn&rsquo;t.</p><p>Your identity architecture moves away from permanent, static permissions toward a <strong>Zero Standing Access (ZSA)</strong> model. Use <strong>Privileged Identity Management (PIM)</strong> for humans and <strong>Workload Identity Federation (OIDC)</strong> for machines. Every high-privilege action becomes time-bound, auditable, and cryptographic—with no static passwords or keys in your environment.</p><h2 id=1-entra-id-vs-azure-rbac>1. Entra ID vs. Azure RBAC</h2><p>To build a secure model, you need to keep two authorization systems distinct: the identity provider (Entra ID) and the resource authorization engine (Azure RBAC).</p><h3 id=entra-id-vs-azure-rbac-boundaries>Entra ID vs. Azure RBAC Boundaries</h3><div class=mermaid>flowchart TD
+<span id=readingTime>min read</span></div></div><div class=featured-image><img class="img-fluid mx-auto d-block" src=/posts/azure-identity-architecture/images/featured_hu_babe49059b6715cd.6432b5d7d5647344aaf30f3cda4ef547a9b81976bd4495fc71f283ea7cb41f89.webp alt="Identity and Access Architecture for Azure Landing Zones: Entra ID, RBAC, and PIM" width=784 height=438 integrity="sha256-ZDK119Vkc0Sq8w882k71R6m4GXa9RJX8cfKD6ny0H4k=" fetchpriority=high loading=eager></div><article class="page-content p-2"><p>The security team&rsquo;s Slack message arrives on a Tuesday afternoon: &ldquo;We&rsquo;re seeing resource deletions in prod. Investigating.&rdquo; Your heart rate goes up. You pull the Azure Activity Log. The deletions are attributed to a service principal—one your team created eight months ago for a deployment pipeline. The pipeline finished its job. Nobody revoked the credential. The client secret was valid for two years.</p><p>It wasn&rsquo;t a sophisticated attack. Someone found the secret in a Git history, and the principal had Contributor on the entire subscription. Everything it could touch, they touched.</p><p>This is the failure mode that network firewalls and VPN gateways don&rsquo;t prevent. Authentication succeeded. Authorization succeeded. The blast radius was just enormous because nobody thought about what &ldquo;temporary access for a deployment pipeline&rdquo; means when the pipeline is gone but the credential isn&rsquo;t.</p><p>Your identity architecture moves away from permanent, static permissions toward a <strong>Zero Standing Access (ZSA)</strong> model. Use <strong>Privileged Identity Management (PIM)</strong> for humans and <strong>Workload Identity Federation (OIDC)</strong> for machines. Every high-privilege action becomes time-bound, auditable, and cryptographic—with no static passwords or keys in your environment.</p><h2 id=1-entra-id-vs-azure-rbac>1. Entra ID vs. Azure RBAC</h2><p>To build a secure model, you need to keep two authorization systems distinct: the identity provider (Entra ID) and the resource authorization engine (Azure RBAC).</p><h3 id=entra-id-vs-azure-rbac-boundaries>Entra ID vs. Azure RBAC Boundaries</h3><div class=mermaid-wrapper><template class=mermaid-src>flowchart TD
 subgraph Entra["[ ENTRA ID TENANT ] (Identity Provider)"]
 Roles["[ Entra ID Roles ]<br>(User Admin, Global Admin)"]
 Users["[ USERS / GROUPS / SPNs ]"]
@@ -12,7 +12,15 @@ end
 subgraph Azure["[ AZURE RESOURCES ] (Azure RBAC)"]
 RBAC["- Owner, Contributor, Reader<br>- (Scoped to MG, Sub, RG)"]
 end
-Entra -->|Trust Relationship| Azure</div><ul><li><strong>Entra ID Roles:</strong> Manage the directory (Users, Groups, Domains). Examples: <code>Global Administrator</code>, <code>User Administrator</code>.</li><li><strong>Azure RBAC Roles:</strong> Manage resources inside subscriptions. Examples: <code>Owner</code>, <code>Contributor</code>, <code>Storage Blob Data Reader</code>.</li></ul><p><strong>Security Rule:</strong> Never use Entra ID admins for daily Azure resource management. Create a dedicated <code>Platform Engineers</code> group in Entra ID and assign it Azure RBAC roles at the Management Group scope.</p><h2 id=2-privileged-identity-management-pim>2. Privileged Identity Management (PIM)</h2><p>Permanent &ldquo;Owner&rdquo; assignments are the #1 risk identified in 2026 security audits. PIM solves this by making users <strong>Eligible</strong> for a role rather than <strong>Active</strong>—they have to explicitly request access, justify it, and it expires automatically.</p><h3 id=pim-jit-activation-lifecycle>PIM JIT Activation Lifecycle</h3><div class=mermaid>sequenceDiagram
+Entra -->|Trust Relationship| Azure</template><div class=mermaid>flowchart TD
+subgraph Entra["[ ENTRA ID TENANT ] (Identity Provider)"]
+Roles["[ Entra ID Roles ]<br>(User Admin, Global Admin)"]
+Users["[ USERS / GROUPS / SPNs ]"]
+end
+subgraph Azure["[ AZURE RESOURCES ] (Azure RBAC)"]
+RBAC["- Owner, Contributor, Reader<br>- (Scoped to MG, Sub, RG)"]
+end
+Entra -->|Trust Relationship| Azure</div></div><ul><li><strong>Entra ID Roles:</strong> Manage the directory (Users, Groups, Domains). Examples: <code>Global Administrator</code>, <code>User Administrator</code>.</li><li><strong>Azure RBAC Roles:</strong> Manage resources inside subscriptions. Examples: <code>Owner</code>, <code>Contributor</code>, <code>Storage Blob Data Reader</code>.</li></ul><p><strong>Security Rule:</strong> Never use Entra ID admins for daily Azure resource management. Create a dedicated <code>Platform Engineers</code> group in Entra ID and assign it Azure RBAC roles at the Management Group scope.</p><h2 id=2-privileged-identity-management-pim>2. Privileged Identity Management (PIM)</h2><p>Permanent &ldquo;Owner&rdquo; assignments are the #1 risk identified in 2026 security audits. PIM solves this by making users <strong>Eligible</strong> for a role rather than <strong>Active</strong>—they have to explicitly request access, justify it, and it expires automatically.</p><h3 id=pim-jit-activation-lifecycle>PIM JIT Activation Lifecycle</h3><div class=mermaid-wrapper><template class=mermaid-src>sequenceDiagram
 participant Admin as Platform Admin
 participant PIM as PIM Service
 participant Sub as Azure Subscription
@@ -20,7 +28,15 @@ note over Admin: 1. User is ELIGIBLE
 Admin->>PIM: 2. Request Activation<br>(Justification + MFA)
 note over PIM: 3. Validate & Approve
 PIM->>Sub: 4. Update RBAC Assignment<br>(ACTIVE for 8 hours)
-PIM-->>Admin: 5. Access GRANTED</div><p><strong>Terraform Implementation:</strong>
+PIM-->>Admin: 5. Access GRANTED</template><div class=mermaid>sequenceDiagram
+participant Admin as Platform Admin
+participant PIM as PIM Service
+participant Sub as Azure Subscription
+note over Admin: 1. User is ELIGIBLE
+Admin->>PIM: 2. Request Activation<br>(Justification + MFA)
+note over PIM: 3. Validate & Approve
+PIM->>Sub: 4. Update RBAC Assignment<br>(ACTIVE for 8 hours)
+PIM-->>Admin: 5. Access GRANTED</div></div><p><strong>Terraform Implementation:</strong>
 Use the <code>azurerm_pim_eligible_role_assignment</code> resource to automate your platform access.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-hcl data-lang=hcl><span class=line><span class=cl><span class=k>resource</span> <span class=s2>&#34;azurerm_pim_eligible_role_assignment&#34; &#34;platform_admins&#34;</span> {
 </span></span><span class=line><span class=cl><span class=n>  scope</span>              <span class=o>=</span> <span class=s2>&#34;/providers/Microsoft.Management/managementGroups/contoso-platform&#34;</span>
 </span></span><span class=line><span class=cl><span class=n>  role_definition_id</span> <span class=o>=</span> <span class=k>data</span><span class=p>.</span><span class=k>azurerm_role_definition</span><span class=p>.</span><span class=k>owner</span><span class=p>.</span><span class=k>id</span>
@@ -33,14 +49,21 @@ Use the <code>azurerm_pim_eligible_role_assignment</code> resource to automate y
 </span></span></span><span class=line><span class=cl>    }
 </span></span><span class=line><span class=cl>  }
 </span></span><span class=line><span class=cl>}
-</span></span></code></pre></div><h2 id=3-secret-less-cicd-with-oidc>3. Secret-less CI/CD with OIDC</h2><p>Storing &ldquo;Client Secrets&rdquo; in GitHub or Azure DevOps repository settings is a legacy risk. If a secret leaks, an attacker has permanent access until someone notices and rotates it. <strong>Workload Identity Federation (OIDC)</strong> eliminates the secret entirely—your pipeline proves its identity with a short-lived cryptographic token, not a password.</p><h3 id=github-oidc-token-exchange-flow>GitHub OIDC Token Exchange Flow</h3><div class=mermaid>sequenceDiagram
+</span></span></code></pre></div><h2 id=3-secret-less-cicd-with-oidc>3. Secret-less CI/CD with OIDC</h2><p>Storing &ldquo;Client Secrets&rdquo; in GitHub or Azure DevOps repository settings is a legacy risk. If a secret leaks, an attacker has permanent access until someone notices and rotates it. <strong>Workload Identity Federation (OIDC)</strong> eliminates the secret entirely—your pipeline proves its identity with a short-lived cryptographic token, not a password.</p><h3 id=github-oidc-token-exchange-flow>GitHub OIDC Token Exchange Flow</h3><div class=mermaid-wrapper><template class=mermaid-src>sequenceDiagram
 participant GH as GitHub Actions
 participant Entra as Entra ID (Azure)
 participant Azure as Azure Resources
 GH->>Entra: 1. Request OIDC Token
 note over Entra: 2. Verify Federated Credential
 Entra-->>GH: 3. Issue Azure Access Token
-GH->>Azure: 4. Execute IaC (Bearer Token)</div><p>In 2026, use <strong>User-Assigned Managed Identities</strong> for your self-hosted runners and establish federated credentials between the runner and your GitHub Environment. Only a workflow running in your production environment branch on GitHub can acquire the production deployment token—not a developer&rsquo;s local machine, not a fork, not a branch named <code>main-copy</code>.</p><h2 id=4-constraining-administration-with-rbac-conditions>4. Constraining Administration with RBAC Conditions</h2><p>The &ldquo;Owner&rdquo; role is too powerful. It lets a user grant <em>other</em> people &ldquo;Owner&rdquo; access, which means one compromised admin can create another compromised admin. Your governance doesn&rsquo;t survive that.</p><p>In 2026, use <strong>RBAC Conditions</strong> to restrict administrative reach.</p><p><strong>Example:</strong> Grant &ldquo;Owner&rdquo; but block the ability to assign the &ldquo;Owner&rdquo; or &ldquo;User Access Administrator&rdquo; roles to anyone else. This stops privilege escalation even when an admin account is compromised.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bicep data-lang=bicep><span class=line><span class=cl><span class=kd>resource</span><span class=w> </span><span class=nv>platformOwner</span><span class=w> </span><span class=s>&#39;Microsoft.Authorization/roleAssignments@2022-04-01&#39;</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=p>{</span><span class=w>
+GH->>Azure: 4. Execute IaC (Bearer Token)</template><div class=mermaid>sequenceDiagram
+participant GH as GitHub Actions
+participant Entra as Entra ID (Azure)
+participant Azure as Azure Resources
+GH->>Entra: 1. Request OIDC Token
+note over Entra: 2. Verify Federated Credential
+Entra-->>GH: 3. Issue Azure Access Token
+GH->>Azure: 4. Execute IaC (Bearer Token)</div></div><p>In 2026, use <strong>User-Assigned Managed Identities</strong> for your self-hosted runners and establish federated credentials between the runner and your GitHub Environment. Only a workflow running in your production environment branch on GitHub can acquire the production deployment token—not a developer&rsquo;s local machine, not a fork, not a branch named <code>main-copy</code>.</p><h2 id=4-constraining-administration-with-rbac-conditions>4. Constraining Administration with RBAC Conditions</h2><p>The &ldquo;Owner&rdquo; role is too powerful. It lets a user grant <em>other</em> people &ldquo;Owner&rdquo; access, which means one compromised admin can create another compromised admin. Your governance doesn&rsquo;t survive that.</p><p>In 2026, use <strong>RBAC Conditions</strong> to restrict administrative reach.</p><p><strong>Example:</strong> Grant &ldquo;Owner&rdquo; but block the ability to assign the &ldquo;Owner&rdquo; or &ldquo;User Access Administrator&rdquo; roles to anyone else. This stops privilege escalation even when an admin account is compromised.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bicep data-lang=bicep><span class=line><span class=cl><span class=kd>resource</span><span class=w> </span><span class=nv>platformOwner</span><span class=w> </span><span class=s>&#39;Microsoft.Authorization/roleAssignments@2022-04-01&#39;</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=p>{</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nv>name</span><span class=p>:</span><span class=w> </span><span class=nf>guid</span><span class=p>(</span><span class=nv>principalId</span><span class=p>,</span><span class=w> </span><span class=s>&#39;Owner&#39;</span><span class=p>,</span><span class=w> </span><span class=nv>scope</span><span class=p>)</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nv>properties</span><span class=p>:</span><span class=w> </span><span class=p>{</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nv>roleDefinitionId</span><span class=p>:</span><span class=w> </span><span class=nf>subscriptionResourceId</span><span class=p>(</span><span class=s>&#39;Microsoft.Authorization/roleDefinitions&#39;</span><span class=p>,</span><span class=w> </span><span class=s>&#39;8e3af657-a8ff-443c-a75c-2fe8c4bcb635&#39;</span><span class=p>)</span><span class=w>
@@ -58,20 +81,54 @@ GH->>Azure: 4. Execute IaC (Bearer Token)</div><p>In 2026, use <strong>User-Assi
 </a></span><span class=px-1><a href=https://www.linkedin.com/in/larryjameshenry aria-label=linkedin><svg width="2.4em" height="2.4em" fill="#fff" aria-label="LinkedIn" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0077b5" rx="15%"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 Larry James Henry. All rights reserved.</div></div></div></footer><script defer src=/bootstrap-5/js/bootstrap.bundle.min.js></script><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script defer src=/js/search.min.c590d9a08e125edb257cb869250fd256afcfd19b0fe36691c74648d868735c21.js integrity="sha256-xZDZoI4SXtslfLhpJQ/SVq/P0ZsP42aRx0ZI2GhzXCE="></script><script type=module>
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
   
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'base',
-    themeVariables: {
+  function getThemeVariables() {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
       primaryColor: isDarkMode ? '#1c2530' : '#ffffff',
       primaryTextColor: isDarkMode ? '#e6edf3' : '#1a2332',
       primaryBorderColor: isDarkMode ? '#5eead4' : '#0f766e',
       lineColor: isDarkMode ? '#9aa7b3' : '#5b6b7c',
-      secondaryColor: isDarkMode ? '#0f766e1a' : '#0f766e1a',
+      secondaryColor: isDarkMode ? '#5eead41a' : '#0f766e1a',
       tertiaryColor: isDarkMode ? '#0f1720' : '#f4f7f9',
-      fontFamily: 'inherit',
+      fontFamily: 'inherit'
+    };
+  }
+
+  async function renderMermaid() {
+    const wrappers = document.querySelectorAll('.mermaid-wrapper');
+    for (const wrapper of wrappers) {
+      const template = wrapper.querySelector('.mermaid-src');
+      const display = wrapper.querySelector('.mermaid');
+      if (template && display) {
+        display.removeAttribute('data-processed');
+        display.innerHTML = template.innerHTML;
+      }
     }
+    
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: getThemeVariables()
+    });
+    
+    await mermaid.run({
+      querySelector: '.mermaid'
+    });
+  }
+
+  renderMermaid();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-theme') {
+        renderMermaid();
+      }
+    });
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    renderMermaid();
   });
 </script><section id=search-content class=py-2 aria-label="Search results"><div class=container id=search-results></div></section></body></html>

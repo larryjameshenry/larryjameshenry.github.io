@@ -13,14 +13,21 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nv>privateEndpointNetworkPolicies</span><span class=p>:</span><span class=w> </span><span class=s>&#39;Disabled&#39;</span><span class=w> </span><span class=c1>// Mandatory for Private Link</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
-</span></span></span></code></pre></div><p>In a hub-and-spoke topology, place the Private Endpoint in the hub&rsquo;s shared-services VNet. This allows all peered spoke VNets to reach the AI service through a single entry point, centralizing DNS and security monitoring.</p><h3 id=hub-and-spoke-networking-topology>Hub-and-Spoke Networking Topology</h3><div class=mermaid>flowchart TD
+</span></span></span></code></pre></div><p>In a hub-and-spoke topology, place the Private Endpoint in the hub&rsquo;s shared-services VNet. This allows all peered spoke VNets to reach the AI service through a single entry point, centralizing DNS and security monitoring.</p><h3 id=hub-and-spoke-networking-topology>Hub-and-Spoke Networking Topology</h3><div class=mermaid-wrapper><template class=mermaid-src>flowchart TD
 subgraph Hub["[ HUB VNET ]"]
 Snet["[ Snet-Private-Endpoints ]<br>- OpenAI Private Endpoint (10.0.1.5)<br>- Private DNS Zone"]
 end
 subgraph Spoke["[ SPOKE VNET A ]"]
 Runner["- Self-hosted GH Runner<br>- (DNS links to Hub Zone)"]
 end
-Hub -->|VNet Peering - Transit| Spoke</div><h2 id=3-provisioning-the-private-endpoint>3. Provisioning the Private Endpoint</h2><p>The most reliable way to deploy Private Link is via Bicep. You must target the <code>account</code> group ID for Azure Cognitive Services.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bicep data-lang=bicep><span class=line><span class=cl><span class=kd>resource</span><span class=w> </span><span class=nv>privateEndpoint</span><span class=w> </span><span class=s>&#39;Microsoft.Network/privateEndpoints@2023-04-01&#39;</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=p>{</span><span class=w>
+Hub -->|VNet Peering - Transit| Spoke</template><div class=mermaid>flowchart TD
+subgraph Hub["[ HUB VNET ]"]
+Snet["[ Snet-Private-Endpoints ]<br>- OpenAI Private Endpoint (10.0.1.5)<br>- Private DNS Zone"]
+end
+subgraph Spoke["[ SPOKE VNET A ]"]
+Runner["- Self-hosted GH Runner<br>- (DNS links to Hub Zone)"]
+end
+Hub -->|VNet Peering - Transit| Spoke</div></div><h2 id=3-provisioning-the-private-endpoint>3. Provisioning the Private Endpoint</h2><p>The most reliable way to deploy Private Link is via Bicep. You must target the <code>account</code> group ID for Azure Cognitive Services.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bicep data-lang=bicep><span class=line><span class=cl><span class=kd>resource</span><span class=w> </span><span class=nv>privateEndpoint</span><span class=w> </span><span class=s>&#39;Microsoft.Network/privateEndpoints@2023-04-01&#39;</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=p>{</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nv>name</span><span class=p>:</span><span class=w> </span><span class=s>&#39;pe-openai-prod&#39;</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nv>location</span><span class=p>:</span><span class=w> </span><span class=nv>location</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nv>properties</span><span class=p>:</span><span class=w> </span><span class=p>{</span><span class=w>
@@ -36,14 +43,21 @@ Hub -->|VNet Peering - Transit| Spoke</div><h2 id=3-provisioning-the-private-end
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>]</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
-</span></span></span></code></pre></div><p>If your OpenAI resource is in a different subscription than the VNet, the connection enters a &ldquo;Pending&rdquo; state and requires manual approval in the Networking blade of the OpenAI resource.</p><h2 id=4-dns-configuration-the-split-brain-pattern>4. DNS Configuration: The Split-Brain Pattern</h2><p>Private Link creates the private IP, but your applications still use the FQDN <code>your-resource.openai.azure.com</code>. Without a DNS override, that FQDN still resolves to the public IP — and your traffic fails the moment you disable public access. The Private DNS step is where most implementations fail silently.</p><h3 id=split-brain-dns-resolution>Split-Brain DNS Resolution</h3><div class=mermaid>sequenceDiagram
+</span></span></span></code></pre></div><p>If your OpenAI resource is in a different subscription than the VNet, the connection enters a &ldquo;Pending&rdquo; state and requires manual approval in the Networking blade of the OpenAI resource.</p><h2 id=4-dns-configuration-the-split-brain-pattern>4. DNS Configuration: The Split-Brain Pattern</h2><p>Private Link creates the private IP, but your applications still use the FQDN <code>your-resource.openai.azure.com</code>. Without a DNS override, that FQDN still resolves to the public IP — and your traffic fails the moment you disable public access. The Private DNS step is where most implementations fail silently.</p><h3 id=split-brain-dns-resolution>Split-Brain DNS Resolution</h3><div class=mermaid-wrapper><template class=mermaid-src>sequenceDiagram
 participant Client as Internal Client (VNet)<br>(nslookup resource.openai.com)
 participant Resolver as Azure DNS Resolver<br>(168.63.129.16)
 participant Zone as Private DNS Zone<br>(privatelink.openai.com)
 Client->>Resolver: 1. Query FQDN
 Resolver->>Zone: 2. Query Private Zone
 Zone-->>Resolver: 3. Return Private IP (10.0.1.5)
-Resolver-->>Client: 4. Resolve to 10.0.1.5</div><h3 id=private-dns-zones>Private DNS Zones</h3><p>Azure provides a specialized Private DNS Zone: <code>privatelink.openai.azure.com</code>. When you link your VNet to this zone, any query for an OpenAI resource returns the private IP. The <code>privateDnsZoneGroups</code> resource in Bicep automates the A-record registration.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bicep data-lang=bicep><span class=line><span class=cl><span class=kd>resource</span><span class=w> </span><span class=nv>dnsGroup</span><span class=w> </span><span class=s>&#39;Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01&#39;</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=p>{</span><span class=w>
+Resolver-->>Client: 4. Resolve to 10.0.1.5</template><div class=mermaid>sequenceDiagram
+participant Client as Internal Client (VNet)<br>(nslookup resource.openai.com)
+participant Resolver as Azure DNS Resolver<br>(168.63.129.16)
+participant Zone as Private DNS Zone<br>(privatelink.openai.com)
+Client->>Resolver: 1. Query FQDN
+Resolver->>Zone: 2. Query Private Zone
+Zone-->>Resolver: 3. Return Private IP (10.0.1.5)
+Resolver-->>Client: 4. Resolve to 10.0.1.5</div></div><h3 id=private-dns-zones>Private DNS Zones</h3><p>Azure provides a specialized Private DNS Zone: <code>privatelink.openai.azure.com</code>. When you link your VNet to this zone, any query for an OpenAI resource returns the private IP. The <code>privateDnsZoneGroups</code> resource in Bicep automates the A-record registration.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bicep data-lang=bicep><span class=line><span class=cl><span class=kd>resource</span><span class=w> </span><span class=nv>dnsGroup</span><span class=w> </span><span class=s>&#39;Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01&#39;</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=p>{</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nv>name</span><span class=p>:</span><span class=w> </span><span class=s>&#39;default&#39;</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nv>parent</span><span class=p>:</span><span class=w> </span><span class=nv>privateEndpoint</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nv>properties</span><span class=p>:</span><span class=w> </span><span class=p>{</span><span class=w>
@@ -74,20 +88,54 @@ Resolver-->>Client: 4. Resolve to 10.0.1.5</div><h3 id=private-dns-zones>Private
 </a></span><span class=px-1><a href=https://www.linkedin.com/in/larryjameshenry aria-label=linkedin><svg width="2.4em" height="2.4em" fill="#fff" aria-label="LinkedIn" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0077b5" rx="15%"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 Larry James Henry. All rights reserved.</div></div></div></footer><script defer src=/bootstrap-5/js/bootstrap.bundle.min.js></script><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script defer src=/js/search.min.c590d9a08e125edb257cb869250fd256afcfd19b0fe36691c74648d868735c21.js integrity="sha256-xZDZoI4SXtslfLhpJQ/SVq/P0ZsP42aRx0ZI2GhzXCE="></script><script type=module>
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
   
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'base',
-    themeVariables: {
+  function getThemeVariables() {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
       primaryColor: isDarkMode ? '#1c2530' : '#ffffff',
       primaryTextColor: isDarkMode ? '#e6edf3' : '#1a2332',
       primaryBorderColor: isDarkMode ? '#5eead4' : '#0f766e',
       lineColor: isDarkMode ? '#9aa7b3' : '#5b6b7c',
-      secondaryColor: isDarkMode ? '#0f766e1a' : '#0f766e1a',
+      secondaryColor: isDarkMode ? '#5eead41a' : '#0f766e1a',
       tertiaryColor: isDarkMode ? '#0f1720' : '#f4f7f9',
-      fontFamily: 'inherit',
+      fontFamily: 'inherit'
+    };
+  }
+
+  async function renderMermaid() {
+    const wrappers = document.querySelectorAll('.mermaid-wrapper');
+    for (const wrapper of wrappers) {
+      const template = wrapper.querySelector('.mermaid-src');
+      const display = wrapper.querySelector('.mermaid');
+      if (template && display) {
+        display.removeAttribute('data-processed');
+        display.innerHTML = template.innerHTML;
+      }
     }
+    
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: getThemeVariables()
+    });
+    
+    await mermaid.run({
+      querySelector: '.mermaid'
+    });
+  }
+
+  renderMermaid();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-theme') {
+        renderMermaid();
+      }
+    });
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    renderMermaid();
   });
 </script><section id=search-content class=py-2 aria-label="Search results"><div class=container id=search-results></div></section></body></html>

@@ -8,7 +8,7 @@ Larry James Henry</a><div><input id=search autocomplete=off class="form-control 
 </span></span></span><span class=line><span class=cl>&#34;Requirement: Deny any Azure OpenAI resource that does not have its public network access set to &#39;Disabled&#39;. 
 </span></span><span class=line><span class=cl>Target Alias: Microsoft.CognitiveServices/accounts/publicNetworkAccess. 
 </span></span><span class=line><span class=cl>Use &#39;Indexed&#39; mode and include parameters for the allowed effect.&#34;
-</span></span></code></pre></div><h2 id=2-the-policy-as-code-pipeline>2. The Policy-as-Code Pipeline</h2><p>Policies should be managed with the same rigor as application code. A <strong>Policy-as-Code</strong> repository ensures that every change is versioned, peer-reviewed, and tested before being applied at the Management Group level.</p><h3 id=the-policy-as-code-cicd-loop>The Policy-as-Code CI/CD Loop</h3><div class=mermaid>sequenceDiagram
+</span></span></code></pre></div><h2 id=2-the-policy-as-code-pipeline>2. The Policy-as-Code Pipeline</h2><p>Policies should be managed with the same rigor as application code. A <strong>Policy-as-Code</strong> repository ensures that every change is versioned, peer-reviewed, and tested before being applied at the Management Group level.</p><h3 id=the-policy-as-code-cicd-loop>The Policy-as-Code CI/CD Loop</h3><div class=mermaid-wrapper><template class=mermaid-src>sequenceDiagram
 participant Repo as GITHUB REPO<br>(policies/*.json)
 participant GH as GITHUB ACTIONS<br>(Validation CI)
 participant Azure as AZURE MGMT GROUP<br>(Enforcement)
@@ -19,7 +19,18 @@ note over GH: 3. LLM Intent Review
 GH->>Azure: [ PASSED ]
 Repo->>GH: 4. Merge to Main
 note over GH: 5. Deploy Definition<br>6. Assign Initiative
-GH->>Azure: Enforce</div><h3 id=cicd-validation>CI/CD Validation</h3><p>In your GitHub Actions workflow, use the <code>az policy definition create</code> command in a temporary scope to validate the JSON schema and rule logic. ARM will reject any definition that uses an invalid alias or incorrect nesting—which is exactly the kind of fast feedback you want before a policy reaches a Management Group.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># GitHub Actions: Validate Policy Definition</span><span class=w>
+GH->>Azure: Enforce</template><div class=mermaid>sequenceDiagram
+participant Repo as GITHUB REPO<br>(policies/*.json)
+participant GH as GITHUB ACTIONS<br>(Validation CI)
+participant Azure as AZURE MGMT GROUP<br>(Enforcement)
+Repo->>GH: 1. Commit Change
+note over GH: 2. `az policy create`<br>(Validation Only)
+GH->>Azure: Validation
+note over GH: 3. LLM Intent Review
+GH->>Azure: [ PASSED ]
+Repo->>GH: 4. Merge to Main
+note over GH: 5. Deploy Definition<br>6. Assign Initiative
+GH->>Azure: Enforce</div></div><h3 id=cicd-validation>CI/CD Validation</h3><p>In your GitHub Actions workflow, use the <code>az policy definition create</code> command in a temporary scope to validate the JSON schema and rule logic. ARM will reject any definition that uses an invalid alias or incorrect nesting—which is exactly the kind of fast feedback you want before a policy reaches a Management Group.</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># GitHub Actions: Validate Policy Definition</span><span class=w>
 </span></span></span><span class=line><span class=cl>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>Validate Policy JSON</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>run</span><span class=p>:</span><span class=w> </span><span class=p>|</span><span class=sd>
 </span></span></span><span class=line><span class=cl><span class=sd>    # Requires a Service Principal with &#39;Resource Policy Contributor&#39;
@@ -29,7 +40,7 @@ GH->>Azure: Enforce</div><h3 id=cicd-validation>CI/CD Validation</h3><p>In your 
 </span></span></span><span class=line><span class=cl><span class=sd>      --mode Indexed \
 </span></span></span><span class=line><span class=cl><span class=sd>      --only-show-errors
 </span></span></span><span class=line><span class=cl><span class=sd>    az policy definition delete --name &#34;validate-openai-policy&#34;</span><span class=w>
-</span></span></span></code></pre></div><h2 id=3-shift-left-auditing-iac-for-security-drift>3. Shift-Left: Auditing IaC for Security Drift</h2><p>Azure Policy is typically reactive—it catches a resource <em>after</em> deployment. <strong>Shift-Left Auditing</strong> uses AI to scan Bicep and Terraform files in the Pull Request, identifying compliance gaps before they trigger a policy denial.</p><h3 id=shift-left-ai-audit-flow>Shift-Left AI Audit Flow</h3><div class=mermaid>sequenceDiagram
+</span></span></span></code></pre></div><h2 id=3-shift-left-auditing-iac-for-security-drift>3. Shift-Left: Auditing IaC for Security Drift</h2><p>Azure Policy is typically reactive—it catches a resource <em>after</em> deployment. <strong>Shift-Left Auditing</strong> uses AI to scan Bicep and Terraform files in the Pull Request, identifying compliance gaps before they trigger a policy denial.</p><h3 id=shift-left-ai-audit-flow>Shift-Left AI Audit Flow</h3><div class=mermaid-wrapper><template class=mermaid-src>sequenceDiagram
 participant Dev as DEVELOPER PR
 participant Agent as AI AUDIT AGENT
 participant Policy as POLICY MANIFEST
@@ -37,7 +48,15 @@ Dev->>Agent: 1. Update Bicep
 note over Agent: 2. Decompile to JSON
 Policy-->>Agent: 3. Fetch Baseline Rules
 note over Agent: 4. Semantic Scan
-Agent-->>Dev: 5. PR Annotation<br>(Line-by-line Fixes)</div><p>By auditing the <strong>semantic intent</strong> of the code, AI can catch workarounds—like a developer adding a parameter that defaults to an insecure value—that traditional scanners miss.</p><h2 id=4-explaining-violations-in-plain-language>4. Explaining Violations in Plain Language</h2><p>The most frustrating part of compliance is seeing an error like <code>FieldValueMismatch on Microsoft.CognitiveServices/accounts/publicNetworkAccess</code>. You know something is wrong. You don&rsquo;t know what to do about it.</p><h3 id=ai-remediation-guides>AI Remediation Guides</h3><p>Pass the <code>policyState</code> record to Azure OpenAI to generate a fix guide in plain language. The translation from compliance error to actionable instruction takes seconds.</p><p><strong>Before:</strong> <code>FieldValueMismatch: publicNetworkAccess</code>
+Agent-->>Dev: 5. PR Annotation<br>(Line-by-line Fixes)</template><div class=mermaid>sequenceDiagram
+participant Dev as DEVELOPER PR
+participant Agent as AI AUDIT AGENT
+participant Policy as POLICY MANIFEST
+Dev->>Agent: 1. Update Bicep
+note over Agent: 2. Decompile to JSON
+Policy-->>Agent: 3. Fetch Baseline Rules
+note over Agent: 4. Semantic Scan
+Agent-->>Dev: 5. PR Annotation<br>(Line-by-line Fixes)</div></div><p>By auditing the <strong>semantic intent</strong> of the code, AI can catch workarounds—like a developer adding a parameter that defaults to an insecure value—that traditional scanners miss.</p><h2 id=4-explaining-violations-in-plain-language>4. Explaining Violations in Plain Language</h2><p>The most frustrating part of compliance is seeing an error like <code>FieldValueMismatch on Microsoft.CognitiveServices/accounts/publicNetworkAccess</code>. You know something is wrong. You don&rsquo;t know what to do about it.</p><h3 id=ai-remediation-guides>AI Remediation Guides</h3><p>Pass the <code>policyState</code> record to Azure OpenAI to generate a fix guide in plain language. The translation from compliance error to actionable instruction takes seconds.</p><p><strong>Before:</strong> <code>FieldValueMismatch: publicNetworkAccess</code>
 <strong>After (AI-Generated):</strong> &ldquo;Your Azure OpenAI resource &lsquo;ai-prod-01&rsquo; is non-compliant. The &lsquo;Privacy-First Blueprint&rsquo; requires that public network access be Disabled. To fix this, update line 12 of your Bicep file to set <code>publicNetworkAccess: 'Disabled'</code> or run the following Azure CLI command: <code>az cognitiveservices account update ... --public-network-access Disabled</code>.&rdquo;</p><p>This is where AI earns its place in a compliance workflow. Policy authoring is a one-time cost; violation triage happens every sprint.</p><h2 id=5-microsoft-defender-for-cloud-integration>5. Microsoft Defender for Cloud Integration</h2><p>In 2026, <strong>Microsoft Defender for Cloud (MDC)</strong> acts as the central aggregator for AI compliance. Use the <strong>Custom Recommendations</strong> feature to create findings based on Azure Resource Graph (KQL) queries.</p><pre tabindex=0><code class=language-kusto data-lang=kusto>// ARG Query: Find OpenAI resources with public access
 resources
 | where type == &#34;microsoft.cognitiveservices/accounts&#34;
@@ -51,20 +70,54 @@ resources
 </a></span><span class=px-1><a href=https://www.linkedin.com/in/larryjameshenry aria-label=linkedin><svg width="2.4em" height="2.4em" fill="#fff" aria-label="LinkedIn" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0077b5" rx="15%"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 Larry James Henry. All rights reserved.</div></div></div></footer><script defer src=/bootstrap-5/js/bootstrap.bundle.min.js></script><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script defer src=/js/search.min.c590d9a08e125edb257cb869250fd256afcfd19b0fe36691c74648d868735c21.js integrity="sha256-xZDZoI4SXtslfLhpJQ/SVq/P0ZsP42aRx0ZI2GhzXCE="></script><script type=module>
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
   
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'base',
-    themeVariables: {
+  function getThemeVariables() {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
       primaryColor: isDarkMode ? '#1c2530' : '#ffffff',
       primaryTextColor: isDarkMode ? '#e6edf3' : '#1a2332',
       primaryBorderColor: isDarkMode ? '#5eead4' : '#0f766e',
       lineColor: isDarkMode ? '#9aa7b3' : '#5b6b7c',
-      secondaryColor: isDarkMode ? '#0f766e1a' : '#0f766e1a',
+      secondaryColor: isDarkMode ? '#5eead41a' : '#0f766e1a',
       tertiaryColor: isDarkMode ? '#0f1720' : '#f4f7f9',
-      fontFamily: 'inherit',
+      fontFamily: 'inherit'
+    };
+  }
+
+  async function renderMermaid() {
+    const wrappers = document.querySelectorAll('.mermaid-wrapper');
+    for (const wrapper of wrappers) {
+      const template = wrapper.querySelector('.mermaid-src');
+      const display = wrapper.querySelector('.mermaid');
+      if (template && display) {
+        display.removeAttribute('data-processed');
+        display.innerHTML = template.innerHTML;
+      }
     }
+    
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: getThemeVariables()
+    });
+    
+    await mermaid.run({
+      querySelector: '.mermaid'
+    });
+  }
+
+  renderMermaid();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-theme') {
+        renderMermaid();
+      }
+    });
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    renderMermaid();
   });
 </script><section id=search-content class=py-2 aria-label="Search results"><div class=container id=search-results></div></section></body></html>

@@ -105,7 +105,7 @@ model User {
 </span></span><span class=line><span class=cl><span class=nx>router</span><span class=p>.</span><span class=nx>post</span><span class=p>(</span><span class=s1>&#39;/register&#39;</span><span class=p>,</span> <span class=nx>registerUser</span><span class=p>);</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=nx>module</span><span class=p>.</span><span class=nx>exports</span> <span class=o>=</span> <span class=nx>router</span><span class=p>;</span>
-</span></span></code></pre></div><p>Mount it in <code>server.js</code> with <code>app.use('/api/users', require('./routes/userRoutes'))</code> and you have a <code>/api/users/register</code> endpoint that validates input with Zod, hashes passwords at 12 salt rounds, checks for duplicate emails and usernames before insert, and never touches raw SQL — Prisma&rsquo;s parameterized queries handle sanitization by default. Written entirely by a 9B model running on your own hardware.</p><h3 id=generated-user-registration-endpoint-diagram>Generated User Registration Endpoint Diagram</h3><p>Visualizes the data flow and validation sequence of the generated User Registration endpoint, from the initial client request through middleware and the controller&rsquo;s logic layers, ending with the database insertion.</p><div class=mermaid>flowchart TD
+</span></span></code></pre></div><p>Mount it in <code>server.js</code> with <code>app.use('/api/users', require('./routes/userRoutes'))</code> and you have a <code>/api/users/register</code> endpoint that validates input with Zod, hashes passwords at 12 salt rounds, checks for duplicate emails and usernames before insert, and never touches raw SQL — Prisma&rsquo;s parameterized queries handle sanitization by default. Written entirely by a 9B model running on your own hardware.</p><h3 id=generated-user-registration-endpoint-diagram>Generated User Registration Endpoint Diagram</h3><p>Visualizes the data flow and validation sequence of the generated User Registration endpoint, from the initial client request through middleware and the controller&rsquo;s logic layers, ending with the database insertion.</p><div class=mermaid-wrapper><template class=mermaid-src>flowchart TD
 Client(["Client Request"])
 Middleware["Express Middleware\n(Rate Limiter)"]
 Controller["Controller Logic"]
@@ -120,7 +120,22 @@ Zod -- Valid --> PrismaRead
 Zod -- Invalid -.-> Return400["Return 400 Bad Request"]
 PrismaRead -- Unique --> Bcrypt
 PrismaRead -- Duplicate -.-> Return409["Return 409 Conflict"]
-Bcrypt --> Database</div><p><strong>Visual Notes:</strong></p><ul><li>The request first passes through Express middleware (Rate Limiter) before hitting the route logic.</li><li>Zod acts as a strict boundary, preventing invalid data from reaching the database driver.</li><li>The Prisma Read operation checks for uniqueness (email/username) before proceeding to the expensive Bcrypt hashing step.</li></ul><h2 id=best-practices-and-tips>Best Practices and Tips</h2><p><strong>Do:</strong></p><ul><li>Review every generated query, even Prisma ones — the ORM prevents injection, but it won&rsquo;t catch a logic error like querying the wrong table.</li><li>Use Zod (or Joi, if that&rsquo;s your stack) to strictly type every input boundary. Don&rsquo;t let <code>req.body</code> reach a controller unvalidated.</li><li>Generate the schema before the controller, every time. Feed it back explicitly in the next prompt.</li></ul><p><strong>Don&rsquo;t:</strong></p><ul><li>Let the agent write a database password, JWT secret, or connection string directly into a file. Enforce <code>process.env</code> for every credential, no exceptions.</li><li>Skip try-catch blocks around async handlers. An unhandled rejection in an Express route hangs the request instead of failing loudly.</li><li>Ask for the server, routes, controllers, and schema in a single prompt. You&rsquo;ll get truncated output and syntax errors from context degradation — not because the model is incapable, but because you handed it too much to hold at once.</li></ul><h2 id=troubleshooting-common-issues>Troubleshooting Common Issues</h2><p><strong>The agent forgets to import a module.</strong>
+Bcrypt --> Database</template><div class=mermaid>flowchart TD
+Client(["Client Request"])
+Middleware["Express Middleware\n(Rate Limiter)"]
+Controller["Controller Logic"]
+Zod{"Zod Validation\n(Strict Boundary)"}
+PrismaRead{"Prisma Read\n(Check Uniqueness)"}
+Bcrypt["Bcrypt\n(Expensive Hashing)"]
+Database[("Database\n(Insert Record)")]
+Client --> Middleware
+Middleware --> Controller
+Controller --> Zod
+Zod -- Valid --> PrismaRead
+Zod -- Invalid -.-> Return400["Return 400 Bad Request"]
+PrismaRead -- Unique --> Bcrypt
+PrismaRead -- Duplicate -.-> Return409["Return 409 Conflict"]
+Bcrypt --> Database</div></div><p><strong>Visual Notes:</strong></p><ul><li>The request first passes through Express middleware (Rate Limiter) before hitting the route logic.</li><li>Zod acts as a strict boundary, preventing invalid data from reaching the database driver.</li><li>The Prisma Read operation checks for uniqueness (email/username) before proceeding to the expensive Bcrypt hashing step.</li></ul><h2 id=best-practices-and-tips>Best Practices and Tips</h2><p><strong>Do:</strong></p><ul><li>Review every generated query, even Prisma ones — the ORM prevents injection, but it won&rsquo;t catch a logic error like querying the wrong table.</li><li>Use Zod (or Joi, if that&rsquo;s your stack) to strictly type every input boundary. Don&rsquo;t let <code>req.body</code> reach a controller unvalidated.</li><li>Generate the schema before the controller, every time. Feed it back explicitly in the next prompt.</li></ul><p><strong>Don&rsquo;t:</strong></p><ul><li>Let the agent write a database password, JWT secret, or connection string directly into a file. Enforce <code>process.env</code> for every credential, no exceptions.</li><li>Skip try-catch blocks around async handlers. An unhandled rejection in an Express route hangs the request instead of failing loudly.</li><li>Ask for the server, routes, controllers, and schema in a single prompt. You&rsquo;ll get truncated output and syntax errors from context degradation — not because the model is incapable, but because you handed it too much to hold at once.</li></ul><h2 id=troubleshooting-common-issues>Troubleshooting Common Issues</h2><p><strong>The agent forgets to import a module.</strong>
 This shows up most on longer controller functions — <code>bcrypt</code> or <code>zod</code> gets used but never required at the top of the file. Add a standing rule to your prompt or <code>AGENTS.md</code>: &ldquo;Always include all required module imports at the top of the file.&rdquo; Cheap to add, and it closes most of these gaps outright.</p><p><strong>A route hangs indefinitely on error.</strong>
 Check whether the generated <code>async</code> handler actually calls <code>next(error)</code> or returns a response inside its catch block. If it doesn&rsquo;t, the request just sits open until the client gives up. Either prompt explicitly for try-catch-with-response on every async handler, or install <code>express-async-handler</code> and have the agent wrap routes with it.</p><p><strong>The model starts hallucinating field names on a large API.</strong>
 Once you&rsquo;re past a handful of endpoints, Qwen3.5 9B can lose track of exact parameter names if you&rsquo;re relying on it to &ldquo;remember&rdquo; the schema from three prompts ago. Fix: paste the actual Zod schema or Prisma model definition into the prompt every time you ask for a new endpoint&rsquo;s controller. Don&rsquo;t assume it&rsquo;s still holding your first message.</p><h2 id=conclusion>Conclusion</h2><p>A 9-billion parameter model handles standard REST CRUD work perfectly well — routing, validation, hashing, parameterized database access, all of it, running entirely on hardware you own. The two things that make or break the output are the same two things that make or break a junior engineer&rsquo;s first sprint: you have to state your security requirements out loud instead of assuming they&rsquo;re implied, and you have to hand over one well-scoped task at a time instead of a vague mandate to &ldquo;build the backend.&rdquo; Do both, and the code that comes back is genuinely production-shaped.</p><p><strong>Next steps:</strong> test the <code>/api/users/register</code> endpoint with Postman or Bruno against a local database before you trust it, and read on to see how locking these architectural rules into a permanent <code>AGENTS.md</code> keeps every future session — not just this one — from drifting back to bad defaults.</p><p><strong>Related Articles in This Series:</strong></p><ul><li><a href=/posts/opencode-nextjs-frontend-scaffolding>Scaffolding a Modern Frontend with OpenCode and Next.js</a></li><li><a href=/posts/configuring-agents-md-web-projects>Mastering Context: Configuring AGENTS.md for Web Projects</a></li></ul><h2 id=sources>Sources</h2><ul><li><a href=https://expressjs.com/>Express.js Documentation</a></li><li><a href=https://helmetjs.github.io/>Helmet.js Security</a></li><li><a href=https://www.prisma.io/docs>Prisma Documentation</a></li><li><a href=https://zod.dev/>Zod Validation</a></li><li><a href=https://ollama.com/library/qwen>Ollama Qwen Model Library</a></li></ul></article></div></div><div class="col-sm-12 col-md-12 col-lg-3"><div id=stickySideBar class=sticky-sidebar><aside class=tags><h2 class=h5>Series</h2><ul class="tags-ul list-unstyled list-inline"><li class=list-inline-item><a href=https://larryjameshenry.com/series/architecting-real-world-web-apps-using-local-qwen3.5-9b-models target=_blank>Architecting Real-World Web Apps using Local Qwen3.5 9B Models</a></li></ul></aside><aside class=tags><h2 class=h5>Categories</h2><ul class="tags-ul list-unstyled list-inline"><li class=list-inline-item><a href=https://larryjameshenry.com/categories/ai-development target=_blank>AI Development</a></li></ul></aside><aside class=tags><h2 class=h5>Tags</h2><ul class="tags-ul list-unstyled list-inline"><li class=list-inline-item><a href=https://larryjameshenry.com/tags/backend target=_blank>Backend</a></li><li class=list-inline-item><a href=https://larryjameshenry.com/tags/express.js target=_blank>Express.js</a></li><li class=list-inline-item><a href=https://larryjameshenry.com/tags/node.js target=_blank>Node.js</a></li><li class=list-inline-item><a href=https://larryjameshenry.com/tags/opencode target=_blank>OpenCode</a></li><li class=list-inline-item><a href=https://larryjameshenry.com/tags/api target=_blank>API</a></li></ul></aside><aside class=social><h2 class=h5>Social</h2><div class=social-content><ul class=list-inline><li class="list-inline-item text-center"><a target=_blank href="https://www.linkedin.com/shareArticle?mini=true&url=https%3a%2f%2flarryjameshenry.com%2fposts%2fsecure-backend-api-qwen%2f" aria-label="Share on LinkedIn"><i class="fab fa-linkedin"></i></a></li><li class="list-inline-item text-center"><a target=_blank href="https://twitter.com/share?text=Building%20Secure%20Backend%20APIs%20using%20Qwen3.5%209B&url=https%3a%2f%2flarryjameshenry.com%2fposts%2fsecure-backend-api-qwen%2f" aria-label="Share on Twitter"><i class="fab fa-twitter"></i></a></li><li class="list-inline-item text-center"><a target=_blank href="https://api.whatsapp.com/send?text=Building%20Secure%20Backend%20APIs%20using%20Qwen3.5%209B: https%3a%2f%2flarryjameshenry.com%2fposts%2fsecure-backend-api-qwen%2f" aria-label="Share on WhatsApp"><i class="fab fa-whatsapp"></i></a></li><li class="list-inline-item text-center"><a target=_blank href='mailto:?subject=Building%20Secure%20Backend%20APIs%20using%20Qwen3.5%209B&amp;body=Check%20out%20this%20site https%3a%2f%2flarryjameshenry.com%2fposts%2fsecure-backend-api-qwen%2f' aria-label="Share via Email"><i class="fa fa-envelope"></i></a></li></ul></div></aside></div></div></div><div class=row><div class="col-sm-12 col-md-12 col-lg-9 p-4"></div></div></div><button class="p-2 px-3" onclick=topFunction() id=topScroll>
@@ -131,20 +146,54 @@ Once you&rsquo;re past a handful of endpoints, Qwen3.5 9B can lose track of exac
 </a></span><span class=px-1><a href=https://www.linkedin.com/in/larryjameshenry aria-label=linkedin><svg width="2.4em" height="2.4em" fill="#fff" aria-label="LinkedIn" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0077b5" rx="15%"/><circle cx="142" cy="138" r="37"/><path stroke="#fff" stroke-width="66" d="M244 194v198M142 194v198"/><path d="M276 282c0-20 13-40 36-40 24 0 33 18 33 45v105h66V279c0-61-32-89-76-89-34 0-51 19-59 32"/></svg></a></span></div><div class="container py-4"><div class="row justify-content-center"><div class="col-md-4 text-center">&copy; 2026 Larry James Henry. All rights reserved.</div></div></div></footer><script defer src=/bootstrap-5/js/bootstrap.bundle.min.js></script><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))});var tooltipTriggerList=[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),tooltipList=tooltipTriggerList.map(function(e){return new bootstrap.Tooltip(e)})</script><script defer src=/js/search.min.c590d9a08e125edb257cb869250fd256afcfd19b0fe36691c74648d868735c21.js integrity="sha256-xZDZoI4SXtslfLhpJQ/SVq/P0ZsP42aRx0ZI2GhzXCE="></script><script type=module>
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs';
   
-  const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'base',
-    themeVariables: {
+  function getThemeVariables() {
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                       window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return {
       primaryColor: isDarkMode ? '#1c2530' : '#ffffff',
       primaryTextColor: isDarkMode ? '#e6edf3' : '#1a2332',
       primaryBorderColor: isDarkMode ? '#5eead4' : '#0f766e',
       lineColor: isDarkMode ? '#9aa7b3' : '#5b6b7c',
-      secondaryColor: isDarkMode ? '#0f766e1a' : '#0f766e1a',
+      secondaryColor: isDarkMode ? '#5eead41a' : '#0f766e1a',
       tertiaryColor: isDarkMode ? '#0f1720' : '#f4f7f9',
-      fontFamily: 'inherit',
+      fontFamily: 'inherit'
+    };
+  }
+
+  async function renderMermaid() {
+    const wrappers = document.querySelectorAll('.mermaid-wrapper');
+    for (const wrapper of wrappers) {
+      const template = wrapper.querySelector('.mermaid-src');
+      const display = wrapper.querySelector('.mermaid');
+      if (template && display) {
+        display.removeAttribute('data-processed');
+        display.innerHTML = template.innerHTML;
+      }
     }
+    
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: getThemeVariables()
+    });
+    
+    await mermaid.run({
+      querySelector: '.mermaid'
+    });
+  }
+
+  renderMermaid();
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'data-theme') {
+        renderMermaid();
+      }
+    });
+  });
+  observer.observe(document.documentElement, { attributes: true });
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    renderMermaid();
   });
 </script><section id=search-content class=py-2 aria-label="Search results"><div class=container id=search-results></div></section></body></html>
