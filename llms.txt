@@ -2,6 +2,8 @@
 
 > Expert technical guides on Azure Platform Engineering, DevOps, and PowerShell automation by Larry James Henry.
 
+Last updated: 2026-09-17
+
 About the author: [About Larry James Henry](https://larryjameshenry.com/about/)
 
 ## Architecting Real-World Web Apps using Local Qwen3.5 9B Models
