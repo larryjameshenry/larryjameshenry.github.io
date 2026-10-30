@@ -6,6 +6,15 @@ Last updated: 2026-10-27
 
 About the author: [About Larry James Henry](https://larryjameshenry.com/about/)
 
+## Architecting Real-World Web Apps using Local Qwen3.5 9B Models
+
+- [The Architect's Guide to Building Web Apps with Local AI: OpenCode on an 8GB GPU](https://larryjameshenry.com/posts/local-ai-opencode-guide/): A comprehensive guide to replacing cloud-based AI with a fully local stack (OpenCode, Qwen3.5 9B, Ollama) to architect and build a full-stack web app from scratch.
+- [Scaffolding a Modern Frontend with OpenCode and Next.js](https://larryjameshenry.com/posts/opencode-nextjs-frontend-scaffolding/): A focused guide on using the OpenCode terminal agent to generate a production-ready Next.js frontend and style it entirely offline using local AI.
+- [Building Secure Backend APIs using Qwen3.5 9B](https://larryjameshenry.com/posts/secure-backend-api-qwen/): Use the Qwen3.5 9B model via Ollama to design, write, and document an Express.js REST API offline, without shipping proprietary schemas to a cloud LLM.
+- [Mastering Context: Configuring AGENTS.md for Web Projects](https://larryjameshenry.com/posts/configuring-agents-md-web-projects/): Configure OpenCode's AGENTS.md to define architectural rules, coding standards, and persistent memory for your local AI on web projects.
+- [Iterative Debugging: Fixing Hallucinations in 9B Local Agents](https://larryjameshenry.com/posts/debugging-9b-agent-hallucinations/): Learn practical techniques for managing the agentic loop, identifying AI hallucinations, and fixing bugs iteratively with OpenCode.
+- [Integrating MCP (Model Context Protocol) with OpenCode for Web Dev](https://larryjameshenry.com/posts/integrating-mcp-opencode-web/): An advanced guide on extending OpenCode's capabilities by connecting it to external tools and databases using the Model Context Protocol (MCP).
+
 ## Azure DevOps YAML Expression Masterclass
 
 - [The Ultimate Guide to Azure DevOps YAML Expressions: Never Fail a Condition Again](https://larryjameshenry.com/posts/ultimate-guide-yaml-expressions/): How Azure DevOps evaluates ${{ }}, $[ ] and $( ), and how to write pipeline conditions that hold up across governed, multi-team CI/CD platforms.
@@ -44,6 +53,14 @@ About the author: [About Larry James Henry](https://larryjameshenry.com/about/)
 - [AI-Driven Secrets Scanning: Protecting the Pipeline from Hallucinated Credentials](https://larryjameshenry.com/posts/ai-driven-secrets-scanning-protecting-pipeline-hallucinated-credentials/): Configure GHAS secret scanning, push protection, and Copilot Autofix to catch both real leaked secrets and AI-hallucinated credentials before they reach production.
 - [The AI SRE Blueprint: Securely Automating Incident Response on Azure](https://larryjameshenry.com/posts/the-ai-sre-blueprint-securely-automating-incident-response-on-azure/): Architect AI agents that autonomously investigate and remediate Azure incidents within least-privilege boundaries, with human-in-the-loop gates for production actions.
 - [Continuous Compliance: Using AI to Generate and Audit Azure Policy](https://larryjameshenry.com/posts/continuous-compliance-using-ai-to-generate-and-audit-azure-policy/): Use Azure OpenAI to draft custom Azure Policy definitions, audit IaC for compliance drift, and explain policy violations — all integrated into a GitOps CI/CD pipeline.
+
+## The Local AI Coding Revolution: Getting Started with OpenCode
+
+- [The Ultimate Guide to Local AI Coding with OpenCode and Ollama](https://larryjameshenry.com/posts/ultimate-guide-local-ai-coding/): A comprehensive, end-to-end guide on moving from cloud-based AI assistants to a fully local, private, terminal-based AI coding stack using OpenCode.
+- [Hardware & VRAM Guide for Local Code LLMs](https://larryjameshenry.com/posts/hardware-vram-guide-local-code-llms/): A deep dive into the hardware requirements for local AI coding, focusing on VRAM, quantization (Q4_K_M), and the 8GB rule for 9B models.
+- [Installing and Configuring Ollama for Code Generation](https://larryjameshenry.com/posts/installing-configuring-ollama-code-generation/): A focused guide on setting up Ollama, pulling the best models for coding, and optimizing the Modelfile for context window management.
+- [Mastering the OpenCode Terminal User Interface](https://larryjameshenry.com/posts/mastering-opencode-tui/): A practical tutorial on installing OpenCode, navigating its TUI, and using slash commands to generate code and manage files directly from your terminal.
+- [The Enterprise Case: Security and Privacy with Local AI](https://larryjameshenry.com/posts/enterprise-case-security-privacy-local-ai/): An analysis of the data security benefits of local AI coding, explaining how keeping code off third-party servers solves major compliance headaches.
 
 ## The Shift-Left Container Security Playbook
 
